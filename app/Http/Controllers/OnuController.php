@@ -11,10 +11,20 @@ class OnuController extends Controller
     public function getData()
     {
         $data = DB::table('onus')
-                ->join('olts', 'onus.olt_id', 'olts.idOlt')
-                ->select('onus.id', 'onus.name', 'olts.name as olt')
-                ->get();
+            ->join('olts', 'onus.olt_id', 'olts.idOlt')
+            ->select('onus.id', 'onus.name', 'olts.name as olt')
+            ->get();
         return response()->json(['data' => $data], 200);
+    }
+    public function paginater()
+    {
+        $data = DB::table('onus')
+            ->join('olts', 'onus.olt_id', 'olts.idOlt')
+            ->join('odbs', 'onus.odb_id', 'odbs.idOdb')
+            ->join('zones', 'onus.zone_id', 'zones.idZone')
+            ->select('onus.id', 'onus.name', 'onus.sn', 'zones.name as zone', DB::raw("CONCAT(olts.name, ' ',onus.onu) as onu"), 'odbs.name as odb')
+            ->paginate(8);
+        return response()->json($data, 200);
     }
 
     public function store(Request $request)
