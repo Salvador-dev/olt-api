@@ -12,7 +12,9 @@ class OnuController extends Controller
     {
         $data = DB::table('onus')
                 ->join('olts', 'onus.olt_id', 'olts.idOlt')
-                ->select('onus.id', 'onus.name', 'olts.name as olt')
+                ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
+                ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
+                ->select('onus.id', 'onus.name', 'olts.name as olt', 'onus.sn', 'zones.name as zone', 'odbs.name as odb')
                 ->get();
         return response()->json(['data' => $data], 200);
     }

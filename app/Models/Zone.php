@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Zone extends Model
+{
+    use HasFactory;
+    protected $primaryKey = 'idZone';
+    protected $table = 'zones';
+    protected $fillable = [
+        'name'
+    ];
+
+    public function onus(){
+        return $this->hasMany(Onus::class);
+    }
+}

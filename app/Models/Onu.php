@@ -18,4 +18,8 @@ class Onu extends Model
     public function speedProfile(){
         return $this->belongsTo(SpeedProfile::class);
     }
+
+    public function zone(){
+        return $this->belongsTo(Zone::class);
+    }
 }
