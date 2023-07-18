@@ -58,7 +58,7 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.id', 'onus.name', 'olts.name as olt', 'onus.sn', 'zones.name as zone', 'odbs.name as odb', 'onus.vlan', 'onus.tv', 'onus.type', 'onus.onu')
+            ->select('onus.id', 'onus.name', 'olts.name as olt', 'onus.sn', 'zones.name as zone', 'odbs.name as odb', 'onus.vlan', 'onus.tv', 'onus.type', 'onus.onu', 'onus.voip', 'onus.authorization_date')
             ->where('olts.idOlt', $id)
             ->get();
         return response()->json(['data' => $data], 200);
