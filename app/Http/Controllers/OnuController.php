@@ -14,18 +14,19 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.*','olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
+            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
             ->get();
         return response()->json(['data' => $data], 200);
     }
+
     public function paginater()
     {
         $data = DB::table('onus')
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.*','olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
-            ->paginate(5);
+            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
+            ->paginate(10);
         return response()->json($data, 200);
     }
 
@@ -68,7 +69,7 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.*','olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
+            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
             ->where('olts.idOlt', $id)
             ->get();
         return response()->json(['data' => $data], 200);
