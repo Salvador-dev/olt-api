@@ -14,9 +14,19 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.id', 'onus.name', 'olts.name as olt', 'onus.sn', 'zones.name as zone', 'odbs.name as odb', 'onus.vlan', 'onus.tv', 'onus.type', 'onus.onu', 'onus.voip', 'onus.authorization_date', 'onus.status')
+            ->select('onus.*','olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
             ->get();
         return response()->json(['data' => $data], 200);
+    }
+    public function paginater()
+    {
+        $data = DB::table('onus')
+            ->join('olts', 'onus.olt_id', 'olts.idOlt')
+            ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
+            ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
+            ->select('onus.*','olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
+            ->paginate(5);
+        return response()->json($data, 200);
     }
 
     public function store(Request $request)
@@ -58,7 +68,7 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.id', 'onus.name', 'olts.name as olt', 'onus.sn', 'zones.name as zone', 'odbs.name as odb', 'onus.vlan', 'onus.tv', 'onus.type', 'onus.onu', 'onus.voip', 'onus.authorization_date')
+            ->select('onus.*','olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
             ->where('olts.idOlt', $id)
             ->get();
         return response()->json(['data' => $data], 200);
