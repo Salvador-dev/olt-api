@@ -27,7 +27,7 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
+            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb', DB::raw("CONCAT(olts.name, ' ',onus.pon_type, ' ', onus.name) as onu"))
             ->paginate(10);
         return response()->json($data, 200);
     }
