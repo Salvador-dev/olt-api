@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Onu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +15,8 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
+            ->leftJoin('onuTypes', 'onus.onu_type_id', 'onuTypes.idOnuType')
+            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb', 'onu')
             ->get();
         return response()->json(['data' => $data], 200);
     }
