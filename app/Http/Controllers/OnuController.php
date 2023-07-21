@@ -47,7 +47,14 @@ class OnuController extends Controller
 
     public function show($id)
     {
-        $data = DB::table('onus')->where('id', $id)->get();
+        $data = DB::table('onus')
+            ->join('olts', 'onus.olt_id', 'olts.idOlt')
+            ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
+            ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
+            ->leftJoin('onu_types', 'onus.onu_type', 'onu_types.idOnuType')
+            ->where('onus.id', $id)
+            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
+            ->get();
         return response()->json(['data' => $data], 200);
     }
 
