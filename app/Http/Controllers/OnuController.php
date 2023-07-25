@@ -51,7 +51,7 @@ class OnuController extends Controller
             ->join('olts', 'onus.olt_id', 'olts.idOlt')
             ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
             ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->leftJoin('speed_profiles', 'onus.speed_profile_id', 'speed_profiles.idSpeedProfile ')
+            ->leftJoin('speed_profiles', 'onus.speed_profile_id', 'speed_profiles.idSpeedProfile')
             ->leftJoin('onu_types', 'onus.onu_type', 'onu_types.idOnuType')
             ->where('onus.id', $id)
             ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb', 'speed_profiles.name as speed')
