@@ -21,6 +21,6 @@ class SpeedProfile extends Model
     ];
 
     public function onus(){
-        return $this->hasMany(Onu::class, 'speed_profile_id');
+        return $this->hasMany(Onu::class, 'speed_up_id', 'speed_download_id');
     }
 }

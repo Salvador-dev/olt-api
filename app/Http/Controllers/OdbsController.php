@@ -10,8 +10,8 @@ class OdbsController extends Controller
     //
     public function getData()
     {
-        $data = DB::table('zones')
-                ->join('odbs', 'zones.idZone', '=', 'odbs.zone_id')    
+        $data = DB::table('odbs')
+                ->join('zones', 'odbs.zone_id', '=', 'zones.idZone')    
                 ->select('odbs.idOdb', 'zones.name as zone', 'odbs.numPorts', 'odbs.name')
                 ->get();
         return response()->json(['data' => $data], 200);
