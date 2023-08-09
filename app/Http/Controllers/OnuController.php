@@ -5,24 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Onu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class OnuController extends Controller
 {
     //
     public function getData()
     {
-        $data = DB::table('onus')
-            ->join('olts', 'onus.olt_id', 'olts.idOlt')
-            ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
-            ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->leftJoin('speed_profiles as speedUp', 'onus.speed_up_id', 'speedUp.idSpeedProfile')
-            ->leftJoin('speed_profiles as speedDownload', 'onus.speed_download_id', 'speedDownload.idSpeedProfile')
-            ->leftJoin('onu_types', 'onus.onu_type', 'onu_types.idOnuType')
-            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb', 'speedUp.name as speed_up_name', 'speedDownload.name as speed_download_name')
-            ->get();
-
-        //$data = Onu::with(['olt', 'speedProfileUp', 'speedProfileDownload', 'zone', 'ports'])->get();
-        return response()->json(['data' => $data], 200);
+        $data = Cache::get('onus');
+        return response()->json($data, 200);
     }
 
     public function paginater()
