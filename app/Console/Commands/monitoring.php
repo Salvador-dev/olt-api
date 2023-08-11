@@ -33,13 +33,13 @@ class monitoring extends Command
         $olts = Http::get(env('API_URL') . '/get_olts');
         $data = json_decode($olts[0]);
         $arr = $data->response;
+        Cache::put('olts', $arr);
 
         $olt_ids = [];
         $onus = [];
 
         if ($arr) {
-            $fechadevencimiento = \Carbon\Carbon::now()->addMinutes(1);
-            Cache::put('onus', $onus, $fechadevencimiento);
+            Cache::put('onus', $onus);
 
 
             foreach ($arr as $id_olt) {

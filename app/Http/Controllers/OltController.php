@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Olt;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OltController extends Controller
@@ -11,7 +12,7 @@ class OltController extends Controller
     //
     public function getData()
     {
-        $data = DB::table('olts')->get();
+        $data = Cache::get('olts');
         return response()->json(['data' => $data], 200);
     }
 
