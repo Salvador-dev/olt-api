@@ -113,12 +113,13 @@ class OnuController extends Controller
     public function show($id)
     {
         $onus = Cache::get('onus');
-
-        $data = Arr::where($onus, function ($value, $key) use ($id) {
+        $data = array();
+        
+        $filter = Arr::where($onus, function ($value, $key) use ($id) {
             return $value->unique_external_id == $id;
         });
-
-        $data = array_merge($data, $data);
+        
+        $data = array_merge($data, $filter);
 
         return response()->json(['data' => $data], 200);
     }
