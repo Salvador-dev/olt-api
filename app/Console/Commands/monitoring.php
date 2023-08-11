@@ -35,8 +35,8 @@ class monitoring extends Command
         $arr = $data->response;
         Cache::put('olts', $arr);
 
-        $olt_ids = [];
-        $onus = [];
+        $olt_ids = array();
+        $onus = array();
 
         if ($arr) {
             Cache::put('onus', $onus);
@@ -55,7 +55,7 @@ class monitoring extends Command
                 $res = json_decode($res->getBody(), true);
                 $res = json_decode($res[0]);
                 $res = $res->onus;
-                array_push($onus, $res);
+                $onus = array_merge($onus, $res);
                 Cache::set('onus', $onus);
             }
         }

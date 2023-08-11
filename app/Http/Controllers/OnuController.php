@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Onu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -12,25 +13,9 @@ class OnuController extends Controller
     //
     public function getData()
     {
-        $data = array();
-        $onus = Cache::get('onus');
 
-        foreach ($onus as $onu) {
-            $data = array_merge($data, $onu);
-        }
-
+        $data = Cache::get('onus');
         return response()->json(['data' => $data], 200);
-    }
-
-    public function paginater()
-    {
-        $data = DB::table('onus')
-            ->join('olts', 'onus.olt_id', 'olts.idOlt')
-            ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
-            ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb', DB::raw("CONCAT(olts.name, ' ',onus.pon_type, ' ', onus.name) as onu"))
-            ->paginate(10);
-        return response()->json($data, 200);
     }
 
     public function store(Request $request)
@@ -121,18 +106,11 @@ class OnuController extends Controller
 
     public function show($id)
     {
-        $data = DB::table('onus')
-            ->join('olts', 'onus.olt_id', 'olts.idOlt')
-            ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
-            ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->leftJoin('speed_profiles as speedUp', 'onus.speed_up_id', 'speedUp.idSpeedProfile')
-            ->leftJoin('speed_profiles as speedDownload', 'onus.speed_download_id', 'speedDownload.idSpeedProfile')
-            ->leftJoin('onu_types', 'onus.onu_type', 'onu_types.idOnuType')
-            ->where('onus.id', $id)
-            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb', 'speedUp.name as speed_up_name', 'speedDownload.name as speed_download_name')
-            ->get();
+        $onus = Cache::get('onus');
 
-        //$data = Onu::where('id', $id)->with(['olt', 'speedProfileUp', 'speedProfileDownload', 'zone', 'ports'])->first();
+        $data = Arr::where($onus, function ($value, $key) use ($id) {
+            return $value->unique_external_id == $id;
+        });
 
         return response()->json(['data' => $data], 200);
     }

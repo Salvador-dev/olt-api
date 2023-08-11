@@ -51,7 +51,6 @@ Route::get('/onus/{id}', [OnuController::class, 'show']);
 Route::patch('/onus/{id}', [OnuController::class, 'update']);
 Route::delete('/onus/{id}', [OnuController::class, 'destroy']);
 Route::get('/onus/showbyOlt/{olt}', [OnuController::class, 'showByOlt']);
-Route::get('/onus', [OnuController::class, 'paginater']);
 
 
 Route::get('/speed_profiles/listing', [SpeedProfileController::class, 'getData']);
