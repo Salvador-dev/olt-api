@@ -51,7 +51,7 @@ Route::get('/onus/{id}', [OnuController::class, 'show']);
 Route::patch('/onus/{id}', [OnuController::class, 'update']);
 Route::delete('/onus/{id}', [OnuController::class, 'destroy']);
 Route::get('/onus/showbyOlt/{olt}', [OnuController::class, 'showByOlt']);
-
+Route::get('/onus_unconfigured', [OnuController::class, 'onusUnconfigureds']);
 
 Route::get('/speed_profiles/listing', [SpeedProfileController::class, 'getData']);
 Route::post('/speed_profiles', [SpeedProfileController::class, 'store']);
@@ -65,7 +65,7 @@ Route::get('/olts/{id}', [OltController::class, 'show']);
 Route::patch('/olts/{id}', [OltController::class, 'update']);
 Route::delete('/olts/{id}', [OltController::class, 'destroy']);
 Route::get('/olts', [OltController::class, 'paginater']);
-Route::get('/olts/search/{search}', [OltController::class, 'search']);
+Route::get('/get_olts_uptime_and_env_temperature', [OltController::class, 'getOltTemperature']);
 
 Route::get('/onuTypes/listing', [OnuTypesController::class, 'getData']);
 Route::post('/onuTypes', [onuTypesController::class, 'store']);

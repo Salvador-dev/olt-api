@@ -30,6 +30,7 @@ class monitoring extends Command
      */
     public function handle()
     {
+        // get OLTs
         $olts = Http::get(env('API_URL') . '/get_olts');
         $data = json_decode($olts[0]);
         $arr = $data->response;
@@ -37,6 +38,15 @@ class monitoring extends Command
 
         $olt_ids = array();
         $onus = array();
+
+        // get ONUS unconfigured
+        $client = new Client();
+        $request = new Request('GET', env('API_URL') . '/unconfigured_onus');
+        $res = $client->sendAsync($request)->wait();
+        $res = json_decode($res->getBody(), true);
+        $res = json_decode($res[0]);
+        $res = $res->response;
+        Cache::put('onusUnconfigured', $res);
 
         if ($arr) {
             Cache::put('onus', $onus);
@@ -48,9 +58,9 @@ class monitoring extends Command
 
 
             for ($i = 0; $i < 10; $i++) {
-                
+
                 $client = new Client();
-                $request = new Request('GET', env('API_URL3') . '/get_all_onus_details/'. $olt_ids[$i], ['Accept' => 'application/json']);
+                $request = new Request('GET', env('API_URL3') . '/get_all_onus_details/' . $olt_ids[$i], ['Accept' => 'application/json']);
                 $res = $client->sendAsync($request)->wait();
                 $res = json_decode($res->getBody(), true);
                 $res = json_decode($res[0]);

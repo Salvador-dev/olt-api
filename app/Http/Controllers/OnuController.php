@@ -3,18 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Onu;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 
 class OnuController extends Controller
 {
     //
     public function getData()
     {
-
         $data = Cache::get('onus');
+        return response()->json(['data' => $data], 200);
+    }
+
+    public function onusUnconfigureds()
+    {
+        $data = Cache::get('onusUnconfigured');
         return response()->json(['data' => $data], 200);
     }
 
@@ -111,6 +117,8 @@ class OnuController extends Controller
         $data = Arr::where($onus, function ($value, $key) use ($id) {
             return $value->unique_external_id == $id;
         });
+
+        $data = array_merge($data, $data);
 
         return response()->json(['data' => $data], 200);
     }

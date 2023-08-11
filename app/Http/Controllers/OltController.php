@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Olt;
-use Illuminate\Http\Request;
+//use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Http;
 
 class OltController extends Controller
 {
@@ -49,7 +52,7 @@ class OltController extends Controller
 
     public function show($id)
     {
-        $data = Olt::where('idOlt',$id)->with('onus')->first();
+        $data = Olt::where('idOlt', $id)->with('onus')->first();
         return response()->json(['data' => $data], 200);
     }
 
@@ -78,9 +81,15 @@ class OltController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    public function search($query)
+    public function getOltTemperature()
     {
-        $data = DB::table('olts')->where('name', 'LIKE', '%'. $query. '%')->get();
+        /*         $client = new Client();
+        $request = new Request('GET', env('API_URL') . '/get_olts_uptime_and_env_temperature');
+        $res = $client->sendAsync($request)->wait();
+        $res = $res->getBody(); */
+
+        $data = [];
+
         return response()->json(['data' => $data], 200);
     }
 }
