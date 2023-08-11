@@ -12,8 +12,14 @@ class OnuController extends Controller
     //
     public function getData()
     {
-        $data = Cache::get('onus');
-        return response()->json($data, 200);
+        $data = array();
+        $onus = Cache::get('onus');
+
+        foreach ($onus as $onu) {
+            $data = array_merge($data, $onu);
+        }
+
+        return response()->json(['data' => $data], 200);
     }
 
     public function paginater()

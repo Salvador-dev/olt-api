@@ -48,6 +48,7 @@ class monitoring extends Command
 
 
             for ($i = 0; $i < 10; $i++) {
+                
                 $client = new Client();
                 $request = new Request('GET', env('API_URL3') . '/get_all_onus_details/'. $olt_ids[$i], ['Accept' => 'application/json']);
                 $res = $client->sendAsync($request)->wait();
