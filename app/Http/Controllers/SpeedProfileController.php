@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\SpeedProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class SpeedProfileController extends Controller
 {
     //
     public function getData()
     {
-        $data = SpeedProfile::with('onus')->get();
+        $data = Cache::get('speed_profiles');
         return response()->json(['data' => $data], 200);
     }
 
+    // Pendiente por corregir
     public function store(Request $request)
     {
         $request->validate([
@@ -37,10 +41,19 @@ class SpeedProfileController extends Controller
 
     public function show($id)
     {
-        $data = DB::table('speed_profiles')->where('idSpeedProfile', $id)->get();
+        $speed_profiles = Cache::get('speed_profiles');
+        $data = array();
+        
+        $filter = Arr::where($speed_profiles, function ($value, $key) use ($id) {
+            return $value->id == $id;
+        });
+        
+        $data = array_merge($data, $filter);
+
         return response()->json(['data' => $data], 200);
     }
 
+    // Pendiente por corregir
     public function update(Request $request, $id)
     {
         $data = DB::table('speed_profiles')->where('idSpeedProfile', $id)->update([
@@ -54,6 +67,7 @@ class SpeedProfileController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
+    // Pendiente por corregir
     public function destroy($id)
     {
         $data = DB::table('speed_profiles')->where('idSpeedProfile', $id)->delete();

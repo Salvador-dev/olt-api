@@ -32,12 +32,21 @@ class monitoring extends Command
     {
         // get OLTs
         $olts = Http::get(env('API_URL') . '/get_olts');
-        $data = json_decode($olts[0]);
-        $arr = $data->response;
-        Cache::put('olts', $arr);
+        $olts = json_decode($olts[0]);
+        $olts = $olts->response;
+        Cache::put('olts', $olts);
 
-        $olt_ids = array();
-        $onus = array();
+        // get Zones
+        $zones = Http::get(env('API_URL') . '/get_zones');
+        $zones = json_decode($zones[0]);
+        $zones = $zones->response;
+        Cache::put('zones', $zones);
+
+        // get speed profiles
+        $speed_profiles = Http::get(env('API_URL') . '/get_speed_profiles');
+        $speed_profiles = json_decode($speed_profiles[0]);
+        $speed_profiles = $speed_profiles->response;
+        Cache::put('speed_profiles', $speed_profiles);
 
         // get ONUS unconfigured
         $client = new Client();
@@ -48,17 +57,18 @@ class monitoring extends Command
         $res = $res->response;
         Cache::put('onusUnconfigured', $res);
 
-        if ($arr) {
+        // get ONUS List
+        $onus = array();
+
+        if ($olts) {
             Cache::put('onus', $onus);
+            $olt_ids = array();
 
-
-            foreach ($arr as $id_olt) {
+            foreach ($olts as $id_olt) {
                 array_push($olt_ids, $id_olt->id);
             }
 
-
             for ($i = 0; $i < 10; $i++) {
-
                 $client = new Client();
                 $request = new Request('GET', env('API_URL3') . '/get_all_onus_details/' . $olt_ids[$i], ['Accept' => 'application/json']);
                 $res = $client->sendAsync($request)->wait();
