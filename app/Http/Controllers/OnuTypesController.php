@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OnuTypesController extends Controller
@@ -10,10 +12,7 @@ class OnuTypesController extends Controller
     //
     public function getData()
     {
-        $data = DB::table('onu_types')
-            ->leftJoin('capabilitys', 'onu_types.capability_id', 'capabilitys.idCapability')
-            ->select('onu_types.idOnuType', 'onu_types.name', 'capabilitys.name as capability', 'onu_types.voipPorts', 'onu_types.ponType', 'onu_types.ethernetPorts', 'onu_types.wifi', 'onu_types.catv', 'onu_types.customProfile')
-            ->get();
+        $data = Cache::get('onu_types');
         return response()->json(['data' => $data], 200);
     }
 
@@ -43,7 +42,14 @@ class OnuTypesController extends Controller
 
     public function show($id)
     {
-        $data = DB::table('onu_types')->where('idOnuType', $id)->get();
+        $onu_types = Cache::get('onu_types');
+        $data = array();
+
+        $filter = Arr::where($onu_types, function ($value, $key) use ($id) {
+            return $value->id == $id;
+        });
+
+        $data = array_merge($data, $filter);
         return response()->json(['data' => $data], 200);
     }
 

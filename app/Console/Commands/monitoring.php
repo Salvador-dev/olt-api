@@ -48,6 +48,12 @@ class monitoring extends Command
         $speed_profiles = $speed_profiles->response;
         Cache::put('speed_profiles', $speed_profiles);
 
+        // get onu_types
+        $onu_types = Http::get(env('API_URL') . '/get_onu_types');
+        $onu_types = json_decode($onu_types[0]);
+        $onu_types = $onu_types->response;
+        Cache::put('onu_types', $onu_types);
+
         // get ONUS unconfigured
         $client = new Client();
         $request = new Request('GET', env('API_URL') . '/unconfigured_onus');
