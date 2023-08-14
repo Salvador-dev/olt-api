@@ -140,13 +140,15 @@ class OnuController extends Controller
 
     public function showByOlt($id)
     {
-        $data = DB::table('onus')
-            ->join('olts', 'onus.olt_id', 'olts.idOlt')
-            ->leftJoin('zones', 'onus.zone_id', 'zones.idZone')
-            ->leftJoin('odbs', 'onus.odb_id', 'odbs.idOdb')
-            ->select('onus.*', 'olts.name as olt', 'zones.name as zone', 'odbs.name as odb')
-            ->where('olts.idOlt', $id)
-            ->get();
+        $onus = Cache::get('onus');
+        $data = array();
+        
+        $filter = Arr::where($onus, function ($value, $key) use ($id) {
+            return $value->olt_id == $id;
+        });
+        
+        $data = array_merge($data, $filter);
+
         return response()->json(['data' => $data], 200);
     }
 }
