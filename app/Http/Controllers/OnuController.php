@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Onu;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -114,11 +115,11 @@ class OnuController extends Controller
     {
         $onus = Cache::get('onus');
         $data = array();
-        
+
         $filter = Arr::where($onus, function ($value, $key) use ($id) {
             return $value->unique_external_id == $id;
         });
-        
+
         $data = array_merge($data, $filter);
 
         return response()->json(['data' => $data], 200);
@@ -142,13 +143,30 @@ class OnuController extends Controller
     {
         $onus = Cache::get('onus');
         $data = array();
-        
+
         $filter = Arr::where($onus, function ($value, $key) use ($id) {
             return $value->olt_id == $id;
         });
-        
+
         $data = array_merge($data, $filter);
 
+        return response()->json(['data' => $data], 200);
+    }
+
+    public function getOnuFullStatus($extenal_id)
+    {
+
+        try {
+            $client = new Client();
+            $request = new Request('GET', env('API_URL2') . '/get_onu_full_status_info/' . $extenal_id);
+            $res = $client->sendAsync($request)->wait();
+            $res = json_decode($res->getBody(), true);
+            $res = json_decode($res[0]);
+            $data = $res->full_status_info;
+        } catch (Exception $e) {
+            return response()->json(['error' => $e], 500);
+        }
+        
         return response()->json(['data' => $data], 200);
     }
 }

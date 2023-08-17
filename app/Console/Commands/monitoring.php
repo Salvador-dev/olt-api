@@ -83,8 +83,11 @@ class monitoring extends Command
                 $res = $res->onus;
                 $onus = array_merge($onus, $res);
                 Cache::set('onus', $onus);
+                sleep(0.2);
             }
         }
+
+        $this->info("Proceso culminado con exito!");
 
         return Command::SUCCESS;
     }
