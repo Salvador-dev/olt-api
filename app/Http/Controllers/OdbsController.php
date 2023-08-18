@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class OdbsController extends Controller
 {
     //
     public function getData()
     {
-        $data = DB::table('odbs')
-                ->join('zones', 'odbs.zone_id', '=', 'zones.idZone')    
-                ->select('odbs.idOdb', 'zones.name as zone', 'odbs.numPorts', 'odbs.name')
-                ->get();
+        $data = Cache::get('odbs');
         return response()->json(['data' => $data], 200);
     }
 
@@ -38,7 +38,14 @@ class OdbsController extends Controller
 
     public function show($id)
     {
-        $data = DB::table('odbs')->where('idOdb', $id)->get();
+        $odbs = Cache::get('odbs');
+        $data = array();
+
+        $filter = Arr::where($odbs, function ($value, $key) use ($id) {
+            return $value->id == $id;
+        });
+
+        $data = array_merge($data, $filter);
         return response()->json(['data' => $data], 200);
     }
 

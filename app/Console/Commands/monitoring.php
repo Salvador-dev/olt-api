@@ -42,6 +42,21 @@ class monitoring extends Command
         $zones = $zones->response;
         Cache::put('zones', $zones);
 
+        // get ODBS
+        $id_zones = array();
+        foreach ($zones as $zone) {
+            array_push($id_zones, $zone->id);
+        }
+        $odbs = array();
+        Cache::put('odbs', $odbs);
+        for ($i = 0; $i < count($id_zones); $i++) {
+            $request = Http::get(env('API_URL2') . '/get_odbs/' . $id_zones[$i]);
+            $res = json_decode($request[0]);
+            $res = $res->response;
+            $odbs = array_merge($odbs, $res);
+            Cache::set('odbs', $res);
+        }
+
         // get speed profiles
         $speed_profiles = Http::get(env('API_URL') . '/get_speed_profiles');
         $speed_profiles = json_decode($speed_profiles[0]);

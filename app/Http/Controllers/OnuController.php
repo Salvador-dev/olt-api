@@ -166,7 +166,23 @@ class OnuController extends Controller
         } catch (Exception $e) {
             return response()->json(['error' => $e], 500);
         }
-        
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    public function getOnuRunningConfig($extenal_id)
+    {
+        try {
+            $client = new Client();
+            $request = new Request('GET', env('API_URL2') . '/get_running_config/' . $extenal_id);
+            $res = $client->sendAsync($request)->wait();
+            $res = json_decode($res->getBody(), true);
+            $res = json_decode($res[0]);
+            $data = $res->running_config;
+        } catch (Exception $e) {
+            return response()->json(['error' => $e], 500);
+        }
+
         return response()->json(['data' => $data], 200);
     }
 }

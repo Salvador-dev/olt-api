@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 
 class OltController extends Controller
@@ -52,7 +53,14 @@ class OltController extends Controller
 
     public function show($id)
     {
-        $data = Olt::where('idOlt', $id)->with('onus')->first();
+        $olts = Cache::get('olts');
+        $data = array();
+
+        $filter = Arr::where($olts, function ($value, $key) use ($id) {
+            return $value->id == $id;
+        });
+
+        $data = array_merge($data, $filter);
         return response()->json(['data' => $data], 200);
     }
 
