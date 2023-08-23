@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model
+class HardwareVersion extends Model
 {
     use HasFactory;
-    protected $table = 'zones';
+    protected $table = 'hardware_version';
     protected $fillable = [
-        'name',
-        'description',
+        'name'
     ];
 }

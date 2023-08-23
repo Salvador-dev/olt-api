@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Olt;
-//use Illuminate\Http\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 
 class OltController extends Controller
 {

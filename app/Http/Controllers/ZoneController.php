@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Zone;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class ApiController extends Controller
+class ZoneController extends Controller
 {
     //
     public function getData()
     {
-        $data = Cache::get('zones');
+        $data = Zone::select('id', 'name')->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -32,30 +31,25 @@ class ApiController extends Controller
 
     public function show($id)
     {
-        $zones = Cache::get('zones');
-        $data = array();
-        
-        $filter = Arr::where($zones, function ($value, $key) use ($id) {
-            return $value->id == $id;
-        });
-        
-        $data = array_merge($data, $filter);
-        return response()->json(['data' => $data], 200);
+        $zone = Zone::findOrFail($id);
+        return response()->json(['data' => $zone], 200);
     }
 
     // Pendiente por corregir
     public function update(Request $request, $id)
     {
-        $data = DB::table('zones')->where('idZone', $id)->update([
+        $zone = Zone::findOrFail($id);
+        $zone->update([
             'name' => $request->name,
         ]);
-        return response()->json(['data' => $data], 200);
+        return response()->json(['data' => $zone], 200);
     }
 
     // Pendiente por corregir
     public function destroy($id)
     {
-        $data = DB::table('zones')->where('idZone', $id)->delete();
-        return response()->json(['data' => $data], 200);
+        $zone = Zone::findOrFail($id);
+        $zone->delete();
+        return response()->json(['data' => $zone], 200);
     }
 }

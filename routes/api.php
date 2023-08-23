@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ApiController;
 use App\Http\Controllers\CapabilityController;
 use App\Http\Controllers\OdbsController;
 use App\Http\Controllers\OltController;
@@ -9,6 +8,7 @@ use App\Http\Controllers\OnuTypesController;
 use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\UnconfiguredController;
 use App\Http\Controllers\VpnTunnelController;
+use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,11 +28,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth.key')->group(function () {
-    Route::get('/locations/listing', [ApiController::class, 'getData']);
-    Route::post('/locations', [ApiController::class, 'store']);
-    Route::get('/locations/{id}', [ApiController::class, 'show']);
-    Route::patch('/locations/{id}', [ApiController::class, 'update']);
-    Route::delete('/locations/{id}', [ApiController::class, 'destroy']);
+    Route::get('/locations/listing', [ZoneController::class, 'getData']);
+    Route::post('/locations', [ZoneController::class, 'store']);
+    Route::get('/locations/{id}', [ZoneController::class, 'show']);
+    Route::patch('/locations/{id}', [ZoneController::class, 'update']);
+    Route::delete('/locations/{id}', [ZoneController::class, 'destroy']);
 
     Route::get('/odbs/listing', [OdbsController::class, 'getData']);
     Route::post('/odbs', [OdbsController::class, 'store']);

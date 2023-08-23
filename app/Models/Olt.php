@@ -8,11 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Olt extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'idOlt';
     protected $table = 'olts';
-
-    public function onus()
-    {
-        return $this->hasMany(Onu::class, 'olt_id', 'idOlt');
-    }
+    protected $fillable = [
+        'name',
+        'olt_hardware_version_id',
+        'olt_software_version_id',
+        'ip',
+        'telnet_port',
+        'telnet_username',
+        'telnet_password',
+        'snmp_read_only',
+        'snmp_read_write',
+        'snmp_udp_port',
+        'ipvt_module',
+        'pon_type_id',
+    ];
 }

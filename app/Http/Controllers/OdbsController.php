@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Odb;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class OdbsController extends Controller
 {
     //
     public function getData()
     {
-        $data = Cache::get('odbs');
+        $data = DB::table('odbs')
+            ->join('zones', 'odbs.zone_id', 'zones.id')
+            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.name as zone')
+            ->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -27,10 +28,10 @@ class OdbsController extends Controller
 
         $data = DB::table('odbs')->insert([
             'name' => $request['name'],
+            'nr_of_ports' => $request['nr_of_ports'],
+            'latitude' => $request['latitude'],
+            'longitude' => $request['longitude'],
             'zone_id' => $request['zone_id'],
-            'numPorts' => $request['numPorts'],
-            'lat' => $request['lat'],
-            'lng' => $request['lng'],
         ]);
 
         return response()->json(['data' => $data], 200);
@@ -38,14 +39,11 @@ class OdbsController extends Controller
 
     public function show($id)
     {
-        $odbs = Cache::get('odbs');
-        $data = array();
-
-        $filter = Arr::where($odbs, function ($value, $key) use ($id) {
-            return $value->id == $id;
-        });
-
-        $data = array_merge($data, $filter);
+        $data = DB::table('odbs')
+            ->join('zones', 'odbs.zone_id', 'zones.id')
+            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.name as zone')
+            ->where('odbs.id', $id)
+            ->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -53,17 +51,18 @@ class OdbsController extends Controller
     {
         $data = DB::table('odbs')->where('idOdb', $id)->update([
             'name' => $request['name'],
-            'zone_id' => $request['zone_id'],
-            'numPorts' => $request['numPorts'],
-            'lat' => $request['lat'],
-            'lng' => $request['lng'],
+            'zone_id' => $request['nr_of_ports'],
+            'numPorts' => $request['latitude'],
+            'lat' => $request['longitude'],
+            'lng' => $request['zone_id'],
         ]);
         return response()->json(['data' => $data], 200);
     }
 
     public function destroy($id)
     {
-        $data = DB::table('odbs')->where('idOdb', $id)->delete();
+        $data = Odb::find($id);
+        $data->delete();
         return response()->json(['data' => $data], 200);
     }
 }

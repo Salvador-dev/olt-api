@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Capability;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -9,7 +10,7 @@ class CapabilityController extends Controller
 {
     public function getData()
     {
-        $data = DB::table('capabilitys')->select('idCapability', 'name')->get();
+        $data = Capability::select('id', 'name')->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -18,31 +19,31 @@ class CapabilityController extends Controller
         $request->validate([
             'name' => 'required|max:255'
         ]);
-
-        $data = DB::table('capabilitys')->insert([
+        $data = Capability::create([
             'name' => $request['name'],
         ]);
-
         return response()->json(['data' => $data], 200);
     }
 
     public function show($id)
     {
-        $data = DB::table('capabilitys')->where('idCapability', $id)->get();
+        $data = Capability::findOrFail($id);
         return response()->json(['data' => $data], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $data = DB::table('capabilitys')->where('idCapability', $id)->update([
-            'name' => $request['name'],
+        $data = Capability::findOrFail($id);
+        $data->update([
+            'name' => $request->name
         ]);
         return response()->json(['data' => $data], 200);
     }
 
     public function destroy($id)
     {
-        $data = DB::table('capabilitys')->where('idCapability', $id)->delete();
+        $data = Capability::findOrFail($id);
+        $data->delete();
         return response()->json(['data' => $data], 200);
     }
 }

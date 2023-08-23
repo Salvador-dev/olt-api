@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model
+class OltCard extends Model
 {
     use HasFactory;
-    protected $table = 'zones';
+    protected $table = 'olt_cards';
     protected $fillable = [
-        'name',
-        'description',
+        'slot',
+        'type',
+        'real_type',
+        'ports',
+        'sw',
+        'olt_id',
     ];
 }

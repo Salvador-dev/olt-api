@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model
+class EthernetPort extends Model
 {
     use HasFactory;
-    protected $table = 'zones';
+    protected $table = 'ethernet_ports';
     protected $fillable = [
-        'name',
-        'description',
+        'port',
+        'admin_state',
+        'mode',
+        'dhcp',
     ];
 }

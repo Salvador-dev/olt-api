@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model
+class PonType extends Model
 {
     use HasFactory;
-    protected $table = 'zones';
+    protected $table = 'pon_types';
     protected $fillable = [
-        'name',
-        'description',
+        'name'
     ];
+
+    public function onu_type(){
+        return $this->belongsTo(OnuType::class);
+    }
 }

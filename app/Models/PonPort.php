@@ -5,12 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model
+class PonPort extends Model
 {
     use HasFactory;
-    protected $table = 'zones';
+    protected $table = 'pon_ports';
     protected $fillable = [
-        'name',
+        'pon_type_id',
+        'admin_state',
+        'onus',
+        'average_signal',
         'description',
+        'range',
+        'tx_power',
+        'olt_id',
     ];
 }

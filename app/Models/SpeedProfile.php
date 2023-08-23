@@ -8,19 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class SpeedProfile extends Model
 {
     use HasFactory;
-    protected $table ='speed_profiles';
-    protected $primaryKey = 'idSpeedProfile';
+    protected $table = 'speed_profiles';
     protected $fillable = [
-      'name',
-      'type_conexion',
-      'type_speed',
-      'prefix',
-      'speed',
-      'type',
-      'is_default'
+        'name', 
+        'use_prefix', 
+        'preview_huawei', 
+        'preview_zte', 
+        'type', 
+        'speed', 
     ];
-
-    public function onus(){
-        return $this->hasMany(Onu::class, 'speed_up_id', 'speed_download_id');
-    }
 }

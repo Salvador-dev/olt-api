@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OnuType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OnuTypesController extends Controller
@@ -12,7 +11,22 @@ class OnuTypesController extends Controller
     //
     public function getData()
     {
-        $data = Cache::get('onu_types');
+        $data = DB::table('onu_types')
+            ->join('capabilitys', 'onu_types.capability_id', 'capabilitys.id')
+            ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
+            ->select(
+                'onu_types.id',
+                'pon_types.name as pon_type',
+                'capabilitys.name as capability',
+                'onu_types.ethernet_ports',
+                'onu_types.wifi_ports',
+                'onu_types.voip_ports',
+                'onu_types.catv',
+                'onu_types.allow_custom_profiles'
+            )
+            ->orderBy('id')
+            ->get();
+
         return response()->json(['data' => $data], 200);
     }
 
@@ -23,18 +37,15 @@ class OnuTypesController extends Controller
             'capability_id' => 'required|max:255'
         ]);
 
-        $data = DB::table('onu_types')->insert([
+        $data = OnuType::create([
             'name' => $request['name'],
             'capability_id' => $request['capability_id'],
-            'ponType' => $request['ponType'],
-            'ethernetPorts' => $request['ethernetPorts'],
-            'wifi' => $request['wifi'],
-            'voipPorts' => $request['voipPorts'],
+            'pon_type_id' => $request['pon_type_id'],
+            'ethernet_ports' => $request['ethernet_ports'],
+            'wifi_ports' => $request['wifi_ports'],
+            'voip_ports' => $request['voip_ports'],
             'catv' => $request['catv'],
-            'customProfile' => $request['customProfile'],
-            'ethernetPortsPrefix' => $request['ethernetPortsPrefix'],
-            'wifiPrefix' => $request['wifiPrefix'],
-            'voipPortsPrefix' => $request['voipPortsPrefix']
+            'allow_custom_profiles' => $request['allow_custom_profiles']
         ]);
 
         return response()->json(['data' => $data], 200);
@@ -42,37 +53,45 @@ class OnuTypesController extends Controller
 
     public function show($id)
     {
-        $onu_types = Cache::get('onu_types');
-        $data = array();
-
-        $filter = Arr::where($onu_types, function ($value, $key) use ($id) {
-            return $value->id == $id;
-        });
-
-        $data = array_merge($data, $filter);
+        $data = DB::table('onu_types')
+            ->join('capabilitys', 'onu_types.capability_id', 'capabilitys.id')
+            ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
+            ->select(
+                'onu_types.id',
+                'pon_types.name as pon_type',
+                'capabilitys.name as capability',
+                'onu_types.ethernet_ports',
+                'onu_types.wifi_ports',
+                'onu_types.voip_ports',
+                'onu_types.catv',
+                'onu_types.allow_custom_profiles'
+            )
+            ->orderBy('id')
+            ->where('onu_types.id', $id)
+            ->get();
         return response()->json(['data' => $data], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $data = DB::table('onu_types')->where('idOnuType', $id)->update([
+        $data = OnuType::findOrFail($id);
+        $data->update([
             'name' => $request['name'],
             'capability_id' => $request['capability_id'],
-            'ponType' => $request['ponType'],
-            'ethernetPorts' => $request['ethernetPorts'],
-            'wifi' => $request['wifi'],
-            'voipPorts' => $request['voipPorts'],
+            'pon_type_id' => $request['pon_type_id'],
+            'ethernet_ports' => $request['ethernet_ports'],
+            'wifi_ports' => $request['wifi_ports'],
+            'voip_ports' => $request['voip_ports'],
             'catv' => $request['catv'],
-            'customProfile' => $request['customProfile'],
-            'wifiPrefix' => $request['wifiPrefix'],
-            'voipPortsPrefix' => $request['voipPortsPrefix']
+            'allow_custom_profiles' => $request['allow_custom_profiles']
         ]);
         return response()->json(['data' => $data], 200);
     }
 
     public function destroy($id)
     {
-        $data = DB::table('onu_types')->where('idOnuType', $id)->delete();
+        $data = OnuType::findOrFail($id);
+        $data->delete();
         return response()->json(['data' => $data], 200);
     }
 }
