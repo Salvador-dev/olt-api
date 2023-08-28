@@ -14,7 +14,12 @@ class OltCard extends Model
         'type',
         'real_type',
         'ports',
-        'sw',
+        'software_version',
         'olt_id',
+        'status'
     ];
+
+    public function olt(){
+        return $this->belongsTo(Olt::class);
+    }
 }

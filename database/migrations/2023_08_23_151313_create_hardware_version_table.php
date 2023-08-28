@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('hardware_version', function (Blueprint $table) {
+        Schema::create('hardware_versions', function (Blueprint $table) {
             $table->bigInteger('id', true);
             $table->string('name');
             $table->timestamps();

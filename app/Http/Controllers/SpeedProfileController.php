@@ -3,18 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\SpeedProfile;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class SpeedProfileController extends Controller
 {
     //
     public function getData()
     {
-        $data = Cache::get('speed_profiles');
+        $data = SpeedProfile::select('id', 'name', 'speed', 'direction')->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -43,11 +43,11 @@ class SpeedProfileController extends Controller
     {
         $speed_profiles = Cache::get('speed_profiles');
         $data = array();
-        
+
         $filter = Arr::where($speed_profiles, function ($value, $key) use ($id) {
             return $value->id == $id;
         });
-        
+
         $data = array_merge($data, $filter);
 
         return response()->json(['data' => $data], 200);

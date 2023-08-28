@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class HardwareVersion extends Model
 {
     use HasFactory;
-    protected $table = 'hardware_version';
+    protected $table = 'hardware_versions';
     protected $fillable = [
         'name'
     ];

@@ -16,17 +16,17 @@ return new class extends Migration
         Schema::create('olts', function (Blueprint $table) {
             $table->bigInteger('id', true);
             $table->string('name')->comment('OLTS name');
-            $table->bigInteger('olt_hardware_version_id')->index('olt_hardware_version_id');
-            $table->bigInteger('olt_software_version_id')->index('olt_software_version_id')->comment('OLTS ip');
-            $table->string('ip');
-            $table->bigInteger('telnet_port');
-            $table->string('telnet_username');
-            $table->string('telnet_password');
-            $table->string('snmp_read_only');
-            $table->string('snmp_read_write');
-            $table->bigInteger('snmp_udp_port');
-            $table->integer('ipvt_module');
-            $table->bigInteger('pon_type_id')->index('pon_type_id');
+            $table->bigInteger('olt_hardware_version_id')->index('olt_hardware_version_id')->nullable();
+            $table->bigInteger('olt_software_version_id')->index('olt_software_version_id')->comment('OLTS ip')->nullable();
+            $table->string('ip')->nullable();
+            $table->bigInteger('telnet_port')->nullable();
+            $table->string('telnet_username')->nullable();
+            $table->string('telnet_password')->nullable();
+            $table->string('snmp_read_only')->nullable();
+            $table->string('snmp_read_write')->nullable();
+            $table->bigInteger('snmp_udp_port')->nullable();
+            $table->integer('ipvt_module')->nullable();
+            $table->bigInteger('pon_type_id')->index('pon_type_id')->nullable();
             $table->timestamps();
         });
     }

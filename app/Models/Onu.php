@@ -11,7 +11,7 @@ class Onu extends Model
     protected $table = 'onus';
     protected $fillable = [
         'unique_external_id',
-        'pon_type',
+        'pon_type_id',
         'sn',
         'olt_id',
         'board',
@@ -38,8 +38,21 @@ class Onu extends Model
         'signal_1310',
         'latitude',
         'longitude',
-        'services_port_id',
-        'ethernet_port_id',
         'wifi_port_id',
     ];
+
+    public function service_ports()
+    {
+        return $this->hasMany(ServicePort::class);
+    }
+
+    public function ethernet_ports()
+    {
+        return $this->hasMany(EthernetPort::class);
+    }
+
+    public function olt()
+    {
+        return $this->belongsTo(Olt::class);
+    }
 }

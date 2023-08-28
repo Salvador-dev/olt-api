@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('service_ports', function (Blueprint $table) {
             $table->bigInteger('id', true);
+            $table->bigInteger('onu_id')->nullable();
             $table->bigInteger('vlan_id')->nullable()->index('vlan_id')->comment('{
                  "service_port": "111 example",
                     "vlan": "100 example",

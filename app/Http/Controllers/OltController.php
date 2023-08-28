@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Olt;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
 
 class OltController extends Controller
 {
     //
     public function getData()
     {
-        $data = Cache::get('olts');
+        $data = Olt::join('hardware_versions', 'olt_hardware_version_id', 'hardware_versions.id')
+            ->select('olts.id', 'olts.name', 'hardware_versions.name as hardware_version', 'olts.ip', 'olts.telnet_port', 'olts.snmp_udp_port')
+            ->orderBy('olts.id')
+            ->get();
+
         return response()->json(['data' => $data], 200);
     }
 
@@ -27,22 +29,25 @@ class OltController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
-            'oltIp' => 'required'
+            'ip' => 'required',
+            'olt_hardware_version_id' => 'required',
+            'telnet_port' => 'required',
+            'snmp_udp_port' => 'required',
         ]);
 
-        $data = DB::table('olts')->insert([
-            'name' => $request['name'],
-            'oltIp' => $request['oltIp'],
-            'telnet_username' => $request['telnet_username'],
-            'telnet_password' => $request['telnet_password'],
-            'snmp_read_only' => $request['snmp_read_only'],
-            'snmp_read_write' => $request['snmp_read_write'],
-            'snmp_udp_port' => $request['snmp_udp_port'],
-            'telnet_ssh_tcp_port' => $request['telnet_ssh_tcp_port'],
-            'ipvt' => $request['ipvt'],
-            'oltHardwareVersion' => $request['oltHardwareVersion'],
-            'oltSwVersion' => $request['oltSwVersion'],
-            'support_pon_type' => $request['support_pon_type'],
+        $data = Olt::create([
+            'name' => $request->name,
+            'olt_hardware_version_id' => $request->olt_hardware_version,
+            'olt_software_version_id' => $request->olt_software_version_id,
+            'ip' => $request->ip,
+            'telnet_port' => $request->telnet_port,
+            'telnet_username' => $request->telnet_username,
+            'telnet_password' => $request->telnet_password,
+            'snmp_read_only' => $request->snmp_read_only,
+            'snmp_read_write' => $request->snmp_read_write,
+            'snmp_udp_port' => $request->snmp_port,
+            'ipvt_module' => $request->ipvt_module,
+            'pon_type_id' => $request->pon_type_id,
         ]);
 
         return response()->json(['data' => $data], 200);
@@ -50,40 +55,49 @@ class OltController extends Controller
 
     public function show($id)
     {
-        $olts = Cache::get('olts');
-        $data = array();
-
-        $filter = Arr::where($olts, function ($value, $key) use ($id) {
-            return $value->id == $id;
-        });
-
-        $data = array_merge($data, $filter);
+        $data = Olt::where('olts.id', $id)->with(['olt_cards:slot,type,real_type,ports,software_version,status,olt_id', 'pon_ports:admin_state,average_signal'])
+            ->join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
+            ->select('olts.id', 'olts.name', 'hardware_versions.name as hardware_version', 'olts.ip', 'olts.telnet_port', 'olts.snmp_udp_port')
+            ->get();
         return response()->json(['data' => $data], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $data = DB::table('olts')->where('idOlt', $id)->update([
-            'name' => $request['name'],
-            'oltIp' => $request['oltIp'],
-            'telnet_username' => $request['telnet_username'],
-            'telnet_password' => $request['telnet_password'],
-            'snmp_read_only' => $request['snmp_read_only'],
-            'snmp_read_write' => $request['snmp_read_write'],
-            'snmp_udp_port' => $request['snmp_udp_port'],
-            'telnet_ssh_tcp_port' => $request['telnet_ssh_tcp_port'],
-            'ipvt' => $request['ipvt'],
-            'oltHardwareVersion' => $request['oltHardwareVersion'],
-            'oltSwVersion' => $request['oltSwVersion'],
-            'support_pon_type' => $request['support_pon_type'],
+        $request->validate([
+            'name' => 'required|max:255',
+            'ip' => 'required',
+            'olt_hardware_version_id' => 'required',
+            'telnet_port' => 'required',
+            'snmp_udp_port' => 'required',
         ]);
+
+        $data = Olt::where('id', $id)->update([
+            'name' => $request->name,
+            'olt_hardware_version_id' => $request->olt_hardware_version,
+            'olt_software_version_id' => $request->olt_software_version_id,
+            'ip' => $request->ip,
+            'telnet_port' => $request->telnet_port,
+            'telnet_username' => $request->telnet_username,
+            'telnet_password' => $request->telnet_password,
+            'snmp_read_only' => $request->snmp_read_only,
+            'snmp_read_write' => $request->snmp_read_write,
+            'snmp_udp_port' => $request->snmp_port,
+            'ipvt_module' => $request->ipvt_module,
+            'pon_type_id' => $request->pon_type_id,
+        ]);
+
         return response()->json(['data' => $data], 200);
     }
 
     public function destroy($id)
     {
-        $data = DB::table('olts')->where('idOlt', $id)->delete();
-        return response()->json(['data' => $data], 200);
+        try {
+            Olt::where('id', $id)->delete();
+            return response()->json(['data' => 'Success!'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function getOltTemperature()

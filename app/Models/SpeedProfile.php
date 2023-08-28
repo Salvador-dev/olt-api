@@ -15,6 +15,11 @@ class SpeedProfile extends Model
         'preview_huawei', 
         'preview_zte', 
         'type', 
-        'speed', 
+        'speed',
+        'direction'
     ];
+
+    public function services_ports(){
+        return $this->hasMany(ServicePort::class);
+    }
 }

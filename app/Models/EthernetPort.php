@@ -14,5 +14,12 @@ class EthernetPort extends Model
         'admin_state',
         'mode',
         'dhcp',
+        'service_port',
+        'onu_id'
     ];
+
+    public function onu()
+    {
+        return $this->belongsTo(Onu::class, 'onu_id');
+    }
 }

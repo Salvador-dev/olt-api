@@ -23,4 +23,14 @@ class Olt extends Model
         'ipvt_module',
         'pon_type_id',
     ];
+
+    public function olt_cards()
+    {
+        return $this->hasMany(OltCard::class);
+    }
+
+    public function pon_ports()
+    {
+        return $this->hasMany(PonPort::class);
+    }
 }
