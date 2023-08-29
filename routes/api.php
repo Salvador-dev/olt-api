@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CapabilityController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OdbsController;
 use App\Http\Controllers\OltController;
 use App\Http\Controllers\OnuController;
@@ -28,6 +29,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth.key')->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'dashboard']);
+
     Route::get('/locations/listing', [ZoneController::class, 'getData']);
     Route::post('/locations', [ZoneController::class, 'store']);
     Route::get('/locations/{id}', [ZoneController::class, 'show']);
