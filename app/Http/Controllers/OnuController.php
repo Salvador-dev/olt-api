@@ -35,7 +35,7 @@ class OnuController extends Controller
                 'onu_types.name as onu_type',
                 'onus.signal_1310'
             )
-            ->distinct()
+            ->groupBy('onus.id')
             ->get();
         return response()->json(['data' => $data], 200);
     }
@@ -143,6 +143,7 @@ class OnuController extends Controller
                 ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 ->join('zones', 'onus.zone_id', 'zones.id')
                 ->select(
+                    'onus.id',
                     'onus.name as onu',
                     'onus.unique_external_id',
                     'onus.status',
