@@ -171,9 +171,9 @@ class OnuController extends Controller
                     ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
                     ->where('service_ports.onu_id', $onu->id)
                     ->select(
+                        'service_ports.id as service_port',
                         'speed_profiles.name as download_speed',
                         'up_speed.name as upload_speed',
-                        'service_ports.service_port',
                         'service_ports.vlan_id as vlan',
                         'service_ports.cvlan_id as cvlan',
                         'service_ports.svlan_id as svlan',
