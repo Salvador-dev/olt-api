@@ -16,9 +16,10 @@ class OnuController extends Controller
     //
     public function getData()
     {
-        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
+        $data = DB::table('onus')
+            ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
-            ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
+            ->join('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->select(
                 'onus.name',
