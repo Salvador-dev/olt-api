@@ -16,6 +16,7 @@ class OnuTypesController extends Controller
             ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
             ->select(
                 'onu_types.id',
+                'onu_types.name',
                 'pon_types.name as pon_type',
                 'capabilitys.name as capability',
                 'onu_types.ethernet_ports',
@@ -58,6 +59,7 @@ class OnuTypesController extends Controller
             ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
             ->select(
                 'onu_types.id',
+                'onu_types.name',
                 'pon_types.name as pon_type',
                 'capabilitys.name as capability',
                 'onu_types.ethernet_ports',

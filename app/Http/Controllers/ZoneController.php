@@ -15,7 +15,6 @@ class ZoneController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    // Pendiente por corregir
     public function store(Request $request)
     {
         $request->validate([
@@ -35,7 +34,6 @@ class ZoneController extends Controller
         return response()->json(['data' => $zone], 200);
     }
 
-    // Pendiente por corregir
     public function update(Request $request, $id)
     {
         $zone = Zone::findOrFail($id);
@@ -45,7 +43,6 @@ class ZoneController extends Controller
         return response()->json(['data' => $zone], 200);
     }
 
-    // Pendiente por corregir
     public function destroy($id)
     {
         $zone = Zone::findOrFail($id);
