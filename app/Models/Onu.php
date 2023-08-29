@@ -43,7 +43,7 @@ class Onu extends Model
 
     public function service_ports()
     {
-        return $this->hasMany(ServicePort::class);
+        return $this->hasMany(ServicePort::class, 'onu_id', 'id');
     }
 
     public function ethernet_ports()

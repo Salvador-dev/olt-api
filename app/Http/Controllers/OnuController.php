@@ -6,7 +6,6 @@ use App\Models\EthernetPort;
 use App\Models\Onu;
 use App\Models\ServicePort;
 use Exception;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Client;
@@ -17,10 +16,9 @@ class OnuController extends Controller
     //
     public function getData()
     {
-        $data = DB::table('onus')
-            ->join('olts', 'onus.olt_id', 'olts.id')
+        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
-            ->join('service_ports', 'onus.id', 'service_ports.onu_id')
+            ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->select(
                 'onus.name',
@@ -34,10 +32,11 @@ class OnuController extends Controller
                 'olts.name as olt_name',
                 'onus.zone_id',
                 'zones.name as zone_name',
-                'service_ports.vlan_id as vlan',
                 'onu_types.name as onu_type',
                 'onus.signal_1310'
-            )->get();
+            )
+            ->groupBy('onus.id')
+            ->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -141,10 +140,10 @@ class OnuController extends Controller
                 ->join('olts', 'onus.olt_id', 'olts.id')
                 ->join('pon_types', 'onus.pon_type_id', 'pon_types.id')
                 ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+                ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 ->join('zones', 'onus.zone_id', 'zones.id')
                 ->select(
-                    'onus.id',
-                    'onus.name',
+                    'onus.name as onu',
                     'onus.unique_external_id',
                     'onus.status',
                     'onus.sn',
@@ -153,6 +152,11 @@ class OnuController extends Controller
                     'onus.authorization_date',
                     'onus.olt_id',
                     'onus.zone_id',
+                    'onus.board',
+                    'onus.port',
+                    'onus.address',
+                    'onus.mode',
+                    'service_ports.vlan_id as vlan',
                     'olts.name as olt_name',
                     'pon_types.name as pon_type',
                     'onu_types.name as onu_type',
