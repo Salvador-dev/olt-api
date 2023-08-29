@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::table('olts', function (Blueprint $table) {
             $table->foreign(['pon_type_id'], 'olts_ibfk_1')->references(['id'])->on('pon_types')->onUpdate('NO ACTION')->onDelete('NO ACTION');
-            $table->foreign(['olt_hardware_version_id'], 'olts_ibfk_2')->references(['id'])->on('hardware_version')->onUpdate('NO ACTION')->onDelete('NO ACTION');
-            $table->foreign(['olt_software_version_id'], 'olts_ibfk_3')->references(['id'])->on('software_version')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+            $table->foreign(['olt_hardware_version_id'], 'olts_ibfk_2')->references(['id'])->on('hardware_versions')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+            $table->foreign(['olt_software_version_id'], 'olts_ibfk_3')->references(['id'])->on('software_versions')->onUpdate('NO ACTION')->onDelete('NO ACTION');
         });
     }
 

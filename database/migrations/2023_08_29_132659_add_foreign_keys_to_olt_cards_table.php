@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('hardware_versions', function (Blueprint $table) {
-            $table->bigInteger('id', true);
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('olt_cards', function (Blueprint $table) {
+            $table->foreign(['olt_id'], 'olt_cards_ibfk_1')->references(['id'])->on('olts')->onDelete('CASCADE');
         });
     }
 
@@ -27,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hardware_version');
+        Schema::table('olt_cards', function (Blueprint $table) {
+            $table->dropForeign('olt_cards_ibfk_1');
+        });
     }
 };

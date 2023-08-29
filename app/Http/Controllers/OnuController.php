@@ -140,23 +140,25 @@ class OnuController extends Controller
                 )
                 ->first();
 
-            $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
-            $service_ports = ServicePort::join('speed_profiles', 'service_ports.download_speed_id', 'speed_profiles.id')
-                ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
-                ->where('service_ports.onu_id', $onu->id)
-                ->select(
-                    'speed_profiles.name as download_speed',
-                    'up_speed.name as upload_speed',
-                    'service_ports.service_port',
-                    'service_ports.vlan_id as vlan',
-                    'service_ports.cvlan_id as cvlan',
-                    'service_ports.svlan_id as svlan',
-                    'service_ports.tag_mode'
-                )
-                ->get();
+            if ($onu) {
+                $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
+                $service_ports = ServicePort::join('speed_profiles', 'service_ports.download_speed_id', 'speed_profiles.id')
+                    ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
+                    ->where('service_ports.onu_id', $onu->id)
+                    ->select(
+                        'speed_profiles.name as download_speed',
+                        'up_speed.name as upload_speed',
+                        'service_ports.service_port',
+                        'service_ports.vlan_id as vlan',
+                        'service_ports.cvlan_id as cvlan',
+                        'service_ports.svlan_id as svlan',
+                        'service_ports.tag_mode'
+                    )
+                    ->get();
 
-            $onu['ethernet_ports'] = $ethernet_ports;
-            $onu['service_ports'] = $service_ports;
+                $onu['ethernet_ports'] = $ethernet_ports;
+                $onu['service_ports'] = $service_ports;
+            }
         } catch (Exception $e) {
 
             return response()->json(array('error' => $e), 200);
@@ -180,15 +182,7 @@ class OnuController extends Controller
 
     public function showByOlt($id)
     {
-        $onus = Cache::get('onus');
-        $data = array();
-
-        $filter = Arr::where($onus, function ($value, $key) use ($id) {
-            return $value->olt_id == $id;
-        });
-
-        $data = array_merge($data, $filter);
-
+        $data = Onu::where('olt_id', $id)->get();
         return response()->json(['data' => $data], 200);
     }
 

@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('software_versions', function (Blueprint $table) {
-            $table->bigInteger('id', true);
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('ethernet_ports', function (Blueprint $table) {
+            $table->foreign(['onu_id'], 'ethernet_ports_ibfk_1')->references(['id'])->on('onus')->onUpdate('NO ACTION')->onDelete('NO ACTION');
         });
     }
 
@@ -27,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('software_version');
+        Schema::table('ethernet_ports', function (Blueprint $table) {
+            $table->dropForeign('ethernet_ports_ibfk_1');
+        });
     }
 };

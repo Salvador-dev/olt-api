@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('onus', function (Blueprint $table) {
             $table->bigInteger('id', true)->comment('ONU');
             $table->string('unique_external_id')->comment('Unique External ID SN');
-            $table->string('pon_type')->comment('EPON | GPON');
             $table->string('sn')->comment('SERIAL');
             $table->bigInteger('olt_id')->index('olt_id')->comment('OLT ID');
             $table->string('board')->nullable();
@@ -43,8 +42,7 @@ return new class extends Migration
             $table->string('signal_1310')->nullable()->comment('-27.45');
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-            $table->bigInteger('services_port_id')->index('services_port_id')->comment('Services Ports');
-            $table->bigInteger('ethernet_port_id')->index('ethernet_port_id')->comment('Ethernet Ports');
+            $table->bigInteger('pon_type_id')->nullable()->index('onus_ibfk_7_idx');
             $table->bigInteger('wifi_port_id')->nullable()->index('wifi_port_id')->comment('Wifi Ports');
             $table->timestamps();
         });

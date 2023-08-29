@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('ethernet_ports', function (Blueprint $table) {
             $table->bigInteger('id', true);
-            $table->string('port');
-            $table->boolean('admin_state');
-            $table->string('mode')->comment('["lan","access","hybrid","trunk","transparent"]');
+            $table->bigInteger('onu_id')->nullable()->index('ethernet_ports_ibfk_1_idx');
+            $table->string('port')->nullable();
+            $table->string('admin_state')->nullable();
+            $table->string('mode')->nullable()->comment('["lan","access","hybrid","trunk","transparent"]');
             $table->string('dhcp')->nullable();
             $table->timestamps();
         });

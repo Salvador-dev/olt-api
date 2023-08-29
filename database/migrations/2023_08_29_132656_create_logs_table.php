@@ -13,8 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('olt_cards', function (Blueprint $table) {
-            $table->foreign(['olt_id'], 'olt_cards_ibfk_1')->references(['id'])->on('olts')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+        Schema::create('logs', function (Blueprint $table) {
+            $table->bigInteger('id', true);
+            $table->string('action')->nullable();
+            $table->string('user')->nullable();
+            $table->string('descritption')->nullable();
+            $table->timestamp('created_at')->nullable();
         });
     }
 
@@ -25,8 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('olt_cards', function (Blueprint $table) {
-            $table->dropForeign('olt_cards_ibfk_1');
-        });
+        Schema::dropIfExists('logs');
     }
 };
