@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Olt;
+use App\Models\OltCard;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -55,11 +56,21 @@ class OltController extends Controller
 
     public function show($id)
     {
-        $data = Olt::where('olts.id', $id)->with(['olt_cards:slot,type,real_type,ports,software_version,status,olt_id', 'pon_ports:admin_state,average_signal'])
-            ->join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
-            ->select('olts.id', 'olts.name', 'hardware_versions.name as hardware_version', 'olts.ip', 'olts.telnet_port', 'olts.snmp_udp_port')
-            ->get();
-        return response()->json(['data' => $data], 200);
+        $olt = Olt::where('olts.id', $id)
+            ->join(
+                'hardware_versions',
+                'olts.olt_hardware_version_id',
+                'hardware_versions.id'
+            )
+            ->select(
+                'olts.*',
+                'hardware_versions.name as hardware_version'
+            )
+            ->first();
+        $olt_cards = OltCard::where('olt_id', $id)->get();
+        $olt['olt_cards'] = $olt_cards;
+
+        return response()->json(['data' => $olt], 200);
     }
 
     public function update(Request $request, $id)
