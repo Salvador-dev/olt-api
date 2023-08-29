@@ -17,7 +17,27 @@ class OnuController extends Controller
     //
     public function getData()
     {
-        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')->select('onus.name', 'onus.unique_external_id', 'onus.status', 'onus.sn', 'onus.signal', 'onus.catv', 'onus.authorization_date', 'onus.olt_id', 'olts.name as olt_name')->get();
+        $data = DB::table('onus')
+            ->join('olts', 'onus.olt_id', 'olts.id')
+            ->join('zones', 'onus.zone_id', 'zones.id')
+            ->join('service_ports', 'onus.id', 'service_ports.onu_id')
+            ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+            ->select(
+                'onus.name',
+                'onus.unique_external_id',
+                'onus.status',
+                'onus.sn',
+                'onus.signal',
+                'onus.catv',
+                'onus.authorization_date',
+                'onus.olt_id',
+                'olts.name as olt_name',
+                'onus.zone_id',
+                'zones.name as zone_name',
+                'service_ports.vlan_id as vlan',
+                'onu_types.name as onu_type',
+                'onus.signal_1310'
+            )->get();
         return response()->json(['data' => $data], 200);
     }
 
