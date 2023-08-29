@@ -16,11 +16,10 @@ class OnuController extends Controller
     //
     public function getData()
     {
-        $data = DB::table('onus')
-            ->join('olts', 'onus.olt_id', '=', 'olts.id')
-            ->join('zones', 'onus.zone_id', '=', 'zones.id')
-            ->join('service_ports', 'service_ports.onu_id', '=', 'onus.id')
-            ->join('onu_types', 'onus.onu_type_id', '=', 'onu_types.id')
+        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
+            ->join('zones', 'onus.zone_id', 'zones.id')
+            ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
+            ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->select(
                 'onus.name',
                 'onus.unique_external_id',
@@ -36,7 +35,7 @@ class OnuController extends Controller
                 'onu_types.name as onu_type',
                 'onus.signal_1310'
             )
-            ->groupBy('onus.id')
+            ->groupBy('onus.id', 'onus.name')
             ->get();
         return response()->json(['data' => $data], 200);
     }
