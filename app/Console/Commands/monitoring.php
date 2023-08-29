@@ -32,7 +32,8 @@ class monitoring extends Command
      * Execute the console command.
      */
     public function handle()
-    
+    {
+
         /* $onus = Cache::get('onus');
 
 
