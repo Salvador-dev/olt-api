@@ -11,6 +11,7 @@ class Uplink extends Model
     protected $table = 'uplinks';
     protected $fillable = [
         'olt_id',
+        'name',
         'uplink_port',
         'description',
         'type',

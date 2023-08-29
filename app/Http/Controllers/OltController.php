@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Olt;
 use App\Models\OltCard;
+use App\Models\PonPort;
+use App\Models\Uplink;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class OltController extends Controller
 {
@@ -69,6 +73,8 @@ class OltController extends Controller
             ->first();
         $olt_cards = OltCard::where('olt_id', $id)->get();
         $olt['olt_cards'] = $olt_cards;
+        $olt_uplinks = Uplink::where('olt_id', $id)->get();
+        $olt['olt_uplinks'] = $olt_uplinks;
 
         return response()->json(['data' => $olt], 200);
     }

@@ -32,11 +32,7 @@ class monitoring extends Command
      * Execute the console command.
      */
     public function handle()
-    {
-        // get OLTs
-        //$olts = Cache::get('olts');
-
-
+    
         /* $onus = Cache::get('onus');
 
 
