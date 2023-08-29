@@ -35,7 +35,7 @@ class OnuController extends Controller
                 'onu_types.name as onu_type',
                 'onus.signal_1310'
             )
-            ->groupBy('onus.id')
+            ->distinct()
             ->get();
         return response()->json(['data' => $data], 200);
     }
