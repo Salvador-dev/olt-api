@@ -149,6 +149,7 @@ class OnuController extends Controller
                     'onus.status',
                     'onus.sn',
                     'onus.signal',
+                    'onus.signal_1310',
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
