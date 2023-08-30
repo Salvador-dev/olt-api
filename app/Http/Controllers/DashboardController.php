@@ -16,7 +16,6 @@ class DashboardController extends Controller
         $pending = $onus->where('administrative_status', 'Disabled')->count();
         $offline = $onus->where('status', 'Offline')->count();
         $signal = $onus->where('signal', '!=', 'Very good')->count();
-        $data = array(['online' => $online], ['pending' => $pending], ['offline' => $offline], ['low signal' => $signal]);
-        return response()->json(['data' => $data], 200);
+        return response()->json(['online' => $online, 'pending' => $pending, 'offline' => $offline, 'low_signal' => $signal], 200);
     }
 }
