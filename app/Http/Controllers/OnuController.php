@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\OnusImport;
 use App\Models\EthernetPort;
 use App\Models\Onu;
 use App\Models\ServicePort;
@@ -9,7 +10,9 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
+/* use GuzzleHttp\Psr7\Request; */
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OnuController extends Controller
 {
@@ -212,7 +215,7 @@ class OnuController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    public function getOnuFullStatus($extenal_id)
+   /*  public function getOnuFullStatus($extenal_id)
     {
 
         try {
@@ -243,5 +246,13 @@ class OnuController extends Controller
         }
 
         return response()->json(['data' => $data], 200);
+    } */
+
+
+    public function importOnus(Request $request)
+    {
+        $file = $request->file('import_file');
+        Excel::import(new OnusImport, $file);
+        return response()->json(['status' => true], 200);
     }
 }

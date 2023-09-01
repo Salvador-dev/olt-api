@@ -59,6 +59,7 @@ Route::middleware('auth.key')->group(function () {
     Route::get('/onus_unconfigured', [OnuController::class, 'onusUnconfigureds']);
     Route::get('/onus/get_all_status/{external_id}', [OnuController::class, 'getOnuFullStatus']);
     Route::get('/onus/get_running_config/{external_id}', [OnuController::class, 'getOnuRunningConfig']);
+    Route::post('/onus_imports', [OnuController::class, 'importOnus']);
 
     Route::get('/speed_profiles/listing', [SpeedProfileController::class, 'getData']);
     Route::post('/speed_profiles', [SpeedProfileController::class, 'store']);
