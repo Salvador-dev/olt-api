@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('uplinks', function (Blueprint $table) {
-            $table->foreign(['olt_id'], 'uplinks_ibfk_1')->references(['id'])->on('olts')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+        Schema::table('remote_acls', function (Blueprint $table) {
+            $table->foreign(['olt_id'], 'remote_acls_ibfk_1')->references(['id'])->on('olts');
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('uplinks', function (Blueprint $table) {
-            $table->dropForeign('uplinks_ibfk_1');
+        Schema::table('remote_acls', function (Blueprint $table) {
+            $table->dropForeign('remote_acls_ibfk_1');
         });
     }
 };

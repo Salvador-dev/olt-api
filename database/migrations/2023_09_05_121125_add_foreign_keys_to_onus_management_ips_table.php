@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('onus_management_ips', function (Blueprint $table) {
-            $table->foreign(['olt_id'], 'onus_management_ips_ibfk_1')->references(['id'])->on('olts')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+            $table->foreign(['olt_id'], 'onus_management_ips_ibfk_1')->references(['id'])->on('olts');
         });
     }
 

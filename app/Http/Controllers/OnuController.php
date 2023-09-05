@@ -8,10 +8,8 @@ use App\Models\Onu;
 use App\Models\ServicePort;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use GuzzleHttp\Client;
-/* use GuzzleHttp\Psr7\Request; */
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 
 class OnuController extends Controller
@@ -45,7 +43,13 @@ class OnuController extends Controller
 
     public function onusUnconfigureds()
     {
-        $data = Cache::get('onusUnconfigured');
+        $client = new \GuzzleHttp\Client();
+        $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/unconfigured_onus');
+        $res = $client->sendAsync($request)->wait();
+        $res = json_decode($res->getBody(), true);
+        $res = json_decode($res[0]);
+        $res = $res->response;
+        $data = $res;
         return response()->json(['data' => $data], 200);
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CapabilityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OdbsController;
@@ -28,9 +29,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+
 Route::middleware('auth.key')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
+    Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
 
     Route::get('/locations/listing', [ZoneController::class, 'getData']);
     Route::post('/locations', [ZoneController::class, 'store']);
@@ -86,4 +91,6 @@ Route::middleware('auth.key')->group(function () {
     Route::get('/vpn-tunnels/{id}', [VpnTunnelController::class, 'show']);
     Route::patch('/vpn-tunnels/{id}', [VpnTunnelController::class, 'update']);
     Route::delete('/vpn-tunnels/{id}', [VpnTunnelController::class, 'destroy']);
+
+    Route::get('logout', [AuthController::class, 'logout']);
 });

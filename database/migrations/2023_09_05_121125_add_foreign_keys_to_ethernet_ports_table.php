@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('remote_acls', function (Blueprint $table) {
-            $table->foreign(['olt_id'], 'remote_acls_ibfk_1')->references(['id'])->on('olts')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+        Schema::table('ethernet_ports', function (Blueprint $table) {
+            $table->foreign(['onu_id'], 'ethernet_ports_ibfk_1')->references(['id'])->on('onus');
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('remote_acls', function (Blueprint $table) {
-            $table->dropForeign('remote_acls_ibfk_1');
+        Schema::table('ethernet_ports', function (Blueprint $table) {
+            $table->dropForeign('ethernet_ports_ibfk_1');
         });
     }
 };

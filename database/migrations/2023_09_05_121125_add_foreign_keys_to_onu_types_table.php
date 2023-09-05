@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('onu_types', function (Blueprint $table) {
-            $table->foreign(['capability_id'], 'onu_types_ibfk_1')->references(['id'])->on('capabilitys')->onUpdate('NO ACTION')->onDelete('NO ACTION');
-            $table->foreign(['pon_type_id'], 'onu_types_ibfk_2')->references(['id'])->on('pon_types')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+            $table->foreign(['pon_type_id'], 'onu_types_ibfk_2')->references(['id'])->on('pon_types');
+            $table->foreign(['capability_id'], 'onu_types_ibfk_1')->references(['id'])->on('capabilitys');
         });
     }
 
@@ -27,8 +27,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('onu_types', function (Blueprint $table) {
-            $table->dropForeign('onu_types_ibfk_1');
             $table->dropForeign('onu_types_ibfk_2');
+            $table->dropForeign('onu_types_ibfk_1');
         });
     }
 };

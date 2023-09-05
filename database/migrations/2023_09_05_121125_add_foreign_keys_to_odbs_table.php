@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('vlans', function (Blueprint $table) {
-            $table->foreign(['olt_id'], 'vlans_ibfk_1')->references(['id'])->on('olts')->onUpdate('NO ACTION')->onDelete('NO ACTION');
+        Schema::table('odbs', function (Blueprint $table) {
+            $table->foreign(['zone_id'], 'odbs_ibfk_1')->references(['id'])->on('zones');
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('vlans', function (Blueprint $table) {
-            $table->dropForeign('vlans_ibfk_1');
+        Schema::table('odbs', function (Blueprint $table) {
+            $table->dropForeign('odbs_ibfk_1');
         });
     }
 };
