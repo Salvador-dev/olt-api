@@ -219,12 +219,12 @@ class OnuController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-   /*  public function getOnuFullStatus($extenal_id)
+    public function getOnuFullStatus($extenal_id)
     {
 
         try {
-            $client = new Client();
-            $request = new Request('GET', env('API_URL2') . '/get_onu_full_status_info/' . $extenal_id);
+            $client = new \GuzzleHttp\Client();
+            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL2') . '/get_onu_full_status_info/' . $extenal_id);
             $res = $client->sendAsync($request)->wait();
             $res = json_decode($res->getBody(), true);
             $res = json_decode($res[0]);
@@ -235,6 +235,8 @@ class OnuController extends Controller
 
         return response()->json(['data' => $data], 200);
     }
+
+    /*
 
     public function getOnuRunningConfig($extenal_id)
     {
