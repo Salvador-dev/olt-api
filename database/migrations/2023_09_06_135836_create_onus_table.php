@@ -23,10 +23,10 @@ return new class extends Migration
             $table->bigInteger('onu_type_id')->index('onu_type_id');
             $table->bigInteger('zone_id')->index('zone_id');
             $table->string('name');
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->string('odb_name')->nullable();
-            $table->string('mode');
-            $table->string('wan_mode');
+            $table->string('mode')->nullable();
+            $table->string('wan_mode')->nullable();
             $table->string('ip_address')->nullable();
             $table->string('subnet_mask')->nullable();
             $table->string('default_gateway')->nullable();

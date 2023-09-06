@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('olts', function (Blueprint $table) {
-            $table->foreign(['olt_hardware_version_id'], 'olts_ibfk_2')->references(['id'])->on('hardware_versions');
             $table->foreign(['pon_type_id'], 'olts_ibfk_1')->references(['id'])->on('pon_types');
             $table->foreign(['olt_software_version_id'], 'olts_ibfk_3')->references(['id'])->on('software_versions');
+            $table->foreign(['olt_hardware_version_id'], 'olts_ibfk_2')->references(['id'])->on('hardware_versions');
         });
     }
 
@@ -28,9 +28,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('olts', function (Blueprint $table) {
-            $table->dropForeign('olts_ibfk_2');
             $table->dropForeign('olts_ibfk_1');
             $table->dropForeign('olts_ibfk_3');
+            $table->dropForeign('olts_ibfk_2');
         });
     }
 };
