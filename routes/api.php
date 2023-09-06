@@ -29,10 +29,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
 
-Route::middleware('auth.key')->group(function () {
+Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
     Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
