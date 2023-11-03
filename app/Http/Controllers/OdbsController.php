@@ -28,10 +28,10 @@ class OdbsController extends Controller
 
         $data = DB::table('odbs')->insert([
             'name' => $request['name'],
-            'nr_of_ports' => $request['nr_of_ports'],
-            'latitude' => $request['latitude'],
-            'longitude' => $request['longitude'],
             'zone_id' => $request['zone_id'],
+            'nr_of_ports' => $request['numPorts'],
+            'latitude' => $request['lat'],
+            'longitude' => $request['lng'],
         ]);
 
         return response()->json(['data' => $data], 200);
@@ -49,12 +49,12 @@ class OdbsController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = DB::table('odbs')->where('idOdb', $id)->update([
+        $data = DB::table('odbs')->where('id', $id)->update([
             'name' => $request['name'],
-            'zone_id' => $request['nr_of_ports'],
-            'numPorts' => $request['latitude'],
-            'lat' => $request['longitude'],
-            'lng' => $request['zone_id'],
+            'zone_id' => $request['zone_id'],
+            'nr_of_ports' => $request['numPorts'],
+            'latitude' => $request['lat'],
+            'longitude' => $request['lng'],
         ]);
         return response()->json(['data' => $data], 200);
     }

@@ -14,7 +14,7 @@ class SpeedProfileController extends Controller
     //
     public function getData()
     {
-        $data = SpeedProfile::select('id', 'name', 'speed', 'direction', 'type_conexion')->get();
+        $data = SpeedProfile::select('id', 'name', 'speed', 'direction', 'type_conexion', 'use_prefix')->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -30,10 +30,9 @@ class SpeedProfileController extends Controller
         $data = DB::table('speed_profiles')->insert([
             'name' => $request['name'],
             'type_conexion' => $request['type_conexion'],
-            'type_speed' => $request['type_speed'],
+            'direction' => $request['type_speed'],
             'speed' => $request['speed'],
-            'prefix' => $request['prefix'],
-            'is_default' => false,
+            'use_prefix' => $request['prefix'],
         ]);
 
         return response()->json(['data' => $data], 200);
@@ -56,13 +55,14 @@ class SpeedProfileController extends Controller
     // Pendiente por corregir
     public function update(Request $request, $id)
     {
-        $data = DB::table('speed_profiles')->where('idSpeedProfile', $id)->update([
+        
+        $data = DB::table('speed_profiles')->where('id', $id)->update([
             'name' => $request['name'],
-            'onu_id' => $request['onu_id'],
+            // 'onu_id' => $request['onu_id'],
             'type_conexion' => $request['type_conexion'],
-            'type_speed' => $request['type_speed'],
+            'direction' => $request['type_speed'],
             'speed' => $request['speed'],
-            'prefix' => $request['prefix'],
+            'use_prefix' => $request['prefix'],
         ]);
         return response()->json(['data' => $data], 200);
     }
@@ -70,7 +70,7 @@ class SpeedProfileController extends Controller
     // Pendiente por corregir
     public function destroy($id)
     {
-        $data = DB::table('speed_profiles')->where('idSpeedProfile', $id)->delete();
+        $data = DB::table('speed_profiles')->where('id', $id)->delete();
         return response()->json(['data' => $data], 200);
     }
 }
