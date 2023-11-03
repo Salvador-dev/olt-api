@@ -14,7 +14,7 @@ class SpeedProfileController extends Controller
     //
     public function getData()
     {
-        $data = SpeedProfile::select('id', 'name', 'speed', 'direction')->get();
+        $data = SpeedProfile::select('id', 'name', 'speed', 'direction', 'type_conexion')->get();
         return response()->json(['data' => $data], 200);
     }
 

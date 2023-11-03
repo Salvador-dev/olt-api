@@ -15,6 +15,7 @@ class SpeedProfile extends Model
         'preview_huawei', 
         'preview_zte', 
         'type', 
+        'type_conexion', 
         'speed',
         'direction'
     ];
