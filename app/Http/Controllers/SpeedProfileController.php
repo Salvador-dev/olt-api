@@ -32,7 +32,7 @@ class SpeedProfileController extends Controller
             'type_conexion' => $request['type_conexion'],
             'direction' => $request['type_speed'],
             'speed' => $request['speed'],
-            'use_prefix' => $request['prefix'],
+            'use_prefix' => $request['use_prefix'],
         ]);
 
         return response()->json(['data' => $data], 200);
@@ -40,15 +40,19 @@ class SpeedProfileController extends Controller
 
     public function show($id)
     {
-        $speed_profiles = Cache::get('speed_profiles');
-        $data = array();
+        // $speed_profiles = Cache::get('speed_profiles');
+        // $data = array();
 
-        $filter = Arr::where($speed_profiles, function ($value, $key) use ($id) {
-            return $value->id == $id;
-        });
+        // $filter = Arr::where($speed_profiles, function ($value, $key) use ($id) {
+        //     return $value->id == $id;
+        // });
 
-        $data = array_merge($data, $filter);
+        // $data = array_merge($data, $filter);
 
+        $data = DB::table('speed_profiles')
+        ->select('speed_profiles.id', 'speed_profiles.name', 'speed_profiles.use_prefix', 'speed_profiles.type_conexion', 'speed_profiles.speed', 'speed_profiles.direction' )
+        ->where('speed_profiles.id', $id)
+        ->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -62,7 +66,7 @@ class SpeedProfileController extends Controller
             'type_conexion' => $request['type_conexion'],
             'direction' => $request['type_speed'],
             'speed' => $request['speed'],
-            'use_prefix' => $request['prefix'],
+            'use_prefix' => $request['use_prefix'],
         ]);
         return response()->json(['data' => $data], 200);
     }
