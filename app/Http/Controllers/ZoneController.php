@@ -31,8 +31,11 @@ class ZoneController extends Controller
     public function show($id)
     {
         $zone = Zone::findOrFail($id);
-        return response()->json(['data' => $zone], 200);
+        $data = ['data' => [$zone]];
+    
+        return response()->json($data, 200);
     }
+    
 
     public function update(Request $request, $id)
     {

@@ -27,7 +27,8 @@ class CapabilityController extends Controller
 
     public function show($id)
     {
-        $data = Capability::findOrFail($id);
+        $capability = Capability::findOrFail($id);
+        $data = ['data' => [$capability]];
         return response()->json(['data' => $data], 200);
     }
 

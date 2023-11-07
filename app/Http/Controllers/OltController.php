@@ -57,31 +57,35 @@ class OltController extends Controller
 
         return response()->json(['data' => $data], 200);
     }
-
     public function show($id)
     {
-         $olt = Olt::where('olts.id', $id)
-             ->join(
-                 'hardware_versions',
-                 'olts.olt_hardware_version_id',
-                 'hardware_versions.id'
-             )
-             ->join('software_versions',
-              'olt_software_version_id',
-               'software_versions.id')
-             ->select(
-                 'olts.*',
-                 'hardware_versions.name as hardware_version',
-                 'software_versions.name as software_version'
-             )
-             ->first();
-         $olt_cards = OltCard::where('olt_id', $id)->get();
-         $olt['olt_cards'] = $olt_cards;
-         $olt_uplinks = Uplink::where('olt_id', $id)->get();
-         $olt['olt_uplinks'] = $olt_uplinks;
+        $olt = Olt::where('olts.id', $id)
+            ->join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
+            ->join('software_versions', 'olt_software_version_id', 'software_versions.id')
+            ->select(
+                'olts.*',
+                'hardware_versions.name as hardware_version',
+                'software_versions.name as software_version'
+            )
+            ->first();
 
-         return response()->json(['data' => $olt], 200);
+             // $olt_cards = OltCard::where('olt_id', $id)->get();
+        // $olt_uplinks = Uplink::where('olt_id', $id)->get();
+    
+        // // Organiza los datos en un arreglo asociativo
+        // $response = [
+        //     'olt' => $olt,
+        //     'olt_cards' => $olt_cards,
+        //     'olt_uplinks' => $olt_uplinks
+        // ];
+    
+        $data = ['data' => [$olt]];
+
+        return response()->json($data, 200);
     }
+    
+        
+       
 
     public function update(Request $request, $id)
     {
