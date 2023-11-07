@@ -30,11 +30,15 @@ class ZoneController extends Controller
 
     public function show($id)
     {
-        $zone = Zone::findOrFail($id);
-        $data = ['data' => [$zone]];
+        $zone = DB::table('zones')
+            ->select('zones.id', 'zones.name')
+            ->where('zones.id', $id)
+            ->get();
     
+        $data = ['data' => $zone];
         return response()->json($data, 200);
     }
+    
     
 
     public function update(Request $request, $id)

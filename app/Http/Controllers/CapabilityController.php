@@ -27,9 +27,14 @@ class CapabilityController extends Controller
 
     public function show($id)
     {
-        $capability = Capability::findOrFail($id);
-        $data = ['data' => [$capability]];
-        return response()->json(['data' => $data], 200);
+
+        $zone = DB::table('capabilitys')
+        ->select('capabilitys.id', 'capabilitys.name')
+        ->where('capabilitys.id', $id)
+        ->get();
+
+        $data = ['data' => $zone];
+        return response()->json($data, 200);
     }
 
     public function update(Request $request, $id)

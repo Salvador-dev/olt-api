@@ -43,14 +43,16 @@ class OnuController extends Controller
 
     public function onusUnconfigureds()
     {
-        $client = new \GuzzleHttp\Client();
-        $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/unconfigured_onus');
-        $res = $client->sendAsync($request)->wait();
-        $res = json_decode($res->getBody(), true);
-        $res = json_decode($res[0]);
-        $res = $res->response;
-        $data = $res;
-        return response()->json(['data' => $data], 200);
+        // $client = new \GuzzleHttp\Client();
+        // $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/unconfigured_onus');
+        // $res = $client->sendAsync($request)->wait();
+        // $res = json_decode($res->getBody(), true);
+        // $res = json_decode($res[0]);
+        // $res = $res->response;
+        // $data = $res;
+        // return response()->json(['data' => $data], 200);
+
+        return 'onusUnconfigureds';
     }
 
     public function store(Request $request)
