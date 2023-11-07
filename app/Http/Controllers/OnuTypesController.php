@@ -17,7 +17,7 @@ class OnuTypesController extends Controller
             ->select(
                 'onu_types.id',
                 'onu_types.name',
-                'pon_types.name as pon_type',
+                'pon_types.name as pon_type_id',
                 'capabilitys.name as capability',
                 'capabilitys.id as capability_id',
                 'onu_types.ethernet_ports',
@@ -43,9 +43,9 @@ class OnuTypesController extends Controller
             'name' => $request['name'],
             'capability_id' => $request['capability_id'],
             'pon_type_id' => $request['pon_type_id'],
-            'ethernet_ports' => $request['ethernetPorts'],
-            'wifi_ports' => $request['wifi'],
-            'voip_ports' => $request['voipPorts'],
+            'ethernet_ports' => $request['ethernet_ports'],
+            'wifi_ports' => $request['wifi_ports'],
+            'voip_ports' => $request['voip_ports '],
             'catv' => $request['catv'],
             'allow_custom_profiles' => $request['customProfile']
         ]);
@@ -61,8 +61,8 @@ class OnuTypesController extends Controller
             ->select(
                 'onu_types.id',
                 'onu_types.name',
-                'pon_types.name as pon_type',
-                'capabilitys.name as capability',
+                'pon_types.name as pon_type_id',
+                'capabilitys.name as capability_id',
                 'onu_types.ethernet_ports',
                 'onu_types.wifi_ports',
                 'onu_types.voip_ports',
@@ -82,11 +82,11 @@ class OnuTypesController extends Controller
             'name' => $request['name'],
             'capability_id' => $request['capability_id'],
             'pon_type_id' => $request['pon_type_id'],
-            'ethernet_ports' => $request['ethernetPorts'],
-            'wifi_ports' => $request['wifi'],
-            'voip_ports' => $request['voipPorts'],
+            'ethernet_ports' => $request['ethernet_ports'],
+            'wifi_ports' => $request['wifi_ports'],
+            'voip_ports' => $request['voip_ports'],
             'catv' => $request['catv'],
-            'allow_custom_profiles' => $request['customProfile']
+            'allow_custom_profiles' => $request['allow_custom_profiles']
         ]);
         return response()->json(['data' => $data], 200);
     }
