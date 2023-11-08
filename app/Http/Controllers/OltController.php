@@ -69,19 +69,19 @@ class OltController extends Controller
             )
             ->first();
 
-             // $olt_cards = OltCard::where('olt_id', $id)->get();
-        // $olt_uplinks = Uplink::where('olt_id', $id)->get();
+         $olt_cards = OltCard::where('olt_id', $id)->get();
+         $olt_uplinks = Uplink::where('olt_id', $id)->get();
     
-        // // Organiza los datos en un arreglo asociativo
-        // $response = [
-        //     'olt' => $olt,
-        //     'olt_cards' => $olt_cards,
-        //     'olt_uplinks' => $olt_uplinks
-        // ];
+        // Organiza los datos en un arreglo asociativo
+         $response = [
+             'olt' => $olt,
+             'olt_cards' => $olt_cards,
+             'olt_uplinks' => $olt_uplinks
+         ];
     
-        $data = ['data' => [$olt]];
+        // $data = ['data' => [$olt]];
 
-        return response()->json($data, 200);
+        return response()->json($response, 200);
     }
     
         
