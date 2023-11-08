@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Olt;
 use App\Models\OltCard;
-use App\Models\PonPort;
 use App\Models\Uplink;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
+
 
 class OltController extends Controller
 {
