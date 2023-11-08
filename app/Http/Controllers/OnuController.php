@@ -22,6 +22,7 @@ class OnuController extends Controller
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->select(
+                'onus.id',
                 'onus.name',
                 'onus.unique_external_id',
                 'onus.status',
@@ -91,16 +92,16 @@ class OnuController extends Controller
 
         $data = Onu::create([
             'autoincrement' => $request['autoincrement'],
-            'onu_external' => $request['onu_external'],
+            'unique_external_id' => $request['onu_external'],
             'pon_type' => $request['pon_type'],
             'sn' => $request['sn'],
-            'onu_type' => $request['onu_type'],
+            'onu_type_id' => $request['onu_type'],
             'name' => $request['name'],
             'olt_id' => $request['olt_id'],
             'board' => $request['board'],
             'port' => $request['port'],
             'allocated_onu' => $request['allocated_onu'],
-            'zone_id' => $request['zone_id'],
+            'zone_id' => $request['zone'],
             'address' => $request['address'],
             'lat' => $request['lat'],
             'lng' => $request['lng'],
@@ -130,11 +131,7 @@ class OnuController extends Controller
             'speed_up_id' => $request['speed_up_id'],
             'speed_download_id' => $request['speed_download_id'],
         ]);
-
-        $dataPorts = DB::table('onu_ports')->insert([
-            'onu_id' => $data->id,
-            'data_ports' => $json,
-        ]);
+        $data->save();
 
         return response()->json(['data' => $data], 200);
     }
@@ -143,7 +140,7 @@ class OnuController extends Controller
     {
         try {
 
-            $onu = Onu::where('onus.unique_external_id', $id)
+            $onu = Onu::where('onus.id', $id)
                 ->join('olts', 'onus.olt_id', 'olts.id')
                 ->join('pon_types', 'onus.pon_type_id', 'pon_types.id')
                 ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
@@ -151,7 +148,7 @@ class OnuController extends Controller
                 ->join('zones', 'onus.zone_id', 'zones.id')
                 ->select(
                     'onus.id',
-                    'onus.name as onu',
+                    'onus.name as name',
                     'onus.unique_external_id',
                     'onus.status',
                     'onus.sn',
@@ -196,7 +193,7 @@ class OnuController extends Controller
 
             return response()->json(array('error' => $e), 200);
         }
-        return response()->json(['data' => $onu], 200);
+        return response()->json(['data' => [$onu]], 200);
     }
 
     public function update(Request $request, $id)
