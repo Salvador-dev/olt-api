@@ -28,12 +28,12 @@ class CapabilityController extends Controller
     public function show($id)
     {
 
-        $zone = DB::table('capabilitys')
+        $capability = DB::table('capabilitys')
         ->select('capabilitys.id', 'capabilitys.name')
         ->where('capabilitys.id', $id)
         ->get();
 
-        $data = ['data' => $zone];
+        $data = ['data' => $capability];
         return response()->json($data, 200);
     }
 

@@ -20,12 +20,12 @@ class ZoneController extends Controller
         $request->validate([
             'name' => 'required|max:255'
         ]);
-
-        $data = DB::table('zones')->insert([
-            'name' => $request['name'],
-        ]);
-
-        return response()->json(['data' => $data], 200);
+    
+        $zone = new Zone;
+        $zone->name = $request['name'];
+        $zone->save();
+    
+        return response()->json(['data' => $zone], 200);
     }
 
     public function show($id)

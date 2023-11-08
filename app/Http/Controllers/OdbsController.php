@@ -25,16 +25,16 @@ class OdbsController extends Controller
             'zone_id' => 'required',
             'nr_of_ports' => 'required'
         ]);
-
-        $data = DB::table('odbs')->insert([
-            'name' => $request['name'],
-            'zone_id' => $request['zone_id'],
-            'nr_of_ports' => $request['nr_of_ports'],
-            'latitude' => $request['latitude'],
-            'longitude' => $request['longitude'],
-        ]);
-
-        return response()->json(['data' => $data], 200);
+    
+        $odb = new Odb;
+        $odb->name = $request['name'];
+        $odb->zone_id = $request['zone_id'];
+        $odb->nr_of_ports = $request['nr_of_ports'];
+        $odb->latitude = $request['latitude'];
+        $odb->longitude = $request['longitude'];
+        $odb->save();
+    
+        return response()->json(['data' => $odb], 200);
     }
 
     public function show($id)

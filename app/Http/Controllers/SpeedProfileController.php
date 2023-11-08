@@ -26,17 +26,18 @@ class SpeedProfileController extends Controller
             'speed' => 'required',
             'type_conexion' => 'required',
         ]);
-
-        $data = DB::table('speed_profiles')->insert([
-            'name' => $request['name'],
-            'type_conexion' => $request['type_conexion'],
-            'direction' => $request['type_speed'],
-            'speed' => $request['speed'],
-            'use_prefix' => $request['use_prefix'],
-        ]);
-
-        return response()->json(['data' => $data], 200);
+    
+        $speedProfile = new SpeedProfile();
+        $speedProfile->name = $request->input('name');
+        $speedProfile->type_conexion = $request->input('type_conexion');
+        $speedProfile->direction = $request->input('type_speed');
+        $speedProfile->speed = $request->input('speed');
+        $speedProfile->use_prefix = $request->input('use_prefix');
+        $speedProfile->save();
+    
+        return response()->json(['data' => $speedProfile], 200);
     }
+    
 
     public function show($id)
     {
