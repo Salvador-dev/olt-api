@@ -21,6 +21,7 @@ class ZoneController extends Controller
             'name' => 'required|max:255'
         ]);
     
+        
         $zone = new Zone;
         $zone->name = $request['name'];
         $zone->save();
