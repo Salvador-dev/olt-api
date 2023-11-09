@@ -40,7 +40,7 @@ class OltController extends Controller
 
         $data = Olt::create([
             'name' => $request->name,
-            'olt_hardware_version_id' => $request->olt_hardware_version,
+            'olt_hardware_version_id' => $request->olt_hardware_version_id,
             'olt_software_version_id' => $request->olt_software_version_id,
             'ip' => $request->ip,
             'telnet_port' => $request->telnet_port,
@@ -48,7 +48,7 @@ class OltController extends Controller
             'telnet_password' => $request->telnet_password,
             'snmp_read_only' => $request->snmp_read_only,
             'snmp_read_write' => $request->snmp_read_write,
-            'snmp_udp_port' => $request->snmp_port,
+            'snmp_udp_port' => $request->snmp_udp_port,
             'ipvt_module' => $request->ipvt_module,
             'pon_type_id' => $request->pon_type_id,
         ]);

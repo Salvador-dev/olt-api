@@ -95,7 +95,7 @@ class OnuController extends Controller
             'unique_external_id' => $request['onu_external'],
             'pon_type' => $request['pon_type'],
             'sn' => $request['sn'],
-            'onu_type_id' => $request['onu_type'],
+            'onu_type_id' => $request['onu_type_id'],
             'name' => $request['name'],
             'olt_id' => $request['olt_id'],
             'board' => $request['board'],
@@ -105,7 +105,7 @@ class OnuController extends Controller
             'address' => $request['address'],
             'lat' => $request['lat'],
             'lng' => $request['lng'],
-            'odb_id' => $request['odb_id'],
+            'odb_name' => $request['odb'],
             'mode' => $request['mode'],
             'wam_mode' => $request['wam_mode'],
             'ip_address' => $request['ip_address'],
@@ -128,7 +128,6 @@ class OnuController extends Controller
             'service_port_cvlan' => $request['service_port_cvlan'],
             'service_port_svlan' => $request['service_port_svlan'],
             'service_port_tag_transform_mode' => $request['service_port_tag_transform_mode'],
-            'speed_up_id' => $request['speed_up_id'],
             'speed_download_id' => $request['speed_download_id'],
         ]);
         $data->save();
@@ -148,8 +147,8 @@ class OnuController extends Controller
                 ->join('zones', 'onus.zone_id', 'zones.id')
                 ->select(
                     'onus.id',
-                    'onus.name as name',
-                    'onus.unique_external_id',
+                    'onus.name as name', 
+                    'onus.unique_external_id as onu_external',
                     'onus.status',
                     'onus.sn',
                     'onus.signal',
@@ -157,38 +156,39 @@ class OnuController extends Controller
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
-                    'onus.zone_id',
+                    'onus.zone_id as zone',
                     'onus.board',
+                    'onus.odb_name as odb',
                     'onus.port',
                     'onus.address',
                     'onus.mode',
                     'service_ports.vlan_id as vlan',
                     'olts.name as olt_name',
                     'pon_types.name as pon_type',
-                    'onu_types.name as onu_type',
+                    'onu_types.name as onu_type_id',
                     'zones.name as zone_name',
                 )
                 ->first();
 
-            if ($onu) {
-                $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
-                $service_ports = ServicePort::join('speed_profiles', 'service_ports.download_speed_id', 'speed_profiles.id')
-                    ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
-                    ->where('service_ports.onu_id', $onu->id)
-                    ->select(
-                        'service_ports.id as service_port',
-                        'speed_profiles.name as download_speed',
-                        'up_speed.name as upload_speed',
-                        'service_ports.vlan_id as vlan',
-                        'service_ports.cvlan_id as cvlan',
-                        'service_ports.svlan_id as svlan',
-                        'service_ports.tag_mode'
-                    )
-                    ->get();
+            // if ($onu) {
+            //     $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
+            //     $service_ports = ServicePort::join('speed_profiles', 'service_ports.download_speed_id', 'speed_profiles.id')
+            //         ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
+            //         ->where('service_ports.onu_id', $onu->id)
+            //         ->select(
+            //             'service_ports.id as service_port',
+            //             'speed_profiles.name as download_speed',
+            //             'up_speed.name as upload_speed',
+            //             'service_ports.vlan_id as vlan',
+            //             'service_ports.cvlan_id as cvlan',
+            //             'service_ports.svlan_id as svlan',
+            //             'service_ports.tag_mode'
+            //         )
+            //         ->get();
 
-                $onu['ethernet_ports'] = $ethernet_ports;
-                $onu['service_ports'] = $service_ports;
-            }
+            //     $onu['ethernet_ports'] = $ethernet_ports;
+            //     $onu['service_ports'] = $service_ports;
+            // }
         } catch (Exception $e) {
 
             return response()->json(array('error' => $e), 200);
