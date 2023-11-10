@@ -30,7 +30,7 @@ class SpeedProfileController extends Controller
         $speedProfile = new SpeedProfile();
         $speedProfile->name = $request->input('name');
         $speedProfile->type_conexion = $request->input('type_conexion');
-        $speedProfile->direction = $request->input('type_speed');
+        $speedProfile->direction = $request->input('direction');
         $speedProfile->speed = $request->input('speed');
         $speedProfile->use_prefix = $request->input('use_prefix');
         $speedProfile->save();
@@ -65,7 +65,7 @@ class SpeedProfileController extends Controller
             'name' => $request['name'],
             // 'onu_id' => $request['onu_id'],
             'type_conexion' => $request['type_conexion'],
-            'direction' => $request['type_speed'],
+            'direction' => $request['direction'],
             'speed' => $request['speed'],
             'use_prefix' => $request['use_prefix'],
         ]);

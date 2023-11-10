@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Olt;
 use App\Models\OltCard;
+use App\Models\HardwareVersion;
+use App\Models\SoftwareVersion;
 use App\Models\Uplink;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,13 +16,22 @@ class OltController extends Controller
     //
     public function getData()
     {
-        $data = Olt::join('hardware_versions', 'olt_hardware_version_id', 'hardware_versions.id')
-            ->select('olts.id', 'olts.name', 'hardware_versions.name as hardware_version', 'olts.ip', 'olts.telnet_port', 'olts.snmp_udp_port')
+        $data = Olt::join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
+            ->select(
+                'olts.id',
+                'olts.name',
+                'hardware_versions.name as hardware_version',
+                'hardware_versions.id as hardware_version_id',
+                'olts.ip',
+                'olts.telnet_port',
+                'olts.snmp_udp_port'
+            )
             ->orderBy('olts.id')
             ->get();
-
+    
         return response()->json(['data' => $data], 200);
     }
+    
 
     public function paginater()
     {
@@ -89,7 +100,7 @@ class OltController extends Controller
 
         $data = Olt::where('id', $id)->update([
             'name' => $request->name,
-            'olt_hardware_version_id' => $request->olt_hardware_version,
+            'olt_hardware_version_id' => $request->olt_hardware_version_id,
             'olt_software_version_id' => $request->olt_software_version_id,
             'ip' => $request->ip,
             'telnet_port' => $request->telnet_port,
@@ -125,5 +136,17 @@ class OltController extends Controller
         $data = [];
 
         return response()->json(['data' => $data], 200);
+    }
+
+    public function getHardware(){
+        $hardwareVersions = HardwareVersion::select('id', 'name')->get();
+
+        return response()->json(['data' => $hardwareVersions], 200);
+    }
+    public function getSoftware()
+    {
+        $softwareVersions = SoftwareVersion::select('id', 'name')->get();
+    
+        return response()->json(['data' => $softwareVersions], 200);
     }
 }
