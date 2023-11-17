@@ -9,6 +9,7 @@ use App\Models\SoftwareVersion;
 use App\Models\Uplink;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 
 class OltController extends Controller
@@ -126,15 +127,15 @@ class OltController extends Controller
         }
     }
 
-    public function getOltTemperature()
+    //Debe recibir ID del olt en cuestion
+    public function getOltTemperature($id)
     {
-        /*         $client = new Client();
-        $request = new Request('GET', env('API_URL') . '/get_olts_uptime_and_env_temperature');
+
+        $client = new \GuzzleHttp\Client();
+        $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_tiempoactivo_temperatura/'.$id);
         $res = $client->sendAsync($request)->wait();
-        $res = $res->getBody(); */
-
-        $data = [];
-
+        $res = json_decode($res->getBody(), true);
+        $data = $res;
         return response()->json(['data' => $data], 200);
     }
 
@@ -149,4 +150,118 @@ class OltController extends Controller
     
         return response()->json(['data' => $softwareVersions], 200);
     }
+
+    public function getUplinks($id){
+         // Intenta obtener datos desde la caché
+    $cachedData = Cache::get('uplinks_data_' . $id);
+
+    if ($cachedData) {
+        // Si los datos están en caché, devuélvelos
+        return response()->json(['data' => $cachedData], 200);
+    }
+
+        try {
+            $client = new \GuzzleHttp\Client();
+            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_uplinks/'.$id);
+            $res = $client->sendAsync($request)->wait();
+            $data = json_decode($res->getBody());
+    
+            $response = array_map(function ($item) use (&$index) {
+                return [
+                    'type' => $item->tipo_puerto ?? null,
+                    'slot' => $item->slot ?? null,
+                    'puerto' => $item->puerto ?? null,
+                    'vlans' => $item->vlans ?? null,
+                    'negociation' => $item->negociacion ?? null,
+                    'description' => $item->descripcion ?? null,
+                    'status' => $item->estado_operacinal ?? null,
+                    'PVID_Untag' => $item->PVID_untag ?? null,
+                    'admin_state' => $item->estado_administrativo?? null,
+                    
+                ];
+            }, $data);
+            Cache::put('uplinks_data_' . $id, $response, 3600);
+
+            return response()->json(['data' => $response], 200);
+        
+        } catch (\Exception $e) {
+
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function getVlans($id)
+    {
+        // Intenta obtener datos desde la caché
+        $cachedData = Cache::get('vlans_data_' . $id);
+    
+        if ($cachedData) {
+            // Si los datos están en caché, devuélvelos
+            return response()->json(['data' => $cachedData], 200);
+        }
+    
+        try {
+            // Si los datos no están en caché, realiza la solicitud a la API
+            $client = new \GuzzleHttp\Client();
+            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_Vlans/' . $id);
+            $res = $client->sendAsync($request)->wait();
+            $data = json_decode($res->getBody());
+    
+            $response = array_map(function ($item) {
+                return [
+                    'id' => isset($item->id) ? $item->id : null, 
+                    'alcance' => $item->alcance ?? null,
+                    'Description' => $item->descripcion ?? null,
+                    'vlan' => $item->vlan ?? null,
+                    'olt' => $item->olt ?? null,
+                ];
+            }, $data);
+    
+            Cache::put('vlans_data_' . $id, $response, 3600);
+    
+            return response()->json(['data' => $response], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function getPONType($id)
+    {
+        // Intenta obtener datos desde la caché
+        $cachedData = Cache::get('PONType_data_' . $id);
+    
+        if ($cachedData) {
+            // Si los datos están en caché, devuélvelos
+            return response()->json(['data' => $cachedData], 200);
+        }
+    
+        try {
+            // Si los datos no están en caché, realiza la solicitud a la API
+            $client = new \GuzzleHttp\Client();
+            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_puertos/' . $id);
+            $res = $client->sendAsync($request)->wait();
+            $data = json_decode($res->getBody());
+    
+            $response = array_map(function ($item) {
+                return [
+                    'slot' => $item->slot ?? null,
+                    'port' => $item->puerto ?? null,
+                    'type' => $item->tipo_puerto ?? null,
+                    'status' => $item->estado_operacinal ?? null,
+                    'admin_state' => $item->estado_administrativo ?? null,
+                    'tx_power' => $item->poder_tx ?? null,
+                    'description' => $item->descripcion ?? null,
+                    'cantidad_onus' => $item->cantidad_onus ?? null,
+                    'cantidad_online_onus' => $item->cantidad_online_onus ?? null,
+                    'rango_maximo' => $item->rango_maximo ?? null,
+                    'rango_minimo' => $item->rango_minimo ?? null,
+                ];
+            }, $data);
+    
+            Cache::put('PONType_data_' . $id, $response, 3600);
+    
+            return response()->json(['data' => $response], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    
 }

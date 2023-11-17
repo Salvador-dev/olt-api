@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\OnusImport;
+use Illuminate\Support\Facades\Cache;
 use App\Models\EthernetPort;
 use App\Models\Onu;
 use App\Models\ServicePort;
@@ -44,15 +45,52 @@ class OnuController extends Controller
 
     public function onusUnconfigureds()
     {
-         $client = new \GuzzleHttp\Client();
-         $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/unconfigured_onus');
-         $res = $client->sendAsync($request)->wait();
-         $res = json_decode($res->getBody(), true);
-         $res = json_decode($res[0]);
-         $res = $res->response;
-         $data = $res;
-         return response()->json(['data' => $data], 200);
+        // Intenta obtener datos de la caché
+        $cachedData = Cache::get('onus_unconfigured_data');
+    
+        if ($cachedData) {
+            // Si los datos están en caché, devuélvelos
+            return response()->json(['data' => $cachedData], 200);
+        }
+    
+        try {
+            // Si los datos no están en caché, realiza la solicitud a la API
+            $client = new \GuzzleHttp\Client();
+            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/onu/get_no_configurados');
+            $res = $client->sendAsync($request)->wait();
+            $data = json_decode($res->getBody());
+    
+            $index = 1;
+    
+            $response = array_map(function ($item) use (&$index) {
+                return [
+                    'id' => $index++, 
+                    'tipo_puerto' => $item->tipo_puerto ?? null,
+                    'slot' => $item->slot ?? null,
+                    'puerto' => $item->puerto ?? null,
+                    'onu_id' => $item->onu_id ?? null,
+                    'numero_serial' => $item->numero_serial ?? null,
+                    'tipo_onu_id' => $item->tipo_onu_id ?? null,
+                    'tipo_onu_nombre' => $item->tipo_onu_nombre ?? null,
+                    'olt_id' => $item->olt_id ?? null,
+                ];
+            }, $data);
+    
+            // Guarda los datos en caché durante 10 minutos (600 segundos)
+            Cache::put('onus_unconfigured_data', $response, 600);
+    
+            return response()->json(['data' => $response], 200);
+        } catch (\Exception $e) {
+            // Manejo de errores: log, devuelve un error específico, etc.
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+    
+    
+    
+    
+    
+    
 
     public function store(Request $request)
     {
