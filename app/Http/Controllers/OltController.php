@@ -184,7 +184,7 @@ class OltController extends Controller
 
             return response()->json(['data' => $response], 200);
         
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -219,7 +219,7 @@ class OltController extends Controller
             Cache::put('vlans_data_' . $id, $response, 3600);
     
             return response()->json(['data' => $response], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

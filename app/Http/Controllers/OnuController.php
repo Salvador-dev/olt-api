@@ -54,7 +54,6 @@ class OnuController extends Controller
         }
     
         try {
-            // Si los datos no están en caché, realiza la solicitud a la API
             $client = new \GuzzleHttp\Client();
             $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/onu/get_no_configurados');
             $res = $client->sendAsync($request)->wait();
@@ -76,12 +75,10 @@ class OnuController extends Controller
                 ];
             }, $data);
     
-            // Guarda los datos en caché durante 10 minutos (600 segundos)
-            Cache::put('onus_unconfigured_data', $response, 600);
+            Cache::put('onus_unconfigured_data', $response, 3600);
     
             return response()->json(['data' => $response], 200);
-        } catch (\Exception $e) {
-            // Manejo de errores: log, devuelve un error específico, etc.
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
