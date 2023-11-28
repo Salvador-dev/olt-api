@@ -33,4 +33,15 @@ class Olt extends Model
     {
         return $this->hasMany(PonPort::class);
     }
+
+    public function hardwareVersion()
+    {
+        return $this->belongsTo(HardwareVersion::class, 'olt_hardware_version_id');
+    }
+
+    public function softwareVersion()
+    {
+        return $this->belongsTo(SoftwareVersion::class, 'olt_software_version_id');
+    }
+
 }

@@ -20,19 +20,27 @@ class ZoneController extends Controller
         $request->validate([
             'name' => 'required|max:255'
         ]);
-
-        $data = DB::table('zones')->insert([
-            'name' => $request['name'],
-        ]);
-
-        return response()->json(['data' => $data], 200);
+    
+        
+        $zone = new Zone;
+        $zone->name = $request['name'];
+        $zone->save();
+    
+        return response()->json(['data' => $zone], 200);
     }
 
     public function show($id)
     {
-        $zone = Zone::findOrFail($id);
-        return response()->json(['data' => $zone], 200);
+        $zone = DB::table('zones')
+            ->select('zones.id', 'zones.name')
+            ->where('zones.id', $id)
+            ->get();
+    
+        $data = ['data' => $zone];
+        return response()->json($data, 200);
     }
+    
+    
 
     public function update(Request $request, $id)
     {

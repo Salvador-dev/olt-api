@@ -14,7 +14,7 @@ class SpeedProfileController extends Controller
     //
     public function getData()
     {
-        $data = SpeedProfile::select('id', 'name', 'speed', 'direction', 'type_conexion')->get();
+        $data = SpeedProfile::select('id', 'name', 'speed', 'direction', 'type_conexion', 'use_prefix')->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -26,43 +26,48 @@ class SpeedProfileController extends Controller
             'speed' => 'required',
             'type_conexion' => 'required',
         ]);
-
-        $data = DB::table('speed_profiles')->insert([
-            'name' => $request['name'],
-            'type_conexion' => $request['type_conexion'],
-            'type_speed' => $request['type_speed'],
-            'speed' => $request['speed'],
-            'prefix' => $request['prefix'],
-            'is_default' => false,
-        ]);
-
-        return response()->json(['data' => $data], 200);
+    
+        $speedProfile = new SpeedProfile();
+        $speedProfile->name = $request->input('name');
+        $speedProfile->type_conexion = $request->input('type_conexion');
+        $speedProfile->direction = $request->input('direction');
+        $speedProfile->speed = $request->input('speed');
+        $speedProfile->use_prefix = $request->input('use_prefix');
+        $speedProfile->save();
+    
+        return response()->json(['data' => $speedProfile], 200);
     }
+    
 
     public function show($id)
     {
-        $speed_profiles = Cache::get('speed_profiles');
-        $data = array();
+        // $speed_profiles = Cache::get('speed_profiles');
+        // $data = array();
 
-        $filter = Arr::where($speed_profiles, function ($value, $key) use ($id) {
-            return $value->id == $id;
-        });
+        // $filter = Arr::where($speed_profiles, function ($value, $key) use ($id) {
+        //     return $value->id == $id;
+        // });
 
-        $data = array_merge($data, $filter);
+        // $data = array_merge($data, $filter);
 
+        $data = DB::table('speed_profiles')
+        ->select('speed_profiles.id', 'speed_profiles.name', 'speed_profiles.use_prefix', 'speed_profiles.type_conexion', 'speed_profiles.speed', 'speed_profiles.direction' )
+        ->where('speed_profiles.id', $id)
+        ->get();
         return response()->json(['data' => $data], 200);
     }
 
     // Pendiente por corregir
     public function update(Request $request, $id)
     {
-        $data = DB::table('speed_profiles')->where('idSpeedProfile', $id)->update([
+        
+        $data = DB::table('speed_profiles')->where('id', $id)->update([
             'name' => $request['name'],
-            'onu_id' => $request['onu_id'],
+            // 'onu_id' => $request['onu_id'],
             'type_conexion' => $request['type_conexion'],
-            'type_speed' => $request['type_speed'],
+            'direction' => $request['direction'],
             'speed' => $request['speed'],
-            'prefix' => $request['prefix'],
+            'use_prefix' => $request['use_prefix'],
         ]);
         return response()->json(['data' => $data], 200);
     }
@@ -70,7 +75,7 @@ class SpeedProfileController extends Controller
     // Pendiente por corregir
     public function destroy($id)
     {
-        $data = DB::table('speed_profiles')->where('idSpeedProfile', $id)->delete();
+        $data = DB::table('speed_profiles')->where('id', $id)->delete();
         return response()->json(['data' => $data], 200);
     }
 }

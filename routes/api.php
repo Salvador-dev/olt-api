@@ -79,6 +79,11 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::delete('/olts/{id}', [OltController::class, 'destroy']);
     Route::get('/olts', [OltController::class, 'paginater']);
     Route::get('/get_olts_uptime_and_env_temperature', [OltController::class, 'getOltTemperature']);
+    Route::get('/get/hardware', [OltController::class, 'getHardware']);
+    Route::get('/get/software', [OltController::class, 'getSoftware']);
+    Route::get('/get/uplinks/{id}', [OltController::class, 'getUplinks']);
+    Route::get('/get/vlans/{id}', [OltController::class, 'getVlans']);
+    Route::get('/get/pon/{id}', [OltController::class, 'getPONType']);
 
     Route::get('/onuTypes/listing', [OnuTypesController::class, 'getData']);
     Route::post('/onuTypes', [onuTypesController::class, 'store']);

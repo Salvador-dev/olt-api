@@ -13,7 +13,7 @@ class OdbsController extends Controller
     {
         $data = DB::table('odbs')
             ->join('zones', 'odbs.zone_id', 'zones.id')
-            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.name as zone')
+            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.name as zone_id')
             ->get();
         return response()->json(['data' => $data], 200);
     }
@@ -23,25 +23,25 @@ class OdbsController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'zone_id' => 'required',
-            'numPorts' => 'required'
+            'nr_of_ports' => 'required'
         ]);
-
-        $data = DB::table('odbs')->insert([
-            'name' => $request['name'],
-            'nr_of_ports' => $request['nr_of_ports'],
-            'latitude' => $request['latitude'],
-            'longitude' => $request['longitude'],
-            'zone_id' => $request['zone_id'],
-        ]);
-
-        return response()->json(['data' => $data], 200);
+    
+        $odb = new Odb;
+        $odb->name = $request['name'];
+        $odb->zone_id = $request['zone_id'];
+        $odb->nr_of_ports = $request['nr_of_ports'];
+        $odb->latitude = $request['latitude'];
+        $odb->longitude = $request['longitude'];
+        $odb->save();
+    
+        return response()->json(['data' => $odb], 200);
     }
 
     public function show($id)
     {
         $data = DB::table('odbs')
             ->join('zones', 'odbs.zone_id', 'zones.id')
-            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.name as zone')
+            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.name as zone_id')
             ->where('odbs.id', $id)
             ->get();
         return response()->json(['data' => $data], 200);
@@ -49,12 +49,12 @@ class OdbsController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = DB::table('odbs')->where('idOdb', $id)->update([
+        $data = DB::table('odbs')->where('id', $id)->update([
             'name' => $request['name'],
-            'zone_id' => $request['nr_of_ports'],
-            'numPorts' => $request['latitude'],
-            'lat' => $request['longitude'],
-            'lng' => $request['zone_id'],
+            'zone_id' => $request['zone_id'],
+            'nr_of_ports' => $request['nr_of_ports'],
+            'latitude' => $request['latitude'],
+            'longitude' => $request['longitude'],
         ]);
         return response()->json(['data' => $data], 200);
     }

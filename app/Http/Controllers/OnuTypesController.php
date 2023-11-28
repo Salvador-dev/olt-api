@@ -17,8 +17,9 @@ class OnuTypesController extends Controller
             ->select(
                 'onu_types.id',
                 'onu_types.name',
-                'pon_types.name as pon_type',
+                'pon_types.name as pon_type_id',
                 'capabilitys.name as capability',
+                'capabilitys.id as capability_id',
                 'onu_types.ethernet_ports',
                 'onu_types.wifi_ports',
                 'onu_types.voip_ports',
@@ -60,8 +61,8 @@ class OnuTypesController extends Controller
             ->select(
                 'onu_types.id',
                 'onu_types.name',
-                'pon_types.name as pon_type',
-                'capabilitys.name as capability',
+                'pon_types.name as pon_type_id',
+                'capabilitys.name as capability_id',
                 'onu_types.ethernet_ports',
                 'onu_types.wifi_ports',
                 'onu_types.voip_ports',
