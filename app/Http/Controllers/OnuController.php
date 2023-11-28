@@ -63,7 +63,6 @@ class OnuController extends Controller
     
             $response = array_map(function ($item) use (&$index) {
                 return [
-                    'id' => $index++, 
                     'tipo_puerto' => $item->tipo_puerto ?? null,
                     'slot' => $item->slot ?? null,
                     'puerto' => $item->puerto ?? null,

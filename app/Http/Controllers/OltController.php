@@ -151,44 +151,16 @@ class OltController extends Controller
         return response()->json(['data' => $softwareVersions], 200);
     }
 
-    public function getUplinks($id){
-         // Intenta obtener datos desde la caché
-    $cachedData = Cache::get('uplinks_data_' . $id);
-
-    if ($cachedData) {
-        // Si los datos están en caché, devuélvelos
-        return response()->json(['data' => $cachedData], 200);
-    }
-
-        try {
-            $client = new \GuzzleHttp\Client();
-            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_uplinks/'.$id);
-            $res = $client->sendAsync($request)->wait();
-            $data = json_decode($res->getBody());
+    public function getUplinks($id) {
+        // Realizar la consulta utilizando Eloquent
+        $uplinks = Uplink::where('olt_id', $id)
+            ->select('type', 'admin_state', 'status', 'negotiation', 'pivd_untag', 'description', 'mode_vlan')
+            ->get();
     
-            $response = array_map(function ($item) use (&$index) {
-                return [
-                    'type' => $item->tipo_puerto ?? null,
-                    'slot' => $item->slot ?? null,
-                    'puerto' => $item->puerto ?? null,
-                    'vlans' => $item->vlans ?? null,
-                    'negociation' => $item->negociacion ?? null,
-                    'description' => $item->descripcion ?? null,
-                    'status' => $item->estado_operacinal ?? null,
-                    'PVID_Untag' => $item->PVID_untag ?? null,
-                    'admin_state' => $item->estado_administrativo?? null,
-                    
-                ];
-            }, $data);
-            Cache::put('uplinks_data_' . $id, $response, 3600);
-
-            return response()->json(['data' => $response], 200);
-        
-        } catch (Exception $e) {
-
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        // Devolver los resultados de la consulta
+        return response()->json(['data'=> $uplinks], 200) ;
     }
+
     public function getVlans($id)
     {
         // Intenta obtener datos desde la caché
