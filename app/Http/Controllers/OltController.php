@@ -10,11 +10,21 @@ use App\Models\Uplink;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Ndum\Laravel\Snmp;
 
 
 class OltController extends Controller
 {
     //
+    public function getSnmpData(){
+        $snmp = new Snmp();
+        $snmp->newClient('172.29.0.2', 2, 'public');
+        $result = $snmp->getValue('1.3.6.1.2.1.1.5.0'); ## hostname
+
+        return $result;
+    }
+
+
     public function getData()
     {
         $data = Olt::join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
@@ -152,7 +162,6 @@ class OltController extends Controller
     }
 
     public function getUplinks($id) {
-        // Realizar la consulta utilizando Eloquent
         $uplinks = Uplink::where('olt_id', $id)
             ->select('type', 'admin_state', 'status', 'negotiation', 'pivd_untag', 'description', 'mode_vlan')
             ->get();
