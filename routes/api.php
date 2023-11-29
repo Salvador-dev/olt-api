@@ -84,6 +84,7 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/get/uplinks/{id}', [OltController::class, 'getUplinks']);
     Route::get('/get/vlans/{id}', [OltController::class, 'getVlans']);
     Route::get('/get/pon/{id}', [OltController::class, 'getPONType']);
+    Route::get('/get/snmp', [OltController::class, 'getSnmpData']);
 
     Route::get('/onuTypes/listing', [OnuTypesController::class, 'getData']);
     Route::post('/onuTypes', [onuTypesController::class, 'store']);
