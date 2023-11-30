@@ -19,29 +19,6 @@ class SnmpController extends Controller
         ]);
     }
 
-    public function processPortData()
-    {
-        $data = [];
-    
-        $ports = $this->OnusByPort(); // Obtén la lista de puertos
-    
-            $portData = [
-                'port' => $this->portName(),
-                'type' => $this->PortType(),
-                'status' => $this->PortStatus(),
-                'admin_state' => $this->PortStatus(),
-                'tx_power' => $this->powerTxOLT(),
-                'description' => '',
-                'cantidad_onus' => $this->OnusByPort(),
-                'cantidad_online_onus' => $this->ActiveOnusByPort(),
-                'rango_maximo' => '20km',
-                'rango_minimo' => '0',
-            ];
-    
-            $data[] = $portData;
-    
-        return ['data' => $data];
-    }
     
     public function OnusByPort()
     {
@@ -198,9 +175,6 @@ public function portStatus()
             }
         }
     }
-
-
-
 
     public function saveHuaweiOid()
     {
