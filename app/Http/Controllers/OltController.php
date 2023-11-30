@@ -10,19 +10,42 @@ use App\Models\Uplink;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Ndum\Laravel\Snmp;
+use FreeDSx\Snmp\SnmpClient;
+
 
 
 class OltController extends Controller
 {
     //
-    public function getSnmpData(){
-        $snmp = new Snmp();
-        $snmp->newClient('172.29.0.2', 2, 'public');
-        $result = $snmp->getValue('1.3.6.1.2.1.1.5.0'); ## hostname
-
-        return $result;
+    public function getSnmpData()
+    {
+        $snmp = new SnmpClient([
+            'host' => '172.29.0.2',
+            'version' => 2,
+            'community' => 'public',
+        ]);
+    
+        // OID base para el walk
+        $baseOid = '1.3.6.1.2.1.2.2.1.2';
+    
+        // Realizar el SNMP walk
+        $walk = $snmp->walk($baseOid);
+    
+        // Iterar a través de las OIDs obtenidas durante el walk
+        while ($walk->hasOids()) {
+            try {
+                $oid = $walk->next();
+                echo sprintf("%s == %s", $oid->getOid(), $oid->getValue()).PHP_EOL;
+            } catch (Exception $e) {
+                echo "Error al recuperar OID. ".$e->getMessage().PHP_EOL;
+            }
+        }
     }
+    
+    
+    
+    
+
 
 
     public function getData()
