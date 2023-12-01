@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('pon_ports', function (Blueprint $table) {
             $table->bigInteger('id', true);
-            $table->bigInteger('pon_type_id');
-            $table->integer('admin_status');
-            $table->string('onus')->nullable()->comment('Columna por definir');
+            $table->bigInteger('pon_type_id')->default(1); 
+            $table->integer('admin_status')->comment('1: UP, 2: Down');
+            $table->string('onus')->nullable();
             $table->string('average_signal')->nullable();
             $table->string('description')->nullable();
             $table->string('range')->nullable();

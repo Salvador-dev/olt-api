@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('dispositivos', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('hardware_version_id'); 
+            $table->foreign('hardware_version_id')->references('id')->on('hardware_versions');
+            $table->unsignedBigInteger('client_id')->nullable(); 
+            // $table->foreign('client_id')->references('id')->on('client')->nullable(); 
             $table->timestamps();
         });
     }
