@@ -7,6 +7,7 @@ use App\Models\OltCard;
 use App\Models\HardwareVersion;
 use App\Models\SoftwareVersion;
 use App\Models\Uplink;
+use App\Models\PonPort;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -16,37 +17,6 @@ use FreeDSx\Snmp\SnmpClient;
 
 class OltController extends Controller
 {
-    //
-    public function getSnmpData()
-    {
-        $snmp = new SnmpClient([
-            'host' => '172.29.0.2',
-            'version' => 2,
-            'community' => 'public',
-        ]);
-    
-        // OID base para el walk
-        $baseOid = '1.3.6.1.2.1.2.2.1.2';
-    
-        // Realizar el SNMP walk
-        $walk = $snmp->walk($baseOid);
-    
-        // Iterar a través de las OIDs obtenidas durante el walk
-        while ($walk->hasOids()) {
-            try {
-                $oid = $walk->next();
-                echo sprintf("%s == %s", $oid->getOid(), $oid->getValue()).PHP_EOL;
-            } catch (Exception $e) {
-                echo "Error al recuperar OID. ".$e->getMessage().PHP_EOL;
-            }
-        }
-    }
-    
-    
-    
-    
-
-
 
     public function getData()
     {
@@ -227,45 +197,18 @@ class OltController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    public function getPONType($id)
+    public function getPONPort($id)
     {
-        // Intenta obtener datos desde la caché
-        $cachedData = Cache::get('PONType_data_' . $id);
-    
-        if ($cachedData) {
-            // Si los datos están en caché, devuélvelos
-            return response()->json(['data' => $cachedData], 200);
-        }
-    
-        try {
-            // Si los datos no están en caché, realiza la solicitud a la API
-            $client = new \GuzzleHttp\Client();
-            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_puertos/' . $id);
-            $res = $client->sendAsync($request)->wait();
-            $data = json_decode($res->getBody());
-    
-            $response = array_map(function ($item) {
-                return [
-                    'slot' => $item->slot ?? null,
-                    'port' => $item->puerto ?? null,
-                    'type' => $item->tipo_puerto ?? null,
-                    'status' => $item->estado_operacinal ?? null,
-                    'admin_state' => $item->estado_administrativo ?? null,
-                    'tx_power' => $item->poder_tx ?? null,
-                    'description' => $item->descripcion ?? null,
-                    'cantidad_onus' => $item->cantidad_onus ?? null,
-                    'cantidad_online_onus' => $item->cantidad_online_onus ?? null,
-                    'rango_maximo' => $item->rango_maximo ?? null,
-                    'rango_minimo' => $item->rango_minimo ?? null,
-                ];
-            }, $data);
-    
-            Cache::put('PONType_data_' . $id, $response, 3600);
-    
-            return response()->json(['data' => $response], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
+         // Obtener todos los registros que coincidan con el olt_id dado
+         $ponPorts = PonPort::where('olt_id', $id)->get();
+
+         // Verificar si se encontraron registros
+         if ($ponPorts->isEmpty()) {
+             return response()->json(['message' => 'No se encontraron registros para el olt_id proporcionado'], 404);
+         }
+ 
+         // Retornar todos los detalles de los registros en la respuesta JSON
+         return response()->json(['ponDetails' => $ponPorts]);
+     }
     
 }
