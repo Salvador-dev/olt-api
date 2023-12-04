@@ -19,7 +19,7 @@ class SnmpController extends Controller
         ]);
     }
 
-    public function ponPortsData()
+    public function ponPortsData($id)
     {
         // Obtener los resultados de cada método
         $result1 = $this->OnusByPort();
@@ -97,7 +97,7 @@ class SnmpController extends Controller
             $PonPort->min_range = $combinedResult->rango_minimo;
             $PonPort->max_range = $combinedResult->rango_maximo;
             $PonPort->operational_status = $combinedResult->portStatus;
-            $PonPort->olt_id = 1;
+            $PonPort->olt_id = $id;
             $PonPort->onus_active = $combinedResult->cantidad_online_onus;
 
             // Guardar el registro en la base de datos
