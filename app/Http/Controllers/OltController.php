@@ -7,14 +7,17 @@ use App\Models\OltCard;
 use App\Models\HardwareVersion;
 use App\Models\SoftwareVersion;
 use App\Models\Uplink;
+use App\Models\PonPort;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use FreeDSx\Snmp\SnmpClient;
+
 
 
 class OltController extends Controller
 {
-    //
+
     public function getData()
     {
         $data = Olt::join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
@@ -152,7 +155,6 @@ class OltController extends Controller
     }
 
     public function getUplinks($id) {
-        // Realizar la consulta utilizando Eloquent
         $uplinks = Uplink::where('olt_id', $id)
             ->select('type', 'admin_state', 'status', 'negotiation', 'pivd_untag', 'description', 'mode_vlan')
             ->get();
@@ -195,44 +197,78 @@ class OltController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    public function getPONType($id)
+    public function getPONPort($id)
     {
-        // Intenta obtener datos desde la caché
-        $cachedData = Cache::get('PONType_data_' . $id);
-    
-        if ($cachedData) {
-            // Si los datos están en caché, devuélvelos
-            return response()->json(['data' => $cachedData], 200);
+        // Obtener todos los registros que coincidan con el olt_id dado
+        $ponPorts = PonPort::where('olt_id', $id)->get();
+
+        // Verificar si se encontraron registros
+        if ($ponPorts->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron registros para el olt_id proporcionado'], 404);
         }
-    
-        try {
-            // Si los datos no están en caché, realiza la solicitud a la API
-            $client = new \GuzzleHttp\Client();
-            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_puertos/' . $id);
-            $res = $client->sendAsync($request)->wait();
-            $data = json_decode($res->getBody());
-    
-            $response = array_map(function ($item) {
-                return [
-                    'slot' => $item->slot ?? null,
-                    'port' => $item->puerto ?? null,
-                    'type' => $item->tipo_puerto ?? null,
-                    'status' => $item->estado_operacinal ?? null,
-                    'admin_state' => $item->estado_administrativo ?? null,
-                    'tx_power' => $item->poder_tx ?? null,
-                    'description' => $item->descripcion ?? null,
-                    'cantidad_onus' => $item->cantidad_onus ?? null,
-                    'cantidad_online_onus' => $item->cantidad_online_onus ?? null,
-                    'rango_maximo' => $item->rango_maximo ?? null,
-                    'rango_minimo' => $item->rango_minimo ?? null,
-                ];
-            }, $data);
-    
-            Cache::put('PONType_data_' . $id, $response, 3600);
-    
-            return response()->json(['data' => $response], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+
+
+        $transformedPonPorts = $ponPorts->map(function ($ponPort) {
+            return [
+                'board' => $ponPort->board,
+                'pon_type' => $this->mapearPonType($ponPort->pon_type_id),
+                'admin_status' => $this->mapearAdminStatus($ponPort->admin_status),
+                'operational_status' => $this->mapearOperationalStatus($ponPort->operational_status),
+                'onus' => $ponPort->onus,
+                'onus_active' => $ponPort->onus_active,
+                'average_signal' => $ponPort->average_signal,
+                'range' => $ponPort->range,
+                'min_range' => $ponPort->min_range,
+                'max_range' => $ponPort->max_range,
+                'tx_power' => $ponPort->tx_power,
+                'description' => $ponPort->description,
+            ];
+        });
+
+        // Retornar todos los detalles de los registros transformados en la respuesta JSON
+        return response()->json(['data' => $transformedPonPorts],200);
+    }
+
+
+         // Método para mapear el tipo PON a una cadena legible
+    private function mapearPonType($ponTypeId)
+    {
+        switch ($ponTypeId) {
+            case 1:
+                return 'GPON';
+            case 2:
+                return 'EPON';
+            case 3:
+                return 'GPON | EPON';
+            default:
+                return 'Desconocido';
+        }
+    }
+
+     // Métodos adicionales para mapear admin_status y operational_status
+    private function mapearAdminStatus($adminStatus)
+    {
+        switch ($adminStatus) {
+            case 1:
+                return 'UP';
+            case 2:
+                return 'DOWN';
+            case 3:
+                return 'Desconocido';
+            default:
+                return 'Desconocido';
+        }
+    }
+
+    private function mapearOperationalStatus($operationalStatus)
+    {
+        switch ($operationalStatus) {
+            case 1:
+                return 'Enabled';
+            case 2:
+                return 'Disabled';
+            default:
+                return 'Desconocido';
         }
     }
     

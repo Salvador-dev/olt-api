@@ -8,7 +8,7 @@ use App\Http\Controllers\OltController;
 use App\Http\Controllers\OnuController;
 use App\Http\Controllers\OnuTypesController;
 use App\Http\Controllers\SpeedProfileController;
-use App\Http\Controllers\UnconfiguredController;
+use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\VpnTunnelController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
@@ -83,7 +83,7 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/get/software', [OltController::class, 'getSoftware']);
     Route::get('/get/uplinks/{id}', [OltController::class, 'getUplinks']);
     Route::get('/get/vlans/{id}', [OltController::class, 'getVlans']);
-    Route::get('/get/pon/{id}', [OltController::class, 'getPONType']);
+    Route::get('/get/pon/{id}', [OltController::class, 'getPONPort']);
 
     Route::get('/onuTypes/listing', [OnuTypesController::class, 'getData']);
     Route::post('/onuTypes', [onuTypesController::class, 'store']);
@@ -96,6 +96,8 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/vpn-tunnels/{id}', [VpnTunnelController::class, 'show']);
     Route::patch('/vpn-tunnels/{id}', [VpnTunnelController::class, 'update']);
     Route::delete('/vpn-tunnels/{id}', [VpnTunnelController::class, 'destroy']);
+
+    Route::get('/get/snmp/portData/{id}', [SnmpController::class, 'ponPortsData']);
 
     Route::get('logout', [AuthController::class, 'logout']);
 });
