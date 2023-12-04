@@ -199,16 +199,77 @@ class OltController extends Controller
     }
     public function getPONPort($id)
     {
-         // Obtener todos los registros que coincidan con el olt_id dado
-         $ponPorts = PonPort::where('olt_id', $id)->get();
+        // Obtener todos los registros que coincidan con el olt_id dado
+        $ponPorts = PonPort::where('olt_id', $id)->get();
 
-         // Verificar si se encontraron registros
-         if ($ponPorts->isEmpty()) {
-             return response()->json(['message' => 'No se encontraron registros para el olt_id proporcionado'], 404);
-         }
- 
-         // Retornar todos los detalles de los registros en la respuesta JSON
-         return response()->json(['ponDetails' => $ponPorts]);
-     }
+        // Verificar si se encontraron registros
+        if ($ponPorts->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron registros para el olt_id proporcionado'], 404);
+        }
+
+
+        $transformedPonPorts = $ponPorts->map(function ($ponPort) {
+            return [
+                'board' => $ponPort->board,
+                'pon_type' => $this->mapearPonType($ponPort->pon_type_id),
+                'admin_status' => $this->mapearAdminStatus($ponPort->admin_status),
+                'operational_status' => $this->mapearOperationalStatus($ponPort->operational_status),
+                'onus' => $ponPort->onus,
+                'onus_active' => $ponPort->onus_active,
+                'average_signal' => $ponPort->average_signal,
+                'range' => $ponPort->range,
+                'min_range' => $ponPort->min_range,
+                'max_range' => $ponPort->max_range,
+                'tx_power' => $ponPort->tx_power,
+                'description' => $ponPort->description,
+            ];
+        });
+
+        // Retornar todos los detalles de los registros transformados en la respuesta JSON
+        return response()->json(['data' => $transformedPonPorts],200);
+    }
+
+
+         // Método para mapear el tipo PON a una cadena legible
+    private function mapearPonType($ponTypeId)
+    {
+        switch ($ponTypeId) {
+            case 1:
+                return 'GPON';
+            case 2:
+                return 'EPON';
+            case 3:
+                return 'GPON | EPON';
+            default:
+                return 'Desconocido';
+        }
+    }
+
+     // Métodos adicionales para mapear admin_status y operational_status
+    private function mapearAdminStatus($adminStatus)
+    {
+        switch ($adminStatus) {
+            case 1:
+                return 'UP';
+            case 2:
+                return 'DOWN';
+            case 3:
+                return 'Desconocido';
+            default:
+                return 'Desconocido';
+        }
+    }
+
+    private function mapearOperationalStatus($operationalStatus)
+    {
+        switch ($operationalStatus) {
+            case 1:
+                return 'Enabled';
+            case 2:
+                return 'Disabled';
+            default:
+                return 'Desconocido';
+        }
+    }
     
 }
