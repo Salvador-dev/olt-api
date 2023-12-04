@@ -19,6 +19,11 @@ class SnmpController extends Controller
         ]);
     }
 
+    public function uplinksData()
+    {
+
+    }
+
     public function ponPortsData($id)
     {
         // Obtener los resultados de cada método
@@ -47,8 +52,8 @@ class SnmpController extends Controller
             $portNameParts = explode('/', isset($result2[$i]) ? $result2[$i] : '');
 
             $combinedResult = (object)[
-                'slot' => isset($portNameParts[1]) ? $portNameParts[1] : null,
-                'port' => isset($portNameParts[2]) ? $portNameParts[2] : null,
+                'port' => isset($portNameParts[1]) ? $portNameParts[1] : null,
+                'slot' => isset($portNameParts[2]) ? $portNameParts[2] : null,
                 'cantidad_onus' => isset($result1[$i]) ? ($result1[$i]->value ?? $result1[$i]) : null,
                 'portName' => isset($result2[$i]) ? ($result2[$i]->value ?? $result2[$i]) : null,
                 'powerTxOLT' => isset($result3[$i]) ? ($result3[$i]->value ?? $result3[$i]) : null,
@@ -378,6 +383,112 @@ class SnmpController extends Controller
     
         return $portStatusArray;
     }
+
+    private function uplink($oids)
+    {
+        $snmp = $this->getSnmpClient();
+        $arrayMtu = [];
+        $arrayMtuValue = [];
+    
+        // OID base para el walk
+        $baseOid = $oids;
+    
+        // Realizar el SNMP walk
+        $walk = $snmp->walk($baseOid);
+    
+        // Contador para rastrear el número de OIDs recuperadas
+        $oidCount = 0;
+    
+        // Iterar a través de las OIDs obtenidas durante el walk
+        while ($walk->hasOids()) {
+            try {
+                $oid = $walk->next();
+    
+                // Incrementar el contador
+                $oidCount++;
+    
+                $arrayMtu[] = $oid->getOid();
+                $arrayMtuValue[] = $oid->getValue()->getValue();
+            } catch (Exception $e) {
+                // Manejar errores al recuperar OIDs
+                $arrayMtu[] = ['value' => 'Error al recuperar OID. ' . $e->getMessage()];
+            }
+        }
+    
+        // Filtrar solo la parte final después del último punto que tenga una longitud de 9
+        $filteredResults = array_filter(array_map(function ($oid, $value) {
+            $interfaz = substr(strrchr($oid, '.'), 1);
+            return strlen($interfaz) == 9 ? $value : null;
+        }, $arrayMtu, $arrayMtuValue));
+    
+        // Eliminar valores nulos
+        $filteredResults = array_filter($filteredResults);
+    
+        return array_values($filteredResults);
+    }
+
+        public function pvid()
+    {
+        $snmp = $this->getSnmpClient();
+        $pvidArray = [];
+    
+        // OID base para el walk
+        $baseOid = '1.3.6.1.4.1.2011.5.6.1.25.1.44';
+    
+        // Realizar el SNMP walk
+        $walk = $snmp->walk($baseOid);
+    
+        // Iterar a través de las OIDs obtenidas durante el walk
+        while ($walk->hasOids()) {
+            try {
+                $oid = $walk->next();
+                $value = $oid->getValue()->getValue();
+    
+    
+                // Agregar el resultado al arreglo asociativo
+                $pvidArray[] = $value;
+            } catch (Exception $e) {
+                // Manejar errores al recuperar OIDs
+                $pvidArray[] = ['status' => 'Error al recuperar OID. ' . $e->getMessage()];
+            }
+        }
+    
+        return $pvidArray;
+    }
+    
+    public function data($id)
+    {
+        $mtu = $this->uplink('1.3.6.1.2.1.2.2.1.4');
+        $status = $this->uplink('1.3.6.1.2.1.2.2.1.8');
+        $name = $this->uplink('1.3.6.1.2.1.2.2.1.2');
+        $admin_status = $this->uplink('1.3.6.1.2.1.2.2.1.7');
+        $type = $this->uplink('1.3.6.1.2.1.2.2.1.3');
+        $wavel = $this->uplink('1.3.6.1.2.1.2.2.1.5');
+        $pivd = $this->pvid();
+    
+        // Asegurémonos de que todos los arrays tengan el mismo tamaño
+        $length = max(count($mtu), count($status), count($name), count($admin_status), count($type), count($wavel), count($pivd));
+    
+        $result = [];
+    
+        for ($i = 0; $i < $length; $i++) {
+            $result[] = [
+                'olt_id' => $id,
+                'mtu' => $mtu[$i] ?? null,
+                'status' => $status[$i] ?? null,
+                'name' => $name[$i] ?? null,
+                'admin_status' => $admin_status[$i] ?? null,
+                'type' => $type[$i] ?? null,
+                'wavel' => $wavel[$i] ?? null,
+                'pvid_untag' => $pivd[0] ?? null,
+                'negotiation' => $wavel[0] ?? null,
+            ];
+        }
+    
+        return $result;
+    }
+    
+
     public function saveHuaweiOid()
     {
         // Lista de OIDs específicas y sus descripciones
