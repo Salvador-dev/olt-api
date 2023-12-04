@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use FreeDSx\Snmp\SnmpClient;
 use Exception;
 use App\Models\PonPort;
+use App\Models\Uplink;
 use App\Models\Oid;
 use stdClass;
 
@@ -384,7 +385,7 @@ class SnmpController extends Controller
         return $portStatusArray;
     }
 
-    private function uplink($oids)
+    private function uplinkData($oids)
     {
         $snmp = $this->getSnmpClient();
         $arrayMtu = [];
@@ -456,14 +457,14 @@ class SnmpController extends Controller
         return $pvidArray;
     }
     
-    public function data($id)
+    public function uplinkRegister($id)
     {
-        $mtu = $this->uplink('1.3.6.1.2.1.2.2.1.4');
-        $status = $this->uplink('1.3.6.1.2.1.2.2.1.8');
-        $name = $this->uplink('1.3.6.1.2.1.2.2.1.2');
-        $admin_status = $this->uplink('1.3.6.1.2.1.2.2.1.7');
-        $type = $this->uplink('1.3.6.1.2.1.2.2.1.3');
-        $wavel = $this->uplink('1.3.6.1.2.1.2.2.1.5');
+        $mtu = $this->uplinkData('1.3.6.1.2.1.2.2.1.4');
+        $status = $this->uplinkData('1.3.6.1.2.1.2.2.1.8');
+        $name = $this->uplinkData('1.3.6.1.2.1.2.2.1.2');
+        $admin_status = $this->uplinkData('1.3.6.1.2.1.2.2.1.7');
+        $type = $this->uplinkData('1.3.6.1.2.1.2.2.1.3');
+        $wavel = $this->uplinkData('1.3.6.1.2.1.2.2.1.5');
         $pivd = $this->pvid();
     
         // Asegurémonos de que todos los arrays tengan el mismo tamaño
@@ -475,16 +476,21 @@ class SnmpController extends Controller
             $result[] = [
                 'olt_id' => $id,
                 'mtu' => $mtu[$i] ?? null,
+                'description' => '',
                 'status' => $status[$i] ?? null,
                 'name' => $name[$i] ?? null,
-                'admin_status' => $admin_status[$i] ?? null,
+                'admin_state' => $admin_status[$i] ?? null,
                 'type' => $type[$i] ?? null,
                 'wavel' => $wavel[$i] ?? null,
-                'pvid_untag' => $pivd[0] ?? null,
+                'pivd_untag' => $pivd[0] ?? null,
                 'negotiation' => $wavel[0] ?? null,
             ];
         }
-    
+        
+        foreach ($result as $data) {
+            uplink::updateOrCreate(['name' => $data['name']], $data);
+        }
+
         return $result;
     }
     
