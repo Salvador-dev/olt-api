@@ -98,6 +98,8 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::delete('/vpn-tunnels/{id}', [VpnTunnelController::class, 'destroy']);
 
     Route::get('/get/snmp/portData/{id}', [SnmpController::class, 'ponPortsData']);
+    Route::get('/get/snmp/uplink/{id}', [SnmpController::class, 'uplinkRegister']);
+    Route::get('/get/snmp', [SnmpController::class, 'getSnmpClient']);
 
     Route::get('logout', [AuthController::class, 'logout']);
 });
