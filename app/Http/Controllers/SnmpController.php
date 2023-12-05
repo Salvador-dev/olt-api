@@ -20,7 +20,6 @@ class SnmpController extends Controller
         $host = $olt->ip;
         $community = $olt->snmp_read_only;
 
-
         return new SnmpClient([
             'host' => $host,
             'version' => 2,
@@ -29,102 +28,101 @@ class SnmpController extends Controller
     }
 
     public function ponPortsData($id)
-{
-    do {
-        try {
-            // Obtener los resultados de cada método
-            $result1 = $this->OnusByPort($id);
-            $result2 = $this->portName($id);
-            $result3 = $this->powerTxOLT($id);
-            $result4 = $this->portType($id);
-            $result5 = $this->portStatus($id);
-            $result6 = $this->ActiveOnus($id);
+    {
+        do {
+            try {
+                // Obtener los resultados de cada método
+                $result1 = $this->OnusByPort($id);
+                $result2 = $this->portName($id);
+                $result3 = $this->powerTxOLT($id);
+                $result4 = $this->portType($id);
+                $result5 = $this->portStatus($id);
+                $result6 = $this->ActiveOnus($id);
+        
+                // Asegurar que todos los resultados tengan la misma longitud
+                $maxCount = max(
+                    count($result1),
+                    count($result2),
+                    count($result3),
+                    count($result4),
+                    count($result5),
+                    count($result6)
+                );
+        
+                // Combinar los resultados en un solo objeto sin anidaciones
+                $combinedResults = [];
+        
+                for ($i = 0; $i < $maxCount; $i++) {
+                    // Buscar el patrón "SLOT/PORT" en la cadena
+                    $portNameParts = explode('/', isset($result2[$i]) ? $result2[$i] : '');
     
-            // Asegurar que todos los resultados tengan la misma longitud
-            $maxCount = max(
-                count($result1),
-                count($result2),
-                count($result3),
-                count($result4),
-                count($result5),
-                count($result6)
-            );
-    
-            // Combinar los resultados en un solo objeto sin anidaciones
-            $combinedResults = [];
-    
-            for ($i = 0; $i < $maxCount; $i++) {
-                // Buscar el patrón "SLOT/PORT" en la cadena
-                $portNameParts = explode('/', isset($result2[$i]) ? $result2[$i] : '');
-
-                $combinedResult = (object)[
-                    'port' => isset($portNameParts[1]) ? $portNameParts[1] : null,
-                    'slot' => isset($portNameParts[2]) ? $portNameParts[2] : null,
-                    'cantidad_onus' => isset($result1[$i]) ? ($result1[$i]->value ?? $result1[$i]) : null,
-                    'portName' => isset($result2[$i]) ? ($result2[$i]->value ?? $result2[$i]) : null,
-                    'powerTxOLT' => isset($result3[$i]) ? ($result3[$i]->value ?? $result3[$i]) : null,
-                    'portType' => isset($result4[$i]) ? ($result4[$i]->value ?? $result4[$i]) : null,
-                    'portStatus' => isset($result5[$i]) ? ($result5[$i]->status ?? $result5[$i]) : null,
-                    'cantidad_online_onus' => isset($result6[$i]) ? ($result6[$i]->activeCount ?? $result6[$i]) : 0,
-                    'description' => '',
-                    'rango_maximo' => '20km',
-                    'rango_minimo' => '0',
-                ];
-    
-                $combinedResults[] = $combinedResult;
-            }
-
-            foreach ($combinedResults as $combinedResult) {
-                $PonPort = new PonPort();
-            
-                switch ($combinedResult->portType) {
-                    case 'GPON':
-                        $PonPort->pon_type_id = 1;
-                        break;
-                    case 'EPON':
-                        $PonPort->pon_type_id = 2;
-                        break;
-                    case 'GPON | EPON':
-                        $PonPort->pon_type_id = 3;
-                        break;
-                    default:
-                        $PonPort->pon_type_id = 1;
-                        break;
+                    $combinedResult = (object)[
+                        'port' => isset($portNameParts[1]) ? $portNameParts[1] : null,
+                        'slot' => isset($portNameParts[2]) ? $portNameParts[2] : null,
+                        'cantidad_onus' => isset($result1[$i]) ? ($result1[$i]->value ?? $result1[$i]) : null,
+                        'portName' => isset($result2[$i]) ? ($result2[$i]->value ?? $result2[$i]) : null,
+                        'powerTxOLT' => isset($result3[$i]) ? ($result3[$i]->value ?? $result3[$i]) : null,
+                        'portType' => isset($result4[$i]) ? ($result4[$i]->value ?? $result4[$i]) : null,
+                        'portStatus' => isset($result5[$i]) ? ($result5[$i]->status ?? $result5[$i]) : null,
+                        'cantidad_online_onus' => isset($result6[$i]) ? ($result6[$i]->activeCount ?? $result6[$i]) : 0,
+                        'description' => '',
+                        'rango_maximo' => '20km',
+                        'rango_minimo' => '0',
+                    ];
+        
+                    $combinedResults[] = $combinedResult;
                 }
-                $PonPort->admin_status = $combinedResult->portStatus;
-                $PonPort->onus = $combinedResult->cantidad_onus;
-                if ($combinedResult->powerTxOLT >= -8.5 && $combinedResult->powerTxOLT <= 1.0) {
-                    $PonPort->average_signal = 'Critical';
-                } elseif ($combinedResult->powerTxOLT >= -9.5 && $combinedResult->powerTxOLT <= 3.0) {
-                    $PonPort->average_signal = 'Warning';
-                } else {
-                    $PonPort->average_signal = 'Very Good';
-                    
+    
+                foreach ($combinedResults as $combinedResult) {
+                    $PonPort = new PonPort();
+                
+                    switch ($combinedResult->portType) {
+                        case 'GPON':
+                            $PonPort->pon_type_id = 1;
+                            break;
+                        case 'EPON':
+                            $PonPort->pon_type_id = 2;
+                            break;
+                        case 'GPON | EPON':
+                            $PonPort->pon_type_id = 3;
+                            break;
+                        default:
+                            $PonPort->pon_type_id = 1;
+                            break;
+                    }
+                    $PonPort->admin_status = $combinedResult->portStatus;
+                    $PonPort->onus = $combinedResult->cantidad_onus;
+                    if ($combinedResult->powerTxOLT >= -8.5 && $combinedResult->powerTxOLT <= 1.0) {
+                        $PonPort->average_signal = 'Critical';
+                    } elseif ($combinedResult->powerTxOLT >= -9.5 && $combinedResult->powerTxOLT <= 3.0) {
+                        $PonPort->average_signal = 'Warning';
+                    } else {
+                        $PonPort->average_signal = 'Very Good';
+                        
+                    }
+                    $PonPort->description = $combinedResult->description;
+                    $PonPort->tx_power = $combinedResult->powerTxOLT;
+                    $PonPort->board = $combinedResult->slot;
+                    $PonPort->range = $combinedResult->rango_minimo . ' - ' . $combinedResult->rango_maximo;
+                    $PonPort->min_range = $combinedResult->rango_minimo;
+                    $PonPort->max_range = $combinedResult->rango_maximo;
+                    $PonPort->operational_status = $combinedResult->portStatus;
+                    $PonPort->olt_id = $id;
+                    $PonPort->onus_active = $combinedResult->cantidad_online_onus;
+    
+                    // Guardar el registro en la base de datos
+                    $PonPort->save();
                 }
-                $PonPort->description = $combinedResult->description;
-                $PonPort->tx_power = $combinedResult->powerTxOLT;
-                $PonPort->board = $combinedResult->slot;
-                $PonPort->range = $combinedResult->rango_minimo . ' - ' . $combinedResult->rango_maximo;
-                $PonPort->min_range = $combinedResult->rango_minimo;
-                $PonPort->max_range = $combinedResult->rango_maximo;
-                $PonPort->operational_status = $combinedResult->portStatus;
-                $PonPort->olt_id = $id;
-                $PonPort->onus_active = $combinedResult->cantidad_online_onus;
-
-                // Guardar el registro en la base de datos
-                $PonPort->save();
+    
+                // Si llegamos aquí sin excepciones, terminamos el bucle
+                break;
+            } catch (Exception $e) {
             }
-
-            // Si llegamos aquí sin excepciones, terminamos el bucle
-            break;
-        } catch (Exception $e) {
-
-        }
-    } while (true);
-
-    return $combinedResults;
-}
-
+        } while (true); // Bucle infinito
+    
+        return $combinedResults;
+    }
+    
     
     
     public function ActiveOnus($id)
