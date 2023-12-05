@@ -122,8 +122,52 @@ class SnmpController extends Controller
     
         return $combinedResults;
     }
+
+    public function uplinkRegister($id)
+    {
+        do {
+            try {
+                $mtu = $this->uplinkData('1.3.6.1.2.1.2.2.1.4', $id);
+                $status = $this->uplinkData('1.3.6.1.2.1.2.2.1.8', $id);
+                $name = $this->uplinkData('1.3.6.1.2.1.2.2.1.2', $id);
+                $admin_status = $this->uplinkData('1.3.6.1.2.1.2.2.1.7', $id);
+                $type = $this->uplinkData('1.3.6.1.2.1.2.2.1.3', $id);
+                $wavel = $this->uplinkData('1.3.6.1.2.1.2.2.1.5', $id);
+                $pivd = $this->pvid($id);
     
+                // Asegurémonos de que todos los arrays tengan el mismo tamaño
+                $length = max(count($mtu), count($status), count($name), count($admin_status), count($type), count($wavel), count($pivd));
     
+                $result = [];
+    
+                for ($i = 0; $i < $length; $i++) {
+                    $result[] = [
+                        'olt_id' => $id,
+                        'mtu' => $mtu[$i] ?? null,
+                        'description' => '',
+                        'status' => $status[$i] ?? null,
+                        'name' => $name[$i] ?? null,
+                        'admin_state' => $admin_status[$i] ?? null,
+                        'type' => $type[$i] ?? null,
+                        'wavel' => $wavel[$i] ?? null,
+                        'pivd_untag' => $pivd[0] ?? null,
+                        'negotiation' => $wavel[$i] ?? null,
+                    ];
+                }
+    
+                foreach ($result as $data) {
+                    uplink::updateOrCreate(['name' => $data['name']], $data);
+                }
+                // Detener el bucle porque no hay errores
+                break;
+    
+            } catch (Exception $e) {
+
+            }
+        } while (true);
+    
+        return $result;
+    }
     
     public function ActiveOnus($id)
     {
@@ -467,52 +511,7 @@ class SnmpController extends Controller
     
         return $pvidArray;
     }
-    
-    public function uplinkRegister($id)
-    {
-        do {
-            try {
-                $mtu = $this->uplinkData('1.3.6.1.2.1.2.2.1.4', $id);
-                $status = $this->uplinkData('1.3.6.1.2.1.2.2.1.8', $id);
-                $name = $this->uplinkData('1.3.6.1.2.1.2.2.1.2', $id);
-                $admin_status = $this->uplinkData('1.3.6.1.2.1.2.2.1.7', $id);
-                $type = $this->uplinkData('1.3.6.1.2.1.2.2.1.3', $id);
-                $wavel = $this->uplinkData('1.3.6.1.2.1.2.2.1.5', $id);
-                $pivd = $this->pvid($id);
-    
-                // Asegurémonos de que todos los arrays tengan el mismo tamaño
-                $length = max(count($mtu), count($status), count($name), count($admin_status), count($type), count($wavel), count($pivd));
-    
-                $result = [];
-    
-                for ($i = 0; $i < $length; $i++) {
-                    $result[] = [
-                        'olt_id' => $id,
-                        'mtu' => $mtu[$i] ?? null,
-                        'description' => '',
-                        'status' => $status[$i] ?? null,
-                        'name' => $name[$i] ?? null,
-                        'admin_state' => $admin_status[$i] ?? null,
-                        'type' => $type[$i] ?? null,
-                        'wavel' => $wavel[$i] ?? null,
-                        'pivd_untag' => $pivd[0] ?? null,
-                        'negotiation' => $wavel[$i] ?? null,
-                    ];
-                }
-    
-                foreach ($result as $data) {
-                    uplink::updateOrCreate(['name' => $data['name']], $data);
-                }
-                // Detener el bucle porque no hay errores
-                break;
-    
-            } catch (Exception $e) {
 
-            }
-        } while (true);
-    
-        return $result;
-    }
     public function saveHuaweiOid()
     {
         // Lista de OIDs específicas y sus descripciones
@@ -548,4 +547,6 @@ class SnmpController extends Controller
         // Imprimir información de la OID
         echo sprintf("OID: %s, Descripción: %s - Guardado en la base de datos", $oid, $description).PHP_EOL;
     }
+
+    1.3.6.1.4.1.2011.6.3.3.2.1.8
 }
