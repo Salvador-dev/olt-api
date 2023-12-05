@@ -6,121 +6,134 @@ use Exception;
 use App\Models\PonPort;
 use App\Models\Uplink;
 use App\Models\Oid;
+use App\Models\Olt;
 use stdClass;
 
 class SnmpController extends Controller
 {
 
-    private function getSnmpClient()
+     public function getSnmpClient($id)
     {
+
+        $olt = Olt::where("id",$id)->first();
+
+        $host = $olt->ip;
+        $community = $olt->snmp_read_only;
+
+
         return new SnmpClient([
-            'host' => '172.29.0.2',
+            'host' => $host,
             'version' => 2,
-            'community' => 'public',
+            'community' => $community,
         ]);
     }
 
-    public function uplinksData()
-    {
-
-    }
-
     public function ponPortsData($id)
-    {
-        // Obtener los resultados de cada método
-        $result1 = $this->OnusByPort();
-        $result2 = $this->portName();
-        $result3 = $this->powerTxOLT();
-        $result4 = $this->portType();
-        $result5 = $this->portStatus();
-        $result6 = $this->ActiveOnus();
+{
+    do {
+        try {
+            // Obtener los resultados de cada método
+            $result1 = $this->OnusByPort($id);
+            $result2 = $this->portName($id);
+            $result3 = $this->powerTxOLT($id);
+            $result4 = $this->portType($id);
+            $result5 = $this->portStatus($id);
+            $result6 = $this->ActiveOnus($id);
     
-        // Asegurar que todos los resultados tengan la misma longitud
-        $maxCount = max(
-            count($result1),
-            count($result2),
-            count($result3),
-            count($result4),
-            count($result5),
-            count($result6)
-        );
+            // Asegurar que todos los resultados tengan la misma longitud
+            $maxCount = max(
+                count($result1),
+                count($result2),
+                count($result3),
+                count($result4),
+                count($result5),
+                count($result6)
+            );
     
-        // Combinar los resultados en un solo objeto sin anidaciones
-        $combinedResults = [];
+            // Combinar los resultados en un solo objeto sin anidaciones
+            $combinedResults = [];
     
-        for ($i = 0; $i < $maxCount; $i++) {
-            // Buscar el patrón "SLOT/PORT" en la cadena
-            $portNameParts = explode('/', isset($result2[$i]) ? $result2[$i] : '');
+            for ($i = 0; $i < $maxCount; $i++) {
+                // Buscar el patrón "SLOT/PORT" en la cadena
+                $portNameParts = explode('/', isset($result2[$i]) ? $result2[$i] : '');
 
-            $combinedResult = (object)[
-                'port' => isset($portNameParts[1]) ? $portNameParts[1] : null,
-                'slot' => isset($portNameParts[2]) ? $portNameParts[2] : null,
-                'cantidad_onus' => isset($result1[$i]) ? ($result1[$i]->value ?? $result1[$i]) : null,
-                'portName' => isset($result2[$i]) ? ($result2[$i]->value ?? $result2[$i]) : null,
-                'powerTxOLT' => isset($result3[$i]) ? ($result3[$i]->value ?? $result3[$i]) : null,
-                'portType' => isset($result4[$i]) ? ($result4[$i]->value ?? $result4[$i]) : null,
-                'portStatus' => isset($result5[$i]) ? ($result5[$i]->status ?? $result5[$i]) : null,
-                'cantidad_online_onus' => isset($result6[$i]) ? ($result6[$i]->activeCount ?? $result6[$i]) : 0,
-                'description' => '',
-                'rango_maximo' => '20km',
-                'rango_minimo' => '0',
-            ];
+                $combinedResult = (object)[
+                    'port' => isset($portNameParts[1]) ? $portNameParts[1] : null,
+                    'slot' => isset($portNameParts[2]) ? $portNameParts[2] : null,
+                    'cantidad_onus' => isset($result1[$i]) ? ($result1[$i]->value ?? $result1[$i]) : null,
+                    'portName' => isset($result2[$i]) ? ($result2[$i]->value ?? $result2[$i]) : null,
+                    'powerTxOLT' => isset($result3[$i]) ? ($result3[$i]->value ?? $result3[$i]) : null,
+                    'portType' => isset($result4[$i]) ? ($result4[$i]->value ?? $result4[$i]) : null,
+                    'portStatus' => isset($result5[$i]) ? ($result5[$i]->status ?? $result5[$i]) : null,
+                    'cantidad_online_onus' => isset($result6[$i]) ? ($result6[$i]->activeCount ?? $result6[$i]) : 0,
+                    'description' => '',
+                    'rango_maximo' => '20km',
+                    'rango_minimo' => '0',
+                ];
     
-            $combinedResults[] = $combinedResult;
-        }
-
-        foreach ($combinedResults as $combinedResult) {
-            $PonPort = new PonPort();
-        
-            switch ($combinedResult->portType) {
-                case 'GPON':
-                    $PonPort->pon_type_id = 1;
-                    break;
-                case 'EPON':
-                    $PonPort->pon_type_id = 2;
-                    break;
-                case 'GPON | EPON':
-                    $PonPort->pon_type_id = 3;
-                    break;
-                default:
-                    $PonPort->pon_type_id = 1;
-                    break;
+                $combinedResults[] = $combinedResult;
             }
-            $PonPort->admin_status = $combinedResult->portStatus;
-            $PonPort->onus = $combinedResult->cantidad_onus;
-            if ($combinedResult->powerTxOLT >= -8.5 && $combinedResult->powerTxOLT <= 1.0) {
-                $PonPort->average_signal = 'Critical';
-            } elseif ($combinedResult->powerTxOLT >= -9.5 && $combinedResult->powerTxOLT <= 3.0) {
-                $PonPort->average_signal = 'Warning';
-            } else {
-                $PonPort->average_signal = 'Very Good';
-                
-            }
-            $PonPort->description = $combinedResult->description;
-            $PonPort->tx_power = $combinedResult->powerTxOLT;
-            $PonPort->board = $combinedResult->slot;
-            $PonPort->range = $combinedResult->rango_minimo . ' - ' . $combinedResult->rango_maximo;
-            $PonPort->min_range = $combinedResult->rango_minimo;
-            $PonPort->max_range = $combinedResult->rango_maximo;
-            $PonPort->operational_status = $combinedResult->portStatus;
-            $PonPort->olt_id = $id;
-            $PonPort->onus_active = $combinedResult->cantidad_online_onus;
 
-            // Guardar el registro en la base de datos
-            $PonPort->save();
+            foreach ($combinedResults as $combinedResult) {
+                $PonPort = new PonPort();
+            
+                switch ($combinedResult->portType) {
+                    case 'GPON':
+                        $PonPort->pon_type_id = 1;
+                        break;
+                    case 'EPON':
+                        $PonPort->pon_type_id = 2;
+                        break;
+                    case 'GPON | EPON':
+                        $PonPort->pon_type_id = 3;
+                        break;
+                    default:
+                        $PonPort->pon_type_id = 1;
+                        break;
+                }
+                $PonPort->admin_status = $combinedResult->portStatus;
+                $PonPort->onus = $combinedResult->cantidad_onus;
+                if ($combinedResult->powerTxOLT >= -8.5 && $combinedResult->powerTxOLT <= 1.0) {
+                    $PonPort->average_signal = 'Critical';
+                } elseif ($combinedResult->powerTxOLT >= -9.5 && $combinedResult->powerTxOLT <= 3.0) {
+                    $PonPort->average_signal = 'Warning';
+                } else {
+                    $PonPort->average_signal = 'Very Good';
+                    
+                }
+                $PonPort->description = $combinedResult->description;
+                $PonPort->tx_power = $combinedResult->powerTxOLT;
+                $PonPort->board = $combinedResult->slot;
+                $PonPort->range = $combinedResult->rango_minimo . ' - ' . $combinedResult->rango_maximo;
+                $PonPort->min_range = $combinedResult->rango_minimo;
+                $PonPort->max_range = $combinedResult->rango_maximo;
+                $PonPort->operational_status = $combinedResult->portStatus;
+                $PonPort->olt_id = $id;
+                $PonPort->onus_active = $combinedResult->cantidad_online_onus;
+
+                // Guardar el registro en la base de datos
+                $PonPort->save();
+            }
+
+            // Si llegamos aquí sin excepciones, terminamos el bucle
+            break;
+        } catch (Exception $e) {
+
         }
+    } while (true);
+
+    return $combinedResults;
+}
+
     
-        return $combinedResults;
-    }
     
-    
-    public function ActiveOnus()
+    public function ActiveOnus($id)
     {
         // Obtener la información de los Onus por puerto
-        $onusData = $this->OnusByPort();
+        $onusData = $this->OnusByPort($id);
 
         // Obtener la información de los puertos activos
-        $activePorts = $this->ActiveOnusByPort();
+        $activePorts = $this->ActiveOnusByPort($id);
 
         // Crear un array asociativo para almacenar el resultado combinado
         $combinedResult = [];
@@ -168,9 +181,9 @@ class SnmpController extends Controller
         return array_values($combinedResult);
     }
 
-        public function ActiveOnusByPort()
+        public function ActiveOnusByPort($id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
         
         // OID base para el walk
         $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.46.1.15';
@@ -214,9 +227,9 @@ class SnmpController extends Controller
         return array_values($portGroups);
     }
 
-    public function OnusByPort()
+    public function OnusByPort($id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
 
         // OID base para el walk
         $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.21.1.16';
@@ -250,9 +263,9 @@ class SnmpController extends Controller
         return $onusArray;
     }
 
-    public function portName()
+    public function portName($id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
         $portNameArray = [];
     
         // OID base para el walk
@@ -286,9 +299,9 @@ class SnmpController extends Controller
         return $portNameArray;
     }
     
-    public function powerTxOLT()
+    public function powerTxOLT($id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
         $powerTxArray = [];
     
         // OID base para el walk
@@ -316,9 +329,9 @@ class SnmpController extends Controller
     
         return $powerTxArray;
     }
-    public function portType()
+    public function portType($id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
         $portTypeArray = [];
     
         // OID base para el walk
@@ -356,9 +369,9 @@ class SnmpController extends Controller
         return $portTypeArray;
     }
     
-    public function portStatus()
+    public function portStatus($id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
         $portStatusArray = [];
     
         // OID base para el walk
@@ -385,9 +398,9 @@ class SnmpController extends Controller
         return $portStatusArray;
     }
 
-    private function uplinkData($oids)
+    private function uplinkData($oids, $id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
         $arrayMtu = [];
         $arrayMtuValue = [];
     
@@ -428,9 +441,9 @@ class SnmpController extends Controller
         return array_values($filteredResults);
     }
 
-        public function pvid()
+        public function pvid($id)
     {
-        $snmp = $this->getSnmpClient();
+        $snmp = $this->getSnmpClient($id);
         $pvidArray = [];
     
         // OID base para el walk
@@ -459,42 +472,49 @@ class SnmpController extends Controller
     
     public function uplinkRegister($id)
     {
-        $mtu = $this->uplinkData('1.3.6.1.2.1.2.2.1.4');
-        $status = $this->uplinkData('1.3.6.1.2.1.2.2.1.8');
-        $name = $this->uplinkData('1.3.6.1.2.1.2.2.1.2');
-        $admin_status = $this->uplinkData('1.3.6.1.2.1.2.2.1.7');
-        $type = $this->uplinkData('1.3.6.1.2.1.2.2.1.3');
-        $wavel = $this->uplinkData('1.3.6.1.2.1.2.2.1.5');
-        $pivd = $this->pvid();
+        do {
+            try {
+                $mtu = $this->uplinkData('1.3.6.1.2.1.2.2.1.4', $id);
+                $status = $this->uplinkData('1.3.6.1.2.1.2.2.1.8', $id);
+                $name = $this->uplinkData('1.3.6.1.2.1.2.2.1.2', $id);
+                $admin_status = $this->uplinkData('1.3.6.1.2.1.2.2.1.7', $id);
+                $type = $this->uplinkData('1.3.6.1.2.1.2.2.1.3', $id);
+                $wavel = $this->uplinkData('1.3.6.1.2.1.2.2.1.5', $id);
+                $pivd = $this->pvid($id);
     
-        // Asegurémonos de que todos los arrays tengan el mismo tamaño
-        $length = max(count($mtu), count($status), count($name), count($admin_status), count($type), count($wavel), count($pivd));
+                // Asegurémonos de que todos los arrays tengan el mismo tamaño
+                $length = max(count($mtu), count($status), count($name), count($admin_status), count($type), count($wavel), count($pivd));
     
-        $result = [];
+                $result = [];
     
-        for ($i = 0; $i < $length; $i++) {
-            $result[] = [
-                'olt_id' => $id,
-                'mtu' => $mtu[$i] ?? null,
-                'description' => '',
-                'status' => $status[$i] ?? null,
-                'name' => $name[$i] ?? null,
-                'admin_state' => $admin_status[$i] ?? null,
-                'type' => $type[$i] ?? null,
-                'wavel' => $wavel[$i] ?? null,
-                'pivd_untag' => $pivd[0] ?? null,
-                'negotiation' => $wavel[0] ?? null,
-            ];
-        }
-        
-        foreach ($result as $data) {
-            uplink::updateOrCreate(['name' => $data['name']], $data);
-        }
+                for ($i = 0; $i < $length; $i++) {
+                    $result[] = [
+                        'olt_id' => $id,
+                        'mtu' => $mtu[$i] ?? null,
+                        'description' => '',
+                        'status' => $status[$i] ?? null,
+                        'name' => $name[$i] ?? null,
+                        'admin_state' => $admin_status[$i] ?? null,
+                        'type' => $type[$i] ?? null,
+                        'wavel' => $wavel[$i] ?? null,
+                        'pivd_untag' => $pivd[0] ?? null,
+                        'negotiation' => $wavel[$i] ?? null,
+                    ];
+                }
+    
+                foreach ($result as $data) {
+                    uplink::updateOrCreate(['name' => $data['name']], $data);
+                }
+                // Detener el bucle porque no hay errores
+                break;
+    
+            } catch (Exception $e) {
 
+            }
+        } while (true);
+    
         return $result;
     }
-    
-
     public function saveHuaweiOid()
     {
         // Lista de OIDs específicas y sus descripciones
