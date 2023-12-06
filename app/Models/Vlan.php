@@ -10,6 +10,7 @@ class Vlan extends Model
     use HasFactory;
     protected $table = 'vlans';
     protected $fillable = [
+        'vlan_id',
         'description',
         'multicast_vlan',
         'management_voip',

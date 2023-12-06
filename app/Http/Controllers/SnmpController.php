@@ -5,8 +5,10 @@ use FreeDSx\Snmp\SnmpClient;
 use Exception;
 use App\Models\PonPort;
 use App\Models\Uplink;
-use App\Models\Oid;
+use App\Models\Vlan;
 use App\Models\Olt;
+use App\Models\OltCard;
+use App\Models\Oid;
 use stdClass;
 
 class SnmpController extends Controller
@@ -162,13 +164,193 @@ class SnmpController extends Controller
                 break;
     
             } catch (Exception $e) {
-
+                echo "Error: " . $e->getMessage();
             }
         } while (true);
     
         return $result;
     }
+
+    public function oltCardRegister($id)
+    {
+        do {
+            try {
+                // Tu código existente para obtener los datos
+                $type = $this->getSnmpData('1.3.6.1.4.1.2011.6.3.3.2.1.21', $id);
+                $status = $this->getSnmpData('1.3.6.1.4.1.2011.6.3.3.2.1.8', $id);
+                $slot = $this->getSnmpData('1.3.6.1.4.1.2011.6.3.3.2.1.1', $id);
+                $ports = $this->getSnmpData('1.3.6.1.4.1.2011.6.3.3.3.1.3', $id);
+                $software = $this->getSnmpData('1.3.6.1.4.1.2011.6.3.1.3', $id);
+                $slots = $this->getSnmpData('1.3.6.1.4.1.2011.6.3.3.3.1.3', $id);
     
+                $extractedNumbers = [];
+                // Obtener interfaces para los puertos.
+                foreach ($slots['oids'] as $oid) {
+                    // Realizar una coincidencia de expresiones regulares para extraer el número
+                    if (preg_match('/0\.(\d+)\.65535/', $oid, $matches)) {
+                        // Convertir el número extraído a entero
+                        $extractedNumbers[] = (int)$matches[1];
+                    }
+                }
+    
+                // Filtrar los valores de $data, $status, y $slot según los índices en $extractedNumbers
+                $filteredType = $this->filterDataByIndices($type, $extractedNumbers);
+                $filteredStatus = $this->filterDataByIndices($status, $extractedNumbers);
+                $filteredSlot = $this->filterDataByIndices($slot, $extractedNumbers);
+                $filteredPorts = $this->filterDataByIndices($ports, $extractedNumbers);
+    
+                $result = [];
+    
+                for ($i = 0; $i < count($extractedNumbers); $i++) {
+                    $status = $filteredStatus[$i] ?? null;
+    
+                    $statusText = ($status === 2) ? 'Normal' : (($status === 7) ? 'Offline' : 'Desconocido');
+    
+                    $dataItem = [
+                        'slot' => $filteredSlot[$i] ?? null,
+                        'type' => $filteredType[$i] ?? null,
+                        'real_type' => $filteredType[$i] ?? null,
+                        'ports' => $filteredPorts[$i] ?? null,
+                        'software_version' => $software['values'][0] ?? null,
+                        'status' => $statusText ?? null,
+                        'olt_id' => $id,
+                    ];
+    
+                    // Actualizar o crear el registro en la base de datos
+                    OltCard::updateOrCreate(['slot' => $dataItem['slot']], $dataItem);
+    
+                    $result[] = $dataItem;
+                }
+                break;
+    
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        } while (true);
+    
+        return $result;
+    }
+
+    public function vlanRegister($id)
+    {
+        do {
+            try {
+                $data = $this->getSnmpData('1.3.6.1.4.1.2011.5.6.1.1.1.1', $id);
+                $data2 = $this->getSnmpData('1.3.6.1.4.1.2011.5.6.1.1.1.21', $id);
+                $data3 = $this->getSnmpData('1.3.6.1.4.1.2011.5.6.1.1.1.18', $id);
+    
+                $length = count($data['values']);
+    
+                $result = [];
+    
+                for ($i = 0; $i < $length; $i++) {
+                    $dataItem = [
+                        'vlan_id' => $data['values'][$i] ?? null,
+                        'description' => $data2['values'][$i] ?? null,
+                        'multicast_vlan' => $data3['values'][$i] ?? null,
+                        'management_voip' => false,
+                        'dhcp_snooping' => false,
+                        'lan_to_lan' => false,
+                        'olt_id' => $id,
+                    ];
+    
+                    // Actualizar o crear el registro en la base de datos
+                    Vlan::updateOrCreate(['vlan_id' => $dataItem['vlan_id']], $dataItem);
+    
+                    $result[] = $dataItem;
+                }
+    
+                break;
+    
+            } catch (Exception $e) {
+             echo "Error: " . $e->getMessage();
+            }
+
+        } while (true);
+    
+        return $result;
+    }
+    
+    private function uplinkData($oids, $id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $arrayMtu = [];
+        $arrayMtuValue = [];
+    
+        // OID base para el walk
+        $baseOid = $oids;
+    
+        // Realizar el SNMP walk
+        $walk = $snmp->walk($baseOid);
+    
+        // Contador para rastrear el número de OIDs recuperadas
+        $oidCount = 0;
+    
+        // Iterar a través de las OIDs obtenidas durante el walk
+        while ($walk->hasOids()) {
+            try {
+                $oid = $walk->next();
+    
+                // Incrementar el contador
+                $oidCount++;
+    
+                $arrayMtu[] = $oid->getOid();
+                $arrayMtuValue[] = $oid->getValue()->getValue();
+            } catch (Exception $e) {
+                // Manejar errores al recuperar OIDs
+                $arrayMtu[] = ['value' => 'Error al recuperar OID. ' . $e->getMessage()];
+            }
+        }
+    
+        // Filtrar solo la parte final después del último punto que tenga una longitud de 9
+        $filteredResults = array_filter(array_map(function ($oid, $value) {
+            $interfaz = substr(strrchr($oid, '.'), 1);
+            return strlen($interfaz) == 9 ? $value : null;
+        }, $arrayMtu, $arrayMtuValue));
+    
+        // Eliminar valores nulos
+        $filteredResults = array_filter($filteredResults);
+    
+        return array_values($filteredResults);
+    }
+
+    private function getSnmpData($oids, $id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $arrayOltCard = [];
+        $arrayOltCardValue = [];
+    
+        // OID base para el walk
+        $baseOid = $oids;
+    
+        // Realizar el SNMP walk
+        $walk = $snmp->walk($baseOid);
+    
+        // Contador para rastrear el número de OIDs recuperadas
+        $oidCount = 0;
+    
+        // Iterar a través de las OIDs obtenidas durante el walk
+        while ($walk->hasOids()) {
+            try {
+                $oid = $walk->next();
+    
+                // Incrementar el contador
+                $oidCount++;
+    
+                $arrayOltCard[] = $oid->getOid();
+                $arrayOltCardValue[] = $oid->getValue()->getValue();
+            } catch (Exception $e) {
+                // Manejar errores al recuperar OIDs
+                $arrayOltCard[] = ['value' => 'Error al recuperar OID. ' . $e->getMessage()];
+            }
+        }
+    
+        // Devolver todos los valores sin aplicar el filtro
+        return [
+            'values' => $arrayOltCardValue,
+            'oids' => $arrayOltCard,
+        ];
+    }
     public function ActiveOnus($id)
     {
         // Obtener la información de los Onus por puerto
@@ -223,7 +405,7 @@ class SnmpController extends Controller
         return array_values($combinedResult);
     }
 
-        public function ActiveOnusByPort($id)
+    public function ActiveOnusByPort($id)
     {
         $snmp = $this->getSnmpClient($id);
         
@@ -439,67 +621,24 @@ class SnmpController extends Controller
     
         return $portStatusArray;
     }
-
-    private function uplinkData($oids, $id)
-    {
-        $snmp = $this->getSnmpClient($id);
-        $arrayMtu = [];
-        $arrayMtuValue = [];
     
-        // OID base para el walk
-        $baseOid = $oids;
-    
-        // Realizar el SNMP walk
-        $walk = $snmp->walk($baseOid);
-    
-        // Contador para rastrear el número de OIDs recuperadas
-        $oidCount = 0;
-    
-        // Iterar a través de las OIDs obtenidas durante el walk
-        while ($walk->hasOids()) {
-            try {
-                $oid = $walk->next();
-    
-                // Incrementar el contador
-                $oidCount++;
-    
-                $arrayMtu[] = $oid->getOid();
-                $arrayMtuValue[] = $oid->getValue()->getValue();
-            } catch (Exception $e) {
-                // Manejar errores al recuperar OIDs
-                $arrayMtu[] = ['value' => 'Error al recuperar OID. ' . $e->getMessage()];
-            }
-        }
-    
-        // Filtrar solo la parte final después del último punto que tenga una longitud de 9
-        $filteredResults = array_filter(array_map(function ($oid, $value) {
-            $interfaz = substr(strrchr($oid, '.'), 1);
-            return strlen($interfaz) == 9 ? $value : null;
-        }, $arrayMtu, $arrayMtuValue));
-    
-        // Eliminar valores nulos
-        $filteredResults = array_filter($filteredResults);
-    
-        return array_values($filteredResults);
-    }
-
-        public function pvid($id)
+    public function pvid($id)
     {
         $snmp = $this->getSnmpClient($id);
         $pvidArray = [];
-    
+        
         // OID base para el walk
         $baseOid = '1.3.6.1.4.1.2011.5.6.1.25.1.44';
-    
+        
         // Realizar el SNMP walk
         $walk = $snmp->walk($baseOid);
-    
+        
         // Iterar a través de las OIDs obtenidas durante el walk
         while ($walk->hasOids()) {
             try {
                 $oid = $walk->next();
                 $value = $oid->getValue()->getValue();
-    
+                
     
                 // Agregar el resultado al arreglo asociativo
                 $pvidArray[] = $value;
@@ -511,7 +650,17 @@ class SnmpController extends Controller
     
         return $pvidArray;
     }
-
+    private function filterDataByIndices($data, $indices)
+    {
+        $filteredData = [];
+        foreach ($indices as $index) {
+            if (isset($data['values'][$index - 1])) {
+                $filteredData[] = $data['values'][$index - 1];
+            }
+        }
+        return $filteredData;
+    }
+    
     public function saveHuaweiOid()
     {
         // Lista de OIDs específicas y sus descripciones
@@ -548,5 +697,5 @@ class SnmpController extends Controller
         echo sprintf("OID: %s, Descripción: %s - Guardado en la base de datos", $oid, $description).PHP_EOL;
     }
 
-    1.3.6.1.4.1.2011.6.3.3.2.1.8
+    
 }
