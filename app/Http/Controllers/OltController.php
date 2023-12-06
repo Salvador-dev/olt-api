@@ -8,6 +8,7 @@ use App\Models\HardwareVersion;
 use App\Models\SoftwareVersion;
 use App\Models\Uplink;
 use App\Models\PonPort;
+use App\Models\Vlan;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -88,6 +89,10 @@ class OltController extends Controller
         $olt['olt_cards'] = $olt_cards;
         $olt_uplinks = Uplink::where('olt_id', $id)->get();
         $olt['olt_uplinks'] = $olt_uplinks;
+        $olt_ports = PonPort::where('olt_id', $id)->get();
+        $olt['olt_ports'] = $olt_ports;
+        $olt_vlan = Vlan::where('olt_id', $id)->get();
+        $olt['olt_ports'] = $olt_vlan;
 
         return response()->json(['data' => $olt], 200);
     }
