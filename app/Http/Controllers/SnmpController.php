@@ -34,50 +34,47 @@ class SnmpController extends Controller
         do {
             try {
                 // Obtener los resultados de cada método
-                $result1 = $this->OnusByPort($id);
-                $result2 = $this->portName($id);
-                $result3 = $this->powerTxOLT($id);
-                $result4 = $this->portType($id);
-                $result5 = $this->portStatus($id);
-                $result6 = $this->ActiveOnus($id);
+                $result1 = $this->portName($id);
+                $result2 = $this->powerTxOLT($id);
+                $result3 = $this->portType($id);
+                $result4 = $this->portStatus($id);
+                $result5 = $this->ActiveOnus($id);
+                $result6 = $this->OnusByPort($id);
         
                 // Asegurar que todos los resultados tengan la misma longitud
-                $maxCount = max(
-                    count($result1),
-                    count($result2),
-                    count($result3),
-                    count($result4),
-                    count($result5),
-                    count($result6)
-                );
+                $length = count($result6) - 1;
         
                 // Combinar los resultados en un solo objeto sin anidaciones
-                $combinedResults = [];
-        
-                for ($i = 0; $i < $maxCount; $i++) {
+                $combinedResults = [];  
+             
+                for ($i = 0; $i < $length; $i++) {
                     // Buscar el patrón "SLOT/PORT" en la cadena
-                    $portNameParts = explode('/', isset($result2[$i]) ? $result2[$i] : '');
-    
+                    $portNameParts = explode('/', isset($result1[$i]) ? $result1[$i] : '');
+                    
                     $combinedResult = (object)[
-                        'port' => isset($portNameParts[1]) ? $portNameParts[1] : null,
-                        'slot' => isset($portNameParts[2]) ? $portNameParts[2] : null,
-                        'cantidad_onus' => isset($result1[$i]) ? ($result1[$i]->value ?? $result1[$i]) : null,
-                        'portName' => isset($result2[$i]) ? ($result2[$i]->value ?? $result2[$i]) : null,
-                        'powerTxOLT' => isset($result3[$i]) ? ($result3[$i]->value ?? $result3[$i]) : null,
-                        'portType' => isset($result4[$i]) ? ($result4[$i]->value ?? $result4[$i]) : null,
-                        'portStatus' => isset($result5[$i]) ? ($result5[$i]->status ?? $result5[$i]) : null,
-                        'cantidad_online_onus' => isset($result6[$i]) ? ($result6[$i]->activeCount ?? $result6[$i]) : 0,
+                        'board' => isset($portNameParts[1]) ? $portNameParts[1] : null,
+                        'port' => isset($portNameParts[2]) ? $portNameParts[2] : null,
+                        'cantidad_onus' => isset($result5[$i]) ? ($result5[$i]->totalActiveOnus ?? $result5[$i]) : null,
+                        'portName' => isset($result1[$i]) ? ($result1[$i]->value ?? $result1[$i]) : null,
+                        'tx_power' => isset($result2[$i]) ? ($result2[$i] ?? $result2[$i]) : null,
+                        'portType' => isset($result3[$i]) ? ($result3[$i]->value ?? $result3[$i]) : null,
+                        'portStatus' => isset($result4[$i]) ? ($result4[$i]->status ?? $result4[$i]) : null,
+                        'onus_active' => isset($result5[$i]) ? ($result5[$i]->activeCount) : 0,
                         'description' => '',
                         'rango_maximo' => '20km',
                         'rango_minimo' => '0',
                     ];
         
                     $combinedResults[] = $combinedResult;
+
                 }
     
                 foreach ($combinedResults as $combinedResult) {
                     $PonPort = new PonPort();
                 
+                    $PonPort->admin_status = $combinedResult->portStatus;
+                    $PonPort->onus_active = $combinedResult->onus_active;
+                    $PonPort->onus = $combinedResult->cantidad_onus;
                     switch ($combinedResult->portType) {
                         case 'GPON':
                             $PonPort->pon_type_id = 1;
@@ -92,33 +89,42 @@ class SnmpController extends Controller
                             $PonPort->pon_type_id = 1;
                             break;
                     }
-                    $PonPort->admin_status = $combinedResult->portStatus;
-                    $PonPort->onus = $combinedResult->cantidad_onus;
-                    if ($combinedResult->powerTxOLT >= -8.5 && $combinedResult->powerTxOLT <= 1.0) {
+                    // Lógica para determinar el valor de average_signal
+                    if ($combinedResult->tx_power >= -8.5 && $combinedResult->tx_power <= 1.0) {
                         $PonPort->average_signal = 'Critical';
-                    } elseif ($combinedResult->powerTxOLT >= -9.5 && $combinedResult->powerTxOLT <= 3.0) {
+                    } elseif ($combinedResult->tx_power >= -9.5 && $combinedResult->tx_power <= 3.0) {
                         $PonPort->average_signal = 'Warning';
                     } else {
                         $PonPort->average_signal = 'Very Good';
-                        
                     }
+                
                     $PonPort->description = $combinedResult->description;
-                    $PonPort->tx_power = $combinedResult->powerTxOLT;
-                    $PonPort->board = $combinedResult->slot;
+                    $PonPort->tx_power = $combinedResult->tx_power;
+                    $PonPort->board = $combinedResult->board;
                     $PonPort->range = $combinedResult->rango_minimo . ' - ' . $combinedResult->rango_maximo;
                     $PonPort->min_range = $combinedResult->rango_minimo;
                     $PonPort->max_range = $combinedResult->rango_maximo;
                     $PonPort->operational_status = $combinedResult->portStatus;
                     $PonPort->olt_id = $id;
-                    $PonPort->onus_active = $combinedResult->cantidad_online_onus;
-    
-                    // Guardar el registro en la base de datos
-                    $PonPort->save();
+                    $PonPort->port = $combinedResult->port;
+                
+                    // Condiciones para buscar o crear el registro
+                    $conditions = [
+                        'olt_id' => $id,
+                        'board' => $combinedResult->board,
+                        'port' => $combinedResult->port,
+                    ];
+                
+                    // Valores para actualizar o crear
+                    $values = $PonPort->toArray();
+                
+                    PonPort::updateOrCreate($conditions, $values);
                 }
     
                 // Si llegamos aquí sin excepciones, terminamos el bucle
                 break;
             } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
             }
         } while (true); // Bucle infinito
     
@@ -173,6 +179,8 @@ class SnmpController extends Controller
 
     public function oltCardRegister($id)
     {
+        $result = [];
+    
         do {
             try {
                 // Tu código existente para obtener los datos
@@ -199,13 +207,15 @@ class SnmpController extends Controller
                 $filteredSlot = $this->filterDataByIndices($slot, $extractedNumbers);
                 $filteredPorts = $this->filterDataByIndices($ports, $extractedNumbers);
     
-                $result = [];
-    
-                for ($i = 0; $i < count($extractedNumbers); $i++) {
+                //
+
+                $length = count($extractedNumbers) - 1;
+
+                for ($i = 0; $i < $length; $i++) {
                     $status = $filteredStatus[$i] ?? null;
-    
+                
                     $statusText = ($status === 2) ? 'Normal' : (($status === 7) ? 'Offline' : 'Desconocido');
-    
+                
                     $dataItem = [
                         'slot' => $filteredSlot[$i] ?? null,
                         'type' => $filteredType[$i] ?? null,
@@ -215,12 +225,17 @@ class SnmpController extends Controller
                         'status' => $statusText ?? null,
                         'olt_id' => $id,
                     ];
-    
-                    // Actualizar o crear el registro en la base de datos
-                    OltCard::updateOrCreate(['slot' => $dataItem['slot']], $dataItem);
-    
-                    $result[] = $dataItem;
+   
+                        // Actualizar o crear el registro en la base de datos
+                        OltCard::updateOrCreate(
+                            ['slot' => $dataItem['slot'], 'olt_id' => $dataItem['olt_id']],
+                            $dataItem
+                        );
+                
+                        $result[] = $dataItem;
                 }
+                
+    
                 break;
     
             } catch (Exception $e) {
@@ -230,6 +245,7 @@ class SnmpController extends Controller
     
         return $result;
     }
+    
 
     public function vlanRegister($id)
     {
