@@ -245,8 +245,6 @@ class SnmpController extends Controller
     
         return $result;
     }
-    
-
     public function vlanRegister($id)
     {
         do {
@@ -286,7 +284,14 @@ class SnmpController extends Controller
     
         return $result;
     }
-    
+
+    public function onusData($id)
+    {
+        $onusActivas = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.46.1.15',$id);
+      
+
+        return [$onusActivas]; 
+    }
     private function uplinkData($oids, $id)
     {
         $snmp = $this->getSnmpClient($id);
