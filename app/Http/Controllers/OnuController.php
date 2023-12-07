@@ -127,7 +127,7 @@ class OnuController extends Controller
         $data = Onu::create([
             'autoincrement' => $request['autoincrement'],
             'unique_external_id' => $request['onu_external'],
-            'pon_type' => $request['pon_type'],
+            'pon_type_id' => $request['pon_type'],
             'sn' => $request['sn'],
             'onu_type_id' => $request['onu_type_id'],
             'name' => $request['name'],
@@ -174,34 +174,34 @@ class OnuController extends Controller
         try {
 
             $onu = Onu::where('onus.id', $id)
-                // ->join('olts', 'onus.olt_id', 'olts.id')
-                // ->join('pon_types', 'onus.pon_type_id', 'pon_types.id')
-                // ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
-                // ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
-                // ->join('zones', 'onus.zone_id', 'zones.id')
-                // ->select(
-                //     'onus.id',
-                //     'onus.name as name', 
-                //     'onus.unique_external_id as onu_external',
-                //     'onus.status',
-                //     'onus.sn',
-                //     'onus.signal',
-                //     'onus.signal_1310',
-                //     'onus.catv',
-                //     'onus.authorization_date',
-                //     'onus.olt_id',
-                //     'onus.zone_id as zone',
-                //     'onus.board',
-                //     'onus.odb_name as odb',
-                //     'onus.port',
-                //     'onus.address',
-                //     'onus.mode',
-                //     'service_ports.vlan_id as vlan',
-                //     'olts.name as olt_name',
-                //     'pon_types.name as pon_type',
-                //     'onu_types.name as onu_type_id',
-                //     'zones.name as zone_name',
-                // )
+                 ->join('olts', 'onus.olt_id', 'olts.id')
+                 ->join('pon_types', 'onus.pon_type_id', 'pon_types.id')
+                 ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+                 ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
+                 ->join('zones', 'onus.zone_id', 'zones.id')
+                 ->select(
+                     'onus.id',
+                     'onus.name as name', 
+                     'onus.unique_external_id as onu_external',
+                     'onus.status',
+                     'onus.sn',
+                     'onus.signal',
+                     'onus.signal_1310',
+                     'onus.catv',
+                     'onus.authorization_date',
+                     'onus.olt_id',
+                     'onus.zone_id as zone',
+                     'onus.board',
+                     'onus.odb_name as odb',
+                     'onus.port',
+                     'onus.address',
+                     'onus.mode',
+                     'service_ports.vlan_id as vlan',
+                     'olts.name as olt_name',
+                     'pon_types.name as pon_type',
+                     'onu_types.name as onu_type_id',
+                     'zones.name as zone_name',
+                 )
                 ->first();
 
                 if ($onu) {

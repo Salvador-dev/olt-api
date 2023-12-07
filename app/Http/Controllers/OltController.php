@@ -92,7 +92,7 @@ class OltController extends Controller
         $olt_ports = PonPort::where('olt_id', $id)->get();
         $olt['olt_ports'] = $olt_ports;
         $olt_vlan = Vlan::where('olt_id', $id)->get();
-        $olt['olt_ports'] = $olt_vlan;
+        $olt['olt_vlan'] = $olt_vlan;
 
         return response()->json(['data' => $olt], 200);
     }
