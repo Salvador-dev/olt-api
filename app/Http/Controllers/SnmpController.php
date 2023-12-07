@@ -29,6 +29,16 @@ class SnmpController extends Controller
         ]);
     }
 
+    public function activeOlt ($id)
+    {
+        $this->uplinkRegister($id);
+        $this->ponPortsData($id);
+        $this->oltCardRegister($id);
+        $this->vlanRegister($id);
+
+        return 200;
+    }
+
     public function ponPortsData($id)
     {
         do {
