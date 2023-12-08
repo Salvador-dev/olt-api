@@ -29,14 +29,19 @@ class SnmpController extends Controller
         ]);
     }
 
-    public function activeOlt ($id)
+    public function activeOlt($id)
     {
-        $this->uplinkRegister($id);
-        $this->ponPortsData($id);
-        $this->oltCardRegister($id);
-        $this->vlanRegister($id);
+        try {
+            $this->uplinkRegister($id);
+            $this->ponPortsData($id);
+            $this->oltCardRegister($id);
+            $this->vlanRegister($id);
+    
 
-        return 200;
+            return "Activación exitosa";
+        } catch (Exception $e) {
+            return "Error en la activación: " . $e->getMessage();
+        }
     }
 
     public function ponPortsData($id)
@@ -134,7 +139,7 @@ class SnmpController extends Controller
                 // Si llegamos aquí sin excepciones, terminamos el bucle
                 break;
             } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
+                // echo "Error: " . $e->getMessage();
             }
         } while (true); // Bucle infinito
     
@@ -180,7 +185,7 @@ class SnmpController extends Controller
                 break;
     
             } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
+                // echo "Error: " . $e->getMessage();
             }
         } while (true);
     
@@ -249,7 +254,7 @@ class SnmpController extends Controller
                 break;
     
             } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
+                // echo "Error: " . $e->getMessage();
             }
         } while (true);
     
@@ -287,7 +292,7 @@ class SnmpController extends Controller
                 break;
     
             } catch (Exception $e) {
-             echo "Error: " . $e->getMessage();
+            //  echo "Error: " . $e->getMessage();
             }
 
         } while (true);
