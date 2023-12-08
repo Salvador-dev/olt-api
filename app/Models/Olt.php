@@ -24,6 +24,19 @@ class Olt extends Model
         'pon_type_id',
     ];
 
+    public function onus()
+    {
+        return $this->hasMany(Onu::class);
+    }
+
+    public function uplink()
+    {
+        return $this->hasMany(Uplink::class);
+    }
+    public function vlans()
+    {
+        return $this->hasMany(Vlan::class);
+    }
     public function olt_cards()
     {
         return $this->hasMany(OltCard::class);

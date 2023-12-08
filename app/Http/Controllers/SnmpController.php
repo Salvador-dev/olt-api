@@ -15,13 +15,6 @@ use Ndum\Laravel\Snmp;
 class SnmpController extends Controller
 {
 
-    public function change($id)
-    {
-        Olt::where('id', $id)->update(['olt_active' => true]);
-
-        return "Activación exitosa";
-    }
-
      public function getSnmpClient($id)
     {
 
@@ -31,7 +24,8 @@ class SnmpController extends Controller
          $community = $olt->snmp_read_only;
 
          $snmp = new Snmp();
-
+         
+        
          return  $snmp->newClient($host, 2, $community);
 
     }
@@ -312,11 +306,13 @@ class SnmpController extends Controller
     {
 
         
-        $onusStatus = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.8',$id);
+        // $onusStatus = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.46.1.15',$id);
+        // $onusModel = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.8',$id);
+        $onusStatus3 = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.7',$id);
 
       
 
-        return [$onusStatus,]; 
+        return [$onusStatus3]; 
     }
 
     private function uplinkData($oids, $id)
@@ -367,7 +363,6 @@ class SnmpController extends Controller
         $snmp = $this->getSnmpClient($id);
         $arrayOltCard = [];
         $arrayOltCardValue = [];
-    
         // OID base para el walk
         $baseOid = $oids;
     

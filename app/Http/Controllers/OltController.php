@@ -129,7 +129,15 @@ class OltController extends Controller
     public function destroy($id)
     {
         try {
-            Olt::where('id', $id)->delete();
+            $olt = Olt::findOrFail($id);
+
+            $olt->uplink()->delete();
+            $olt->vlans()->delete();
+            $olt->olt_cards()->delete();
+            $olt->pon_ports()->delete();
+            $olt->onus()->delete();
+            $olt->delete();
+         
             return response()->json(['data' => 'Success!'], 200);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
