@@ -29,7 +29,8 @@ class OltController extends Controller
                 'hardware_versions.id as hardware_version_id',
                 'olts.ip',
                 'olts.telnet_port',
-                'olts.snmp_udp_port'
+                'olts.snmp_udp_port',
+                'olts.olt_active'
             )
             ->orderBy('olts.id')
             ->get();

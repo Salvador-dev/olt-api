@@ -37,12 +37,15 @@ class SnmpController extends Controller
             $this->oltCardRegister($id);
             $this->vlanRegister($id);
     
-
+            // Si todas las operaciones fueron exitosas, actualiza la columna olt_active a true
+            Olt::where('id', $id)->update(['olt_active' => true]);
+    
             return "Activación exitosa";
         } catch (Exception $e) {
             return "Error en la activación: " . $e->getMessage();
         }
     }
+    
 
     public function ponPortsData($id)
     {
