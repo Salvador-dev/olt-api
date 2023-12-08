@@ -10,23 +10,30 @@ use App\Models\Olt;
 use App\Models\OltCard;
 use App\Models\Oid;
 use stdClass;
+use Ndum\Laravel\Snmp;
 
 class SnmpController extends Controller
 {
 
+    public function change($id)
+    {
+        Olt::where('id', $id)->update(['olt_active' => true]);
+
+        return "Activación exitosa";
+    }
+
      public function getSnmpClient($id)
     {
 
-        $olt = Olt::where("id",$id)->first();
+         $olt = Olt::where("id",$id)->first();
 
-        $host = $olt->ip;
-        $community = $olt->snmp_read_only;
+         $host = $olt->ip;
+         $community = $olt->snmp_read_only;
 
-        return new SnmpClient([
-            'host' => $host,
-            'version' => 2,
-            'community' => $community,
-        ]);
+         $snmp = new Snmp();
+
+         return  $snmp->newClient($host, 2, $community);
+
     }
 
     public function activeOlt($id)
@@ -45,8 +52,6 @@ class SnmpController extends Controller
             return "Error en la activación: " . $e->getMessage();
         }
     }
-    
-
     public function ponPortsData($id)
     {
         do {
@@ -305,11 +310,15 @@ class SnmpController extends Controller
 
     public function onusData($id)
     {
-        $onusActivas = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.46.1.15',$id);
+
+        
+        $onusStatus = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.8',$id);
+
       
 
-        return [$onusActivas]; 
+        return [$onusStatus,]; 
     }
+
     private function uplinkData($oids, $id)
     {
         $snmp = $this->getSnmpClient($id);

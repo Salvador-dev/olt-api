@@ -103,6 +103,8 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/get/snmp/vlan/{id}', [SnmpController::class, 'vlanRegister']);
     Route::get('/get/snmp/onus/{id}', [SnmpController::class, 'onusData']);
     Route::get('/get/snmp/activeolt/{id}', [SnmpController::class, 'activeOlt']);
+    Route::get('/get/change/{id}', [SnmpController::class, 'change']);
+
 
     Route::get('logout', [AuthController::class, 'logout']);
 });

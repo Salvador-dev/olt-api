@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d355d6dbd96f10f59b18a934029a9e3c",
+    "content-hash": "b84cd40a41d8b8a886aa7f589266f0fe",
     "packages": [
         {
             "name": "brick/math",
@@ -2442,6 +2442,62 @@
                 }
             ],
             "time": "2023-06-21T08:46:11+00:00"
+        },
+        {
+            "name": "ndum/laravel-snmp",
+            "version": "1.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ndum/laravel-snmp.git",
+                "reference": "3dc2abe37d946de972a11f330f6466a0f244a634"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ndum/laravel-snmp/zipball/3dc2abe37d946de972a11f330f6466a0f244a634",
+                "reference": "3dc2abe37d946de972a11f330f6466a0f244a634",
+                "shasum": ""
+            },
+            "require": {
+                "freedsx/snmp": "^0.5.0",
+                "illuminate/support": "~5.5|~6.0|~7.0|~8.0|~9.0|~10.0",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16"
+            },
+            "type": "laravel",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ndum\\Laravel\\SnmpServiceProvider"
+                    ],
+                    "aliases": {
+                        "snmp": "Ndum\\Laravel\\Facades\\Snmp",
+                        "snmptrapserver": "Ndum\\Laravel\\Facades\\SnmpTrapServer"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ndum\\Laravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas D",
+                    "email": "nd@nidum.org"
+                }
+            ],
+            "description": "A FreeDSx/SNMP SNMP-Wrapper for Laravel",
+            "support": {
+                "issues": "https://github.com/ndum/laravel-snmp/issues",
+                "source": "https://github.com/ndum/laravel-snmp/tree/1.9.0"
+            },
+            "time": "2023-06-01T09:45:32+00:00"
         },
         {
             "name": "nesbot/carbon",
