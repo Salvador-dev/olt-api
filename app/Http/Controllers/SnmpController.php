@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers; 
+use App\Jobs\SNMPJob;
 use FreeDSx\Snmp\SnmpClient;
 use Exception;
 use App\Models\PonPort;
@@ -32,19 +33,11 @@ class SnmpController extends Controller
 
     public function activeOlt($id)
     {
-        try {
-            $this->uplinkRegister($id);
-            $this->ponPortsData($id);
-            $this->oltCardRegister($id);
-            $this->vlanRegister($id);
+          Olt::where('id', $id)->update(['olt_active' => 2]);
+        // Despacha la Job a la cola
+        SNMPJob::dispatch($id);
     
-            // Si todas las operaciones fueron exitosas, actualiza la columna olt_active a true
-            Olt::where('id', $id)->update(['olt_active' => true]);
-    
-            return "Activación exitosa";
-        } catch (Exception $e) {
-            return "Error en la activación: " . $e->getMessage();
-        }
+        return "Activación en cola. Esto puede tardar un tiempo.";
     }
     public function ponPortsData($id)
     {

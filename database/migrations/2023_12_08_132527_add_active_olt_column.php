@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('olts', function (Blueprint $table) {
-            $table->boolean('olt_active')->default(false)->after('name');
+            $table->integer('olt_active')->default(0)->after('name');
         });
     }
 
