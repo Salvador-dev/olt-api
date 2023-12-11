@@ -26,7 +26,6 @@ class OltController extends Controller
                 'olts.id',
                 'olts.name',
                 'hardware_versions.name as hardware_version',
-                'hardware_versions.id as hardware_version_id',
                 'olts.ip',
                 'olts.telnet_port',
                 'olts.snmp_udp_port',

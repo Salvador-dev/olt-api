@@ -301,7 +301,7 @@ class SnmpController extends Controller
         
         // $onusStatus = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.46.1.15',$id);
         // $onusModel = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.8',$id);
-        $onusStatus3 = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.7',$id);
+        $onusStatus3 = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.9',$id);
 
       
 
