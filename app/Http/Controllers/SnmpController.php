@@ -297,17 +297,66 @@ class SnmpController extends Controller
 
     public function onusData($id)
     {
-
-        
-        // $onusStatus = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.46.1.15',$id);
-        // $onusModel = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.8',$id);
-        $onusStatus3 = $this->getSnmpData('1.3.6.1.4.1.2011.6.128.1.1.2.43.1.9',$id);
-
-      
-
-        return [$onusStatus3]; 
+        try {
+            $snmp = $this->getSnmpClient($id);
+    
+            $maxRepetitions = 10;
+            $nonRepeaters = 0;
+            $oidToGetBulk = '1.3.6.1.4.1.2011.6.128.1.1.2.43.1.9';
+    
+            // Define un conjunto de patrones para cada tipo de cadena SNMP
+            $patterns = [
+                '/^([^_]+)_zone_([^_]+)_descr_(\S+?)(?:_extid_(HWT[^\s]+))?_authd_(\d+)$/i',
+            ];
+    
+            // Inicia el bucle para obtener bloques progresivos
+            do {
+                // Realiza la solicitud GetBulk
+                $oids = $snmp->getBulk($maxRepetitions, $nonRepeaters, $oidToGetBulk);
+    
+                // Itera a través de los resultados y muestra cada variable OID
+                foreach ($oids as $oid) {
+                    $snmpString = (string) $oid->getValue();
+    
+                    // Intenta hacer coincidir la cadena con cada patrón
+                    foreach ($patterns as $pattern) {
+                        preg_match($pattern, $snmpString, $matches);
+    
+                        // Si se encuentra una coincidencia, extrae los valores y muestra o almacena
+                        if (!empty($matches)) {
+                            list(, $name, $zone, $description, $externalId, $authDate) = array_pad($matches, 6, null);
+    
+                            // Puedes almacenar los valores en un array asociativo
+                            $snmpData = [
+                                'Name' => $name,
+                                'Zone' => $zone,
+                                'Description' => $description,
+                                'External ID' => $externalId,
+                                'Auth Date' => $authDate,
+                            ];
+    
+                            // O imprimirlos directamente
+                            echo "Name: $name\n";
+                            echo "Zone: $zone\n";
+                            echo "Description: $description\n";
+                            echo "External ID: $externalId\n";
+                            echo "Auth Date: $authDate\n";
+                            echo "-----------------\n";
+    
+                            // Si se encuentra una coincidencia, no es necesario probar más patrones
+                            break;
+                        }
+                    }
+                }
+    
+            } while (!empty($oids)); // Continúa el bucle hasta que no hay más variables
+    
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            exit;
+        }
     }
-
+    
     private function uplinkData($oids, $id)
     {
         $snmp = $this->getSnmpClient($id);
