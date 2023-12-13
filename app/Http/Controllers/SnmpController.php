@@ -294,59 +294,36 @@ class SnmpController extends Controller
     
         return $result;
     }
-
     public function onusData($id)
     {
         try {
             $snmp = $this->getSnmpClient($id);
     
-            $maxRepetitions = 10;
+            $maxRepetitions = 50;
             $nonRepeaters = 0;
             $oidToGetBulk = '1.3.6.1.4.1.2011.6.128.1.1.2.43.1.9';
     
-            // Define un conjunto de patrones para cada tipo de cadena SNMP
-            $patterns = [
-                '/^([^_]+)_zone_([^_]+)_descr_(\S+?)(?:_extid_(HWT[^\s]+))?_authd_(\d+)$/i',
-            ];
+            $lastOid = null;
     
-            // Inicia el bucle para obtener bloques progresivos
             do {
-                // Realiza la solicitud GetBulk
-                $oids = $snmp->getBulk($maxRepetitions, $nonRepeaters, $oidToGetBulk);
+                // Realiza la solicitud GetBulk con un índice de inicio específico
+                $oids = $snmp->getBulk($maxRepetitions, $nonRepeaters, $lastOid ? "{$lastOid}.1" : $oidToGetBulk);
     
-                // Itera a través de los resultados y muestra cada variable OID
+                // Itera a través de los resultados y muestra solo los valores del OID específico
                 foreach ($oids as $oid) {
-                    $snmpString = (string) $oid->getValue();
+                    $currentOid = $oid->getOid();
     
-                    // Intenta hacer coincidir la cadena con cada patrón
-                    foreach ($patterns as $pattern) {
-                        preg_match($pattern, $snmpString, $matches);
-    
-                        // Si se encuentra una coincidencia, extrae los valores y muestra o almacena
-                        if (!empty($matches)) {
-                            list(, $name, $zone, $description, $externalId, $authDate) = array_pad($matches, 6, null);
-    
-                            // Puedes almacenar los valores en un array asociativo
-                            $snmpData = [
-                                'Name' => $name,
-                                'Zone' => $zone,
-                                'Description' => $description,
-                                'External ID' => $externalId,
-                                'Auth Date' => $authDate,
-                            ];
-    
-                            // O imprimirlos directamente
-                            echo "Name: $name\n";
-                            echo "Zone: $zone\n";
-                            echo "Description: $description\n";
-                            echo "External ID: $externalId\n";
-                            echo "Auth Date: $authDate\n";
-                            echo "-----------------\n";
-    
-                            // Si se encuentra una coincidencia, no es necesario probar más patrones
-                            break;
-                        }
+                    // Verifica si el OID actual comienza con el OID de interés
+                    if (strpos($currentOid, $oidToGetBulk) === 0) {
+                        $oidValue = $oid->getValue();
+                        $snmpString = is_object($oidValue) ? (string) $oidValue : $oidValue;
+                        
+                        $parsedResult = $this->parseSNMPResponse($snmpString);
+
+                       print_r($parsedResult);
                     }
+    
+                    $lastOid = $currentOid;
                 }
     
             } while (!empty($oids)); // Continúa el bucle hasta que no hay más variables
@@ -355,6 +332,59 @@ class SnmpController extends Controller
             echo $e->getMessage();
             exit;
         }
+    }
+
+    public function parseSNMPResponse($snmpString)
+    {
+        // Inicializa los valores con null
+        $name = $zone = $description = $external_id = $auth_date = null;
+    
+        // Encuentra la posición de "_zone_"
+        $posZone = strpos($snmpString, '_zone_');
+        if ($posZone !== false) {
+            list($name, $restString) = explode('_zone_', $snmpString, 2);
+    
+            // Formatea la zona según tus especificaciones (elimina "Zone_" y convierte "_" a " ")
+            $zonePart = strtok($restString, '_');
+            $zone = preg_replace('/^Zone_/', '', $zonePart);
+    
+            // Encuentra la posición de "_descr_"
+            if ($posDescr = strpos($restString, '_descr_')) {
+                list($zonePart, $restString) = explode('_descr_', $restString, 2);
+    
+                // Asigna la descripción
+                $description = $zonePart;
+    
+                // Encuentra la posición de "_extid_" y "_authd_"
+                $posExtId = strpos($restString, '_extid_');
+                $posAuthd = strpos($restString, '_authd_');
+    
+                // Verifica y asigna los valores de "_extid_" y "_authd_"
+                if ($posExtId !== false && ($posAuthd === false || $posExtId < $posAuthd)) {
+                    list($external_id, $restString) = explode('_extid_', $restString, 2);
+    
+                    // Verifica si hay "_authd_" después de "_extid_"
+                    $posAuthd = strpos($restString, '_authd_');
+                    if ($posAuthd !== false) {
+                        list($auth_date, $restString) = explode('_authd_', $restString, 2);
+                    }
+                } elseif ($posAuthd !== false) {
+                    list($auth_date, $restString) = explode('_authd_', $restString, 2);
+    
+                    // Verifica si hay "_extid_" después de "_authd_"
+                    $posExtId = strpos($restString, '_extid_');
+                    if ($posExtId !== false) {
+                        list($external_id, $restString) = explode('_extid_', $restString, 2);
+                    }
+                }
+            }
+        } else {
+            // Si no se encuentra "_zone_", asigna el valor completo a name
+            $name = $snmpString;
+        }
+    
+        // Devuelve un arreglo asociativo con los valores
+        return compact('name', 'zone', 'description', 'external_id', 'auth_date');
     }
     
     private function uplinkData($oids, $id)
