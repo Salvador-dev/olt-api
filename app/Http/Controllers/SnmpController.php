@@ -294,6 +294,34 @@ class SnmpController extends Controller
     
         return $result;
     }
+
+    public function onusRegister($id)
+    {
+        // Obtener datos del tipo de ONU
+        $onuType = $this->onuType($id);
+    
+        // Obtener datos generales de la ONU
+        $onuData = $this->onusData($id);
+    
+        // Inicializar la clave "model" como un arreglo vacío si aún no existe
+        $onuData["model"] = isset($onuData["model"]) ? $onuData["model"] : [];
+    
+        // Agregar cada elemento de onuType al arreglo onuData["model"] usando un ciclo for
+        for ($i = 0; $i < count($onuType); $i++) {
+            $onuData["model"][] = $onuType[$i];
+            echo "Agregado a model: " . $onuType[$i] . "<br>";
+        }
+    
+        // Imprimir valores para depuración
+        echo "onuType: ";
+        var_dump($onuType);
+        echo "onuData: ";
+        var_dump($onuData);
+    
+        // Retornar los datos combinados
+        return $onuData;
+    }
+    
     public function onusData($id)
     {
         try {
@@ -318,7 +346,7 @@ class SnmpController extends Controller
                         $oidValue = $oid->getValue();
                         $snmpString = is_object($oidValue) ? (string) $oidValue : $oidValue;
                         
-                        $parsedResult = $this->parseSNMPResponse($snmpString);
+                        $parsedResult = $this->parseSNMPResponses($snmpString);
 
                        print_r($parsedResult);
                     }
@@ -334,57 +362,40 @@ class SnmpController extends Controller
         }
     }
 
-    public function parseSNMPResponse($snmpString)
+    public function parseSNMPResponses($snmpStrings)
     {
-        // Inicializa los valores con null
-        $name = $zone = $description = $external_id = $auth_date = null;
+        // Define patrones regex para cada campo
+        $patterns = [
+            'name' => '/^(.*?)_zone_/',
+            'zone' => '/_zone_(.*?)_descr_/',
+            'descr' => '/_descr_(.*?)(?:_extid_|_odb_|_authd_)/',
+            'external_id' => '/_extid_(.*?)_authd_/',
+            'auth_date' => '/_authd_(.*)/',
+        ];
     
-        // Encuentra la posición de "_zone_"
-        $posZone = strpos($snmpString, '_zone_');
-        if ($posZone !== false) {
-            list($name, $restString) = explode('_zone_', $snmpString, 2);
+        // Inicializa el array de resultados
+        $result = ['model' => ''];
     
-            // Formatea la zona según tus especificaciones (elimina "Zone_" y convierte "_" a " ")
-            $zonePart = strtok($restString, '_');
-            $zone = preg_replace('/^Zone_/', '', $zonePart);
+        // Itera sobre cada patrón y busca coincidencias en la cadena SNMP
+        foreach ($patterns as $field => $pattern) {
+            preg_match($pattern, $snmpStrings, $matches);
     
-            // Encuentra la posición de "_descr_"
-            if ($posDescr = strpos($restString, '_descr_')) {
-                list($zonePart, $restString) = explode('_descr_', $restString, 2);
-    
-                // Asigna la descripción
-                $description = $zonePart;
-    
-                // Encuentra la posición de "_extid_" y "_authd_"
-                $posExtId = strpos($restString, '_extid_');
-                $posAuthd = strpos($restString, '_authd_');
-    
-                // Verifica y asigna los valores de "_extid_" y "_authd_"
-                if ($posExtId !== false && ($posAuthd === false || $posExtId < $posAuthd)) {
-                    list($external_id, $restString) = explode('_extid_', $restString, 2);
-    
-                    // Verifica si hay "_authd_" después de "_extid_"
-                    $posAuthd = strpos($restString, '_authd_');
-                    if ($posAuthd !== false) {
-                        list($auth_date, $restString) = explode('_authd_', $restString, 2);
-                    }
-                } elseif ($posAuthd !== false) {
-                    list($auth_date, $restString) = explode('_authd_', $restString, 2);
-    
-                    // Verifica si hay "_extid_" después de "_authd_"
-                    $posExtId = strpos($restString, '_extid_');
-                    if ($posExtId !== false) {
-                        list($external_id, $restString) = explode('_extid_', $restString, 2);
-                    }
+            // Si el campo es 'name' y no hay coincidencia, considera todo el texto como el nombre
+            if ($field === 'name' && empty($matches)) {
+                $result['name'] = $snmpStrings;
+            } else {
+                // Si el campo es 'descr' y no hay coincidencia, considera todo el texto después de '_descr_' como la descripción
+                if ($field === 'descr' && empty($matches)) {
+                    $descrStart = strpos($snmpStrings, '_descr_');
+                    $result['descr'] = $descrStart !== false ? substr($snmpStrings, $descrStart + strlen('_descr_')) : null;
+                } else {
+                    // Ajuste para acceder al grupo de captura adecuado
+                    $result[$field] = isset($matches[1]) ? $matches[1] : null;
                 }
             }
-        } else {
-            // Si no se encuentra "_zone_", asigna el valor completo a name
-            $name = $snmpString;
         }
     
-        // Devuelve un arreglo asociativo con los valores
-        return compact('name', 'zone', 'description', 'external_id', 'auth_date');
+        return $result;
     }
     
     private function uplinkData($oids, $id)
@@ -429,7 +440,6 @@ class SnmpController extends Controller
     
         return array_values($filteredResults);
     }
-
     private function getSnmpData($oids, $id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -764,6 +774,34 @@ class SnmpController extends Controller
         }
     
         return $pvidArray;
+    }
+    public function onuType($id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $onuTypeArray = [];
+    
+        // OID base para el walk
+        $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.43.1.8';
+    
+        // Realizar el SNMP walk
+        $walk = $snmp->walk($baseOid);
+    
+        // Iterar a través de las OIDs obtenidas durante el walk
+        while ($walk->hasOids()) {
+            try {
+                $oid = $walk->next();
+                $value = $oid->getValue()->getValue();
+    
+    
+                // Agregar el resultado al arreglo asociativo
+                $onuTypeArray[] = $value;
+            } catch (Exception $e) {
+                // Manejar errores al recuperar OIDs
+                $onuTypeArray[] = ['status' => 'Error al recuperar OID. ' . $e->getMessage()];
+            }
+        }
+
+        return $onuTypeArray;
     }
     private function filterDataByIndices($data, $indices)
     {
