@@ -302,24 +302,32 @@ class SnmpController extends Controller
     
         // Obtener datos generales de la ONU
         $onuData = $this->onusData($id);
-    
-        // Inicializar la clave "model" como un arreglo vacío si aún no existe
-        $onuData["model"] = isset($onuData["model"]) ? $onuData["model"] : [];
-    
-        // Agregar cada elemento de onuType al arreglo onuData["model"] usando un ciclo for
+        
+        // Inicializar el nuevo arreglo combinado
+        $combinedArray = [];
+
+        if (count($onuType) !== count($onuData)) {
+            throw new Exception("Los arreglos no tienen la misma longitud");
+        }        
+
+        // Iterar sobre los elementos de ambos arreglos
         for ($i = 0; $i < count($onuType); $i++) {
-            $onuData["model"][] = $onuType[$i];
-            echo "Agregado a model: " . $onuType[$i] . "<br>";
+            // Crear un nuevo objeto para el elemento combinado
+            $combinedItem = [
+                'model' => $onuType[$i],  // Usar el valor del primer arreglo en la propiedad "model"
+                'name' => $onuData[$i]['name'],
+                'zone' => $onuData[$i]['zone'],
+                'descr' => $onuData[$i]['descr'],
+                'external_id' => $onuData[$i]['external_id'],
+                'auth_date' => $onuData[$i]['auth_date'],
+            ];
+
+            // Agregar el nuevo objeto al arreglo combinado
+            $combinedArray[] = $combinedItem;
         }
-    
-        // Imprimir valores para depuración
-        echo "onuType: ";
-        var_dump($onuType);
-        echo "onuData: ";
-        var_dump($onuData);
-    
-        // Retornar los datos combinados
-        return $onuData;
+
+        return $combinedArray;
+       
     }
     
     public function onusData($id)
@@ -346,7 +354,7 @@ class SnmpController extends Controller
                         $oidValue = $oid->getValue();
                         $snmpString = is_object($oidValue) ? (string) $oidValue : $oidValue;
                         
-                        $parsedResult = $this->parseSNMPResponses($snmpString);
+                        $parsedResult = $this->parseSNMPResponses($snmpString, $id);
 
                        print_r($parsedResult);
                     }
@@ -357,12 +365,12 @@ class SnmpController extends Controller
             } while (!empty($oids)); // Continúa el bucle hasta que no hay más variables
     
         } catch (Exception $e) {
-            echo $e->getMessage();
+
             exit;
         }
     }
-
-    public function parseSNMPResponses($snmpStrings)
+    
+    public function parseSNMPResponses($snmpStrings, $id)
     {
         // Define patrones regex para cada campo
         $patterns = [
@@ -372,10 +380,10 @@ class SnmpController extends Controller
             'external_id' => '/_extid_(.*?)_authd_/',
             'auth_date' => '/_authd_(.*)/',
         ];
-    
+        $onuType = $this->onuType($id);
         // Inicializa el array de resultados
         $result = ['model' => ''];
-    
+        
         // Itera sobre cada patrón y busca coincidencias en la cadena SNMP
         foreach ($patterns as $field => $pattern) {
             preg_match($pattern, $snmpStrings, $matches);
@@ -394,10 +402,10 @@ class SnmpController extends Controller
                 }
             }
         }
-    
+        
         return $result;
     }
-    
+              
     private function uplinkData($oids, $id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -780,27 +788,49 @@ class SnmpController extends Controller
         $snmp = $this->getSnmpClient($id);
         $onuTypeArray = [];
     
-        // OID base para el walk
+        // OID base para el getBulk
         $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.43.1.8';
     
-        // Realizar el SNMP walk
-        $walk = $snmp->walk($baseOid);
+        // Número máximo de repeticiones en el getBulk
+        $maxRepetitions = 50;  // Ajusta según sea necesario
     
-        // Iterar a través de las OIDs obtenidas durante el walk
-        while ($walk->hasOids()) {
-            try {
-                $oid = $walk->next();
-                $value = $oid->getValue()->getValue();
+        $stopOid = '1.3.6.1.4.1.2011.6.128.1.1.2.43.1.9'; // OID para detener la búsqueda
     
+        try {
+            $oid = $baseOid;
     
-                // Agregar el resultado al arreglo asociativo
-                $onuTypeArray[] = $value;
-            } catch (Exception $e) {
-                // Manejar errores al recuperar OIDs
-                $onuTypeArray[] = ['status' => 'Error al recuperar OID. ' . $e->getMessage()];
-            }
+            do {
+                // Realizar el SNMP getBulk para el rango actual
+                $bulkResponse = $snmp->getBulk($maxRepetitions, 0, $oid);
+    
+                // Verificar si hay respuestas en el rango actual
+                if (!empty($bulkResponse)) {
+                    // Iterar a través de las respuestas del getBulk
+                    foreach ($bulkResponse as $oid) {
+                        $currentOid = $oid->getOid();
+                        $value = $oid->getValue()->getValue();
+    
+                        // Verificar si se alcanzó el OID de detención antes de agregar el resultado al arreglo
+                        if (strpos($currentOid, $stopOid) === 0) {
+                            break 2; // Salir de los dos bucles (do-while y foreach)
+                        }
+    
+                        // Agregar el resultado al arreglo con el valor solamente
+                        $onuTypeArray[] = $value;
+                    }
+    
+                    // Obtener el último OID devuelto para la siguiente iteración
+                    $oid = $currentOid;
+                } else {
+                    // No hay más respuestas, salir del bucle
+                    break;
+                }
+            } while (true);
+        } catch (Exception $e) {
+            // Manejar errores en la solicitud SNMP
+            $onuTypeArray[] = ['status' => 'Error en la solicitud SNMP. ' . $e->getMessage()];
         }
-
+    
         return $onuTypeArray;
     }
     private function filterDataByIndices($data, $indices)
