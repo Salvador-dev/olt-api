@@ -297,113 +297,115 @@ class SnmpController extends Controller
 
     public function onusRegister($id)
     {
-        // Obtener datos del tipo de ONU
-        $onuType = $this->onuType($id);
+        try {
+            // Obtener datos del tipo de ONU
+            $onuType = $this->onuType($id);
     
-        // Obtener datos generales de la ONU
-        $onuData = $this->onusData($id);
-        
-        // Inicializar el nuevo arreglo combinado
-        $combinedArray = [];
-
-        if (count($onuType) !== count($onuData)) {
-            throw new Exception("Los arreglos no tienen la misma longitud");
-        }        
-
-        // Iterar sobre los elementos de ambos arreglos
-        for ($i = 0; $i < count($onuType); $i++) {
-            // Crear un nuevo objeto para el elemento combinado
-            $combinedItem = [
-                'model' => $onuType[$i],  // Usar el valor del primer arreglo en la propiedad "model"
-                'name' => $onuData[$i]['name'],
-                'zone' => $onuData[$i]['zone'],
-                'descr' => $onuData[$i]['descr'],
-                'external_id' => $onuData[$i]['external_id'],
-                'auth_date' => $onuData[$i]['auth_date'],
-            ];
-
-            // Agregar el nuevo objeto al arreglo combinado
-            $combinedArray[] = $combinedItem;
+            // Obtener datos generales de la ONU
+            $onuData = $this->onusData($id);
+    
+            // Iterar sobre cada objeto en $onuData y asignar el tipo correspondiente
+            foreach ($onuData as $index => $onusObject) {
+                // Verificar si existe un tipo correspondiente en $onuType
+                if (isset($onuType[$index])) {
+                    // Asignar el tipo al objeto en $onuData
+                    $onusObject->model = $onuType[$index];
+                } else {
+                    // Manejar la situación donde no hay un tipo correspondiente (puedes ajustar según tus necesidades)
+                    $onusObject->model = 'Tipo_No_Encontrado';
+                }
+            }
+    
+            return $onuData;
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage() . PHP_EOL;
+            // Manejar el error según tus necesidades
         }
-
-        return $combinedArray;
-       
     }
     
     public function onusData($id)
     {
-        try {
-            $snmp = $this->getSnmpClient($id);
+        do {
+            try {
+                $snmp = $this->getSnmpClient($id);
     
-            $maxRepetitions = 50;
-            $nonRepeaters = 0;
-            $oidToGetBulk = '1.3.6.1.4.1.2011.6.128.1.1.2.43.1.9';
+                // OID base para el getBulk
+                $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.43.1.9';
     
-            $lastOid = null;
+                // Configuración para la solicitud SNMP GetBulk
+                $maxRepetitions = 50;
+                $nonRepeaters = 0;
     
-            do {
-                // Realiza la solicitud GetBulk con un índice de inicio específico
-                $oids = $snmp->getBulk($maxRepetitions, $nonRepeaters, $lastOid ? "{$lastOid}.1" : $oidToGetBulk);
+                $onusArray = []; // Array para almacenar los objetos Onus
     
-                // Itera a través de los resultados y muestra solo los valores del OID específico
+                $startOid = null;
+    
+                // Realizar la solicitud SNMP GetBulk
+                $oids = $snmp->getBulk($maxRepetitions, $nonRepeaters, $startOid ? "{$startOid}.1" : $baseOid);
+    
                 foreach ($oids as $oid) {
+                    $value = $oid->getValue()->getValue();
                     $currentOid = $oid->getOid();
     
-                    // Verifica si el OID actual comienza con el OID de interés
-                    if (strpos($currentOid, $oidToGetBulk) === 0) {
-                        $oidValue = $oid->getValue();
-                        $snmpString = is_object($oidValue) ? (string) $oidValue : $oidValue;
-                        
-                        $parsedResult = $this->parseSNMPResponses($snmpString, $id);
-
-                       print_r($parsedResult);
-                    }
+                    // Verificar si el OID tiene el formato correcto
+                    if (strpos($currentOid, "{$baseOid}.") === 0) {
+                        // Crear un objeto Onus y agregarlo al array
+                        $onus = new stdClass();
     
-                    $lastOid = $currentOid;
+                        // Aplicar expresiones regulares para parsear los valores
+                        $parsedResult = $this->parseSNMPResponses($value);
+    
+                        // Agregar los valores parseados al objeto Onus
+                        $onus->parsedValues = $parsedResult;
+    
+                        $onusArray[] = $onus;
+    
+                        // Actualizar el OID de inicio para la próxima iteración
+                        $startOid = $currentOid;
+                    }
                 }
     
-            } while (!empty($oids)); // Continúa el bucle hasta que no hay más variables
+                return $onusArray;
     
-        } catch (Exception $e) {
-
-            exit;
-        }
+            } catch (Exception $e) {
+                echo "Error al recuperar OID. " . $e->getMessage() . PHP_EOL;
+                sleep(1); // Esperar antes de intentar nuevamente (puedes ajustar este valor según tus necesidades)
+    
+            }
+        } while (true); // Continuar indefinidamente
     }
     
-    public function parseSNMPResponses($snmpStrings, $id)
+    public function parseSNMPResponses($snmpStrings)
     {
-        // Define patrones regex para cada campo
-        $patterns = [
-            'name' => '/^(.*?)_zone_/',
-            'zone' => '/_zone_(.*?)_descr_/',
-            'descr' => '/_descr_(.*?)(?:_extid_|_odb_|_authd_)/',
-            'external_id' => '/_extid_(.*?)_authd_/',
-            'auth_date' => '/_authd_(.*)/',
-        ];
-        $onuType = $this->onuType($id);
-        // Inicializa el array de resultados
-        $result = ['model' => ''];
+          // Define patrones regex para cada campo
+          $patterns = [
+              'name' => '/^(.*?)_zone_/',
+              'zone' => '/_zone_(.*?)_descr_/',
+              'descr' => '/_descr_(.*?)(?:_extid_|_odb_|_authd_)/',
+              'external_id' => '/_extid_(.*?)_authd_/',
+              'auth_date' => '/_authd_(.*)/',
+          ];
         
-        // Itera sobre cada patrón y busca coincidencias en la cadena SNMP
-        foreach ($patterns as $field => $pattern) {
-            preg_match($pattern, $snmpStrings, $matches);
+          // Itera sobre cada patrón y busca coincidencias en la cadena SNMP
+          foreach ($patterns as $field => $pattern) {
+              preg_match($pattern, $snmpStrings, $matches);
     
-            // Si el campo es 'name' y no hay coincidencia, considera todo el texto como el nombre
-            if ($field === 'name' && empty($matches)) {
-                $result['name'] = $snmpStrings;
-            } else {
-                // Si el campo es 'descr' y no hay coincidencia, considera todo el texto después de '_descr_' como la descripción
-                if ($field === 'descr' && empty($matches)) {
-                    $descrStart = strpos($snmpStrings, '_descr_');
-                    $result['descr'] = $descrStart !== false ? substr($snmpStrings, $descrStart + strlen('_descr_')) : null;
-                } else {
-                    // Ajuste para acceder al grupo de captura adecuado
-                    $result[$field] = isset($matches[1]) ? $matches[1] : null;
-                }
-            }
-        }
+              // Si el campo es 'name' y no hay coincidencia, considera todo el texto como el nombre
+              if ($field === 'name' && empty($matches)) {
+                  $result['name'] = $snmpStrings;
+              } else {
+                  // Si el campo es 'descr' y no hay coincidencia, considera todo el texto después de '_descr_' como la descripción
+                  if ($field === 'descr' && empty($matches)) {
+                      $descrStart = strpos($snmpStrings, '_descr_');
+                      $result['descr'] = $descrStart !== false ? substr($snmpStrings, $descrStart + strlen('_descr_')) : null;
+                  } else {
+                      // Ajuste para acceder al grupo de captura adecuado
+                      $result[$field] = isset($matches[1]) ? $matches[1] : null;
+                  }
+              }
+          }
         
-        return $result;
+          return $result;
     }
               
     private function uplinkData($oids, $id)
