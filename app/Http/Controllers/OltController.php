@@ -12,6 +12,7 @@ use App\Models\Vlan;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Models\OltTemperature;
 use FreeDSx\Snmp\SnmpClient;
 
 
@@ -144,15 +145,26 @@ class OltController extends Controller
     }
 
     //Debe recibir ID del olt en cuestion
-    public function getOltTemperature($id)
+    public function getOltTemperature()
     {
-
-        $client = new \GuzzleHttp\Client();
-        $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/olt/get_tiempoactivo_temperatura/'.$id);
-        $res = $client->sendAsync($request)->wait();
-        $res = json_decode($res->getBody(), true);
-        $data = $res;
-        return response()->json(['data' => $data], 200);
+        try {
+            // Obtener todos los registros de olt_temperature con información relacionada de olts
+            $oltTemperatures = OltTemperature::with('olt')->get();
+    
+            // Construir la respuesta JSON
+            $response = $oltTemperatures->map(function ($oltTemperature) {
+                return [
+                    'olt_id' => $oltTemperature->olt_id,
+                    'olt_name' => $oltTemperature->olt->name,
+                    'uptime' => $oltTemperature->uptime,
+                    'env_temp' => $oltTemperature->env_temp,
+                ];
+            });
+    
+            return response()->json($response);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function getHardware(){
