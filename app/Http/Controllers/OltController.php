@@ -158,6 +158,7 @@ class OltController extends Controller
                     'olt_name' => $oltTemperature->olt->name,
                     'uptime' => $oltTemperature->uptime,
                     'env_temp' => $oltTemperature->env_temp,
+                    'created_at' => $oltTemperature->created_at->toDateTimeString(), // Agregado
                 ];
             });
     
@@ -166,6 +167,7 @@ class OltController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    
 
     public function getHardware(){
         $hardwareVersions = HardwareVersion::select('id', 'name')->get();

@@ -30,7 +30,6 @@ class SnmpController extends Controller
          return  $snmp->newClient($host, 2, $community);
 
     }
-
     public function activeOlt($id)
     {
           Olt::where('id', $id)->update(['olt_active' => 2]);
@@ -140,7 +139,6 @@ class SnmpController extends Controller
     
         return $combinedResults;
     }
-
     public function uplinkRegister($id)
     {
         do {
@@ -186,7 +184,6 @@ class SnmpController extends Controller
     
         return $result;
     }
-
     public function oltCardRegister($id)
     {
         $result = [];
@@ -294,7 +291,6 @@ class SnmpController extends Controller
     
         return $result;
     }
-
     public function onusRegister($id)
     {
         try {
@@ -322,7 +318,6 @@ class SnmpController extends Controller
             // Manejar el error según tus necesidades
         }
     }
-    
     public function onusData($id)
     {
         do {
@@ -369,12 +364,10 @@ class SnmpController extends Controller
     
             } catch (Exception $e) {
                 echo "Error al recuperar OID. " . $e->getMessage() . PHP_EOL;
-                sleep(1); // Esperar antes de intentar nuevamente (puedes ajustar este valor según tus necesidades)
     
             }
-        } while (true); // Continuar indefinidamente
+        } while (true);
     }
-    
     public function parseSNMPResponses($snmpStrings)
     {
           // Define patrones regex para cada campo
@@ -407,7 +400,6 @@ class SnmpController extends Controller
         
           return $result;
     }
-              
     private function uplinkData($oids, $id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -539,7 +531,6 @@ class SnmpController extends Controller
         // Retornar los resultados como un array de objetos
         return array_values($combinedResult);
     }
-
     public function ActiveOnusByPort($id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -585,7 +576,6 @@ class SnmpController extends Controller
         // Retornar los resultados como un array de objetos
         return array_values($portGroups);
     }
-
     public function OnusByPort($id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -621,7 +611,6 @@ class SnmpController extends Controller
 
         return $onusArray;
     }
-
     public function portName($id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -657,7 +646,6 @@ class SnmpController extends Controller
     
         return $portNameArray;
     }
-    
     public function powerTxOLT($id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -727,7 +715,6 @@ class SnmpController extends Controller
     
         return $portTypeArray;
     }
-    
     public function portStatus($id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -756,7 +743,6 @@ class SnmpController extends Controller
     
         return $portStatusArray;
     }
-    
     public function pvid($id)
     {
         $snmp = $this->getSnmpClient($id);
@@ -845,7 +831,6 @@ class SnmpController extends Controller
         }
         return $filteredData;
     }
-    
     public function saveHuaweiOid()
     {
         // Lista de OIDs específicas y sus descripciones
@@ -881,6 +866,4 @@ class SnmpController extends Controller
         // Imprimir información de la OID
         echo sprintf("OID: %s, Descripción: %s - Guardado en la base de datos", $oid, $description).PHP_EOL;
     }
-
-    
 }
