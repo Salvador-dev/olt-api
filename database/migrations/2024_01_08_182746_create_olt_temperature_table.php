@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('olt_temperature', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('olt_id');
-            $table->integer('uptime');
+            $table->string('uptime');
             $table->float('env_temp');
             $table->timestamps();
-
+    
             // Definir la clave foránea
             $table->foreign('olt_id')->references('id')->on('olts')->onDelete('cascade');
         });
     }
+    
 
     /**
      * Reverse the migrations.
