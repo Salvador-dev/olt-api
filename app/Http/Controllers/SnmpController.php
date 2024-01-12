@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers; 
 use App\Jobs\SNMPJob;
-use FreeDSx\Snmp\SnmpClient;
 use Exception;
 use App\Models\PonPort;
 use App\Models\Uplink;
@@ -296,19 +295,71 @@ class SnmpController extends Controller
         try {
             // Obtener datos del tipo de ONU
             $onuType = $this->onuType($id);
-    
+        
             // Obtener datos generales de la ONU
             $onuData = $this->onusData($id);
+        
+            // Obtener datos de señal 1310 para la ONU
+            $onuSignalData = $this->signal1310($id);
     
-            // Iterar sobre cada objeto en $onuData y asignar el tipo correspondiente
+            // Obtener datos de estatus de la ONU
+            $onuStatusData = $this->onuStatus($id);
+    
+            // Obtener datos de CATV para la ONU (asumiendo que tienes un método llamado catvData)
+            $catvData = $this->onuCatv($id);
+    
+            // Obtener datos de WanMode para la ONU
+            $wanModeData = $this->wanModeOnu($id);
+    
+            // Iterar sobre cada objeto en $onuData y asignar el tipo correspondiente, la señal 1310, el estatus, CATV y WanMode
             foreach ($onuData as $index => $onusObject) {
                 // Verificar si existe un tipo correspondiente en $onuType
                 if (isset($onuType[$index])) {
                     // Asignar el tipo al objeto en $onuData
                     $onusObject->model = $onuType[$index];
                 } else {
-                    // Manejar la situación donde no hay un tipo correspondiente (puedes ajustar según tus necesidades)
+                    // Manejar la situación donde no hay un tipo correspondiente
                     $onusObject->model = 'Tipo_No_Encontrado';
+                }
+    
+                // Verificar si existe información de señal 1310 correspondiente en $onuSignalData
+                if (isset($onuSignalData[$index])) {
+                    // Agregar la información de señal 1310 al objeto
+                    $onusObject->signal_1310 = $onuSignalData[$index];
+                } else {
+                    // Manejar la situación donde no hay información de señal 1310 correspondiente
+                    $onusObject->signal_1310 = 'Sin_Info_Senal_1310';
+                }
+    
+                // Verificar si existe información de estatus correspondiente en $onuStatusData
+                if (isset($onuStatusData[$index])) {
+                    // Agregar la información de estatus al objeto
+                    $onusObject->onuStatus = $onuStatusData[$index];
+    
+                    // Agregar la propiedad administrative_status basada en el valor de onuStatus
+                    $onusObject->administrative_status = ($onuStatusData[$index] == 'Online') ? 'Enabled' : 'Disabled';
+                } else {
+                    // Manejar la situación donde no hay información de estatus correspondiente
+                    $onusObject->onuStatus = 'Sin_Info_Estatus';
+                    $onusObject->administrative_status = 'Unknown'; // O manejar según tus necesidades
+                }
+    
+                // Verificar si existe información de CATV correspondiente en $catvData
+                if (isset($catvData[$index])) {
+                    // Agregar la información de CATV al objeto
+                    $onusObject->catv = $catvData[$index];
+                } else {
+                    // Manejar la situación donde no hay información de CATV correspondiente
+                    $onusObject->catv = 'Sin_Info_CATV';
+                }
+    
+                // Verificar si existe información de WanMode correspondiente en $wanModeData
+                if (isset($wanModeData[$index])) {
+                    // Agregar la información de WanMode al objeto
+                    $onusObject->wanModeData = $wanModeData[$index];
+                } else {
+                    // Manejar la situación donde no hay información de WanMode correspondiente
+                    $onusObject->wanModeData = 'Sin_Info_WanMode';
                 }
             }
     
@@ -318,6 +369,8 @@ class SnmpController extends Controller
             // Manejar el error según tus necesidades
         }
     }
+    
+
     public function onusData($id)
     {
         do {
@@ -820,6 +873,277 @@ class SnmpController extends Controller
         }
     
         return $onuTypeArray;
+    }
+    public function onuCatv($id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $onuCatvArray = [];
+        
+        // OID base para el getBulk
+        $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.63.1.3';
+        
+        // Número máximo de repeticiones en el getBulk
+        $maxRepetitions = 50;  // Ajusta según sea necesario
+        
+        $stopOid = '1.3.6.1.4.1.2011.6.128.1.1.2.63.1.4'; // OID para detener la búsqueda
+        
+        try {
+            $oid = $baseOid;
+        
+            do {
+                // Realizar el SNMP getBulk para el rango actual
+                $bulkResponse = $snmp->getBulk($maxRepetitions, 0, $oid);
+        
+                // Verificar si hay respuestas en el rango actual
+                if (!empty($bulkResponse)) {
+                    // Iterar a través de las respuestas del getBulk
+                    foreach ($bulkResponse as $oid) {
+                        $currentOid = $oid->getOid();
+                        $value = $oid->getValue()->getValue();
+        
+                        // Verificar si se alcanzó el OID de detención antes de agregar el resultado al arreglo
+                        if (strpos($currentOid, $stopOid) === 0) {
+                            break 2; // Salir de los dos bucles (do-while y foreach)
+                        }
+        
+                        // Determinar el estado según el valor devuelto
+                        if ($value == -1) {
+                            $status = 'Not supported by ONU-Type';
+                        } elseif ($value == 2) {
+                            $status = 'Disable';
+                        } elseif ($value == 1) {
+                            $status = 'Enable';
+                        } else {
+                            $status = 'Estado Desconocido';
+                        }
+        
+                        // Agregar el resultado al arreglo con el valor y el estado
+                        $onuCatvArray[] = ['status' => $status];
+                    }
+        
+                    // Obtener el último OID devuelto para la siguiente iteración
+                    $oid = $currentOid;
+                } else {
+                    // No hay más respuestas, salir del bucle
+                    break;
+                }
+            } while (true);
+        } catch (Exception $e) {
+            // Manejar errores en la solicitud SNMP
+            $onuCatvArray[] = ['status' => 'Error en la solicitud SNMP. ' . $e->getMessage()];
+        }
+        
+        return $onuCatvArray;
+    }
+    public function signal1310($id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $onuSignalArray = [];
+    
+        // OID base para el getBulk
+        $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.51.1.4';
+    
+        // Número máximo de repeticiones en el getBulk
+        $maxRepetitions = 50;  // Ajusta según sea necesario
+    
+        $stopOid = '1.3.6.1.4.1.2011.6.128.1.1.2.51.1.5'; // OID para detener la búsqueda
+    
+        try {
+            $oid = $baseOid;
+    
+            do {
+                // Realizar el SNMP getBulk para el rango actual
+                $bulkResponse = $snmp->getBulk($maxRepetitions, 0, $oid);
+    
+                // Verificar si hay respuestas en el rango actual
+                if (!empty($bulkResponse)) {
+                    // Iterar a través de las respuestas del getBulk
+                    foreach ($bulkResponse as $oid) {
+                        $currentOid = $oid->getOid();
+                        $value = $oid->getValue()->getValue();
+    
+                        // Verificar si se alcanzó el OID de detención antes de agregar el resultado al arreglo
+                        if (strpos($currentOid, $stopOid) === 0) {
+                            break 2; // Salir de los dos bucles (do-while y foreach)
+                        }
+    
+                        // Convertir el valor si es igual a 2147483647 a null
+                        $value = ($value == 2147483647) ? null : $value;
+    
+                        // Ajustar el formato del valor si es necesario (por ejemplo, -2075 en lugar de -20.75)
+                        $formattedValue = number_format($value / 100, 2);
+    
+                        // Agregar el resultado al arreglo con el valor ajustado y el campo signal
+                        $onuSignalArray[] = [
+                            'value' => $formattedValue,
+                            'signal' => $this->determineSignalStrength($formattedValue),
+                        ];
+                    }
+    
+                    // Obtener el último OID devuelto para la siguiente iteración
+                    $oid = $currentOid;
+                } else {
+                    // No hay más respuestas, salir del bucle
+                    break;
+                }
+            } while (true);
+        } catch (Exception $e) {
+            // Manejar errores en la solicitud SNMP
+            $onuSignalArray[] = ['status' => 'Error en la solicitud SNMP. ' . $e->getMessage()];
+        }
+    
+        return $onuSignalArray;
+    }
+    public function onuStatus($id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $onuStatusArray = [];
+        
+        // OID base para el getBulk
+        $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.46.1.15';
+        
+        // Número máximo de repeticiones en el getBulk
+        $maxRepetitions = 50;  // Ajusta según sea necesario
+        
+        $stopOid = '1.3.6.1.4.1.2011.6.128.1.1.2.46.1.16'; // OID para detener la búsqueda
+        
+        try {
+            $oid = $baseOid;
+        
+            do {
+                // Realizar el SNMP getBulk para el rango actual
+                $bulkResponse = $snmp->getBulk($maxRepetitions, 0, $oid);
+        
+                // Verificar si hay respuestas en el rango actual
+                if (!empty($bulkResponse)) {
+                    // Iterar a través de las respuestas del getBulk
+                    foreach ($bulkResponse as $oid) {
+                        $currentOid = $oid->getOid();
+                        $value = $oid->getValue()->getValue();
+        
+                        // Verificar si se alcanzó el OID de detención antes de agregar el resultado al arreglo
+                        if (strpos($currentOid, $stopOid) === 0) {
+                            break 2; // Salir de los dos bucles (do-while y foreach)
+                        }
+        
+                        // Determinar el estado según el valor devuelto
+                        if ($value == 1) {
+                            $status = 'Online';
+                        } elseif ($value == 2) {
+                            $status = 'Offline';
+                        } else {
+                            $status = 'LOS';
+                        }
+        
+                        // Agregar el resultado al arreglo con el valor ajustado y el campo de estado
+                        $onuStatusArray[] = ['status' => $status];
+                    }
+        
+                    // Obtener el último OID devuelto para la siguiente iteración
+                    $oid = $currentOid;
+                } else {
+                    // No hay más respuestas, salir del bucle
+                    break;
+                }
+            } while (true);
+        } catch (Exception $e) {
+            // Manejar errores en la solicitud SNMP
+            $onuStatusArray[] = ['status' => 'Error en la solicitud SNMP. ' . $e->getMessage()];
+        }
+        
+        return $onuStatusArray;
+    }
+    public function wanModeOnu($id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $onuWanModeArray = [];
+    
+        // OID base para el getBulk
+        $baseOid = '1.3.6.1.4.1.2011.6.128.1.1.2.47.1.4';
+    
+        // Número máximo de repeticiones en el getBulk
+        $maxRepetitions = 50;  // Ajusta según sea necesario
+    
+        $stopOid = '1.3.6.1.4.1.2011.6.128.1.1.2.47.1.5'; // OID para detener la búsqueda
+    
+        try {
+            $oid = $baseOid;
+    
+            do {
+                // Realizar el SNMP getBulk para el rango actual
+                $bulkResponse = $snmp->getBulk($maxRepetitions, 0, $oid);
+    
+                // Verificar si hay respuestas en el rango actual
+                if (!empty($bulkResponse)) {
+                    // Iterar a través de las respuestas del getBulk
+                    foreach ($bulkResponse as $oid) {
+                        $currentOid = $oid->getOid();
+                        $value = $oid->getValue()->getValue();
+    
+                        // Verificar si se alcanzó el OID de detención antes de agregar el resultado al arreglo
+                        if (strpos($currentOid, $stopOid) === 0) {
+                            break 2; // Salir de los dos bucles (do-while y foreach)
+                        }
+    
+                        // Mapear los valores a etiquetas descriptivas
+                        switch ($value) {
+                            case 1:
+                                $wanModeLabel = 'DHCP';
+                                break;
+                            case 2:
+                                $wanModeLabel = 'Static';
+                                break;
+                            case 3:
+                                $wanModeLabel = 'Setup via ONU webpage';
+                                break;
+                            case 4:
+                                $wanModeLabel = 'PPPoE';
+                                break;
+                            case 5:
+                                $wanModeLabel = 'Invalid';
+                                break;
+                            default:
+                                $wanModeLabel = 'Desconocido';
+                        }
+    
+                        // Agregar el resultado al arreglo con el array asociativo
+                        $onuWanModeArray[] = [
+                            'label' => $wanModeLabel,
+                        ];
+                    }
+    
+                    // Obtener el último OID devuelto para la siguiente iteración
+                    $oid = $currentOid;
+                } else {
+                    // No hay más respuestas, salir del bucle
+                    break;
+                }
+            } while (true);
+        } catch (Exception $e) {
+            // Manejar errores en la solicitud SNMP
+            $onuWanModeArray[] = ['status' => 'Error en la solicitud SNMP. ' . $e->getMessage()];
+        }
+    
+        return $onuWanModeArray;
+    }
+
+    public function capabilityModeOnu($id)
+    {
+        return 'Capability mode'
+    }
+    private function determineSignalStrength($formattedValue)
+    {
+        $numericValue = floatval($formattedValue);
+    
+        if ($numericValue == 0) {
+            return null;
+        } elseif ($numericValue >= -20) {
+            return 'Very good';
+        } elseif ($numericValue >= -30) {
+            return 'Warning';
+        } else {
+            return 'Critical';
+        }
     }
     private function filterDataByIndices($data, $indices)
     {
