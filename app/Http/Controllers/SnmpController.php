@@ -6,6 +6,7 @@ use Exception;
 use App\Models\PonPort;
 use App\Models\Uplink;
 use App\Models\Vlan;
+use App\Models\Onu;
 use App\Models\Olt;
 use App\Models\OltCard;
 use App\Models\Oid;
@@ -361,6 +362,13 @@ class SnmpController extends Controller
                     // Manejar la situación donde no hay información de WanMode correspondiente
                     $onusObject->wanModeData = 'Sin_Info_WanMode';
                 }
+            }
+            foreach ($onuData as $index => $onusObject) {
+                // Crear un nuevo objeto Onu con los datos del array
+                $onu = new Onu($onusObject->toArray());
+    
+                // Guardar en la base de datos
+                $onu->save();
             }
     
             return $onuData;
@@ -1125,11 +1133,6 @@ class SnmpController extends Controller
         }
     
         return $onuWanModeArray;
-    }
-
-    public function capabilityModeOnu($id)
-    {
-        return 'Capability mode'
     }
     private function determineSignalStrength($formattedValue)
     {

@@ -104,11 +104,12 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/get/snmp/onus/{id}', [SnmpController::class, 'onusData']);
     Route::get('/get/snmp/activeolt/{id}', [SnmpController::class, 'activeOlt']);
     Route::get('/get/snmp/model/{id}', [SnmpController::class, 'onuType']);
-    Route::get('/get/snmp/{id}', [SnmpController::class, 'onusRegister']);
     Route::get('/get/snmp/catv/{id}', [SnmpController::class, 'onuCatv']);
     Route::get('/get/snmp/status/{id}', [SnmpController::class, 'onuStatus']);
     Route::get('/get/snmp/signal/{id}', [SnmpController::class, 'signal1310']);
     Route::get('/get/snmp/wan/{id}', [SnmpController::class, 'wanModeOnu']);
+    Route::get('/get/snmp/mode/{id}', [SnmpController::class, 'onuMode']);
+    Route::get('/get/snmp/onu/{id}', [SnmpController::class, 'onusRegister']);
 
 
     Route::get('logout', [AuthController::class, 'logout']);
