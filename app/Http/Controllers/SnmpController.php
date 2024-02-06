@@ -6,12 +6,14 @@ use Exception;
 use App\Models\PonPort;
 use App\Models\Uplink;
 use App\Models\Vlan;
-use App\Models\Onu;
 use App\Models\Olt;
 use App\Models\OltCard;
+use Carbon\Carbon;
 use App\Models\Oid;
 use stdClass;
 use Ndum\Laravel\Snmp;
+use Illuminate\Support\Facades\DB;
+
 
 class SnmpController extends Controller
 {
@@ -291,94 +293,111 @@ class SnmpController extends Controller
     
         return $result;
     }
-    public function onusRegister($id)
+        public function onusRegister($id)
     {
         try {
             // Obtener datos del tipo de ONU
             $onuType = $this->onuType($id);
-        
+
             // Obtener datos generales de la ONU
             $onuData = $this->onusData($id);
-        
+
             // Obtener datos de señal 1310 para la ONU
             $onuSignalData = $this->signal1310($id);
-    
+
             // Obtener datos de estatus de la ONU
             $onuStatusData = $this->onuStatus($id);
-    
+
             // Obtener datos de CATV para la ONU (asumiendo que tienes un método llamado catvData)
             $catvData = $this->onuCatv($id);
-    
+
             // Obtener datos de WanMode para la ONU
             $wanModeData = $this->wanModeOnu($id);
-    
+
+            $onusObjects = [];
+
             // Iterar sobre cada objeto en $onuData y asignar el tipo correspondiente, la señal 1310, el estatus, CATV y WanMode
             foreach ($onuData as $index => $onusObject) {
-                // Verificar si existe un tipo correspondiente en $onuType
-                if (isset($onuType[$index])) {
-                    // Asignar el tipo al objeto en $onuData
-                    $onusObject->model = $onuType[$index];
-                } else {
-                    // Manejar la situación donde no hay un tipo correspondiente
-                    $onusObject->model = 'Tipo_No_Encontrado';
+                // Asignar el tipo al objeto en $onuData
+                $onusObject->model = $onuType[$index] ?? 'Tipo_No_Encontrado';
+
+                // Agregar la información de señal 1310 al objeto
+                $onusObject->signal_1310 = $onuSignalData[$index] ?? 'Sin_Info_Senal_1310';
+
+                // Cambiar el nombre de la propiedad onuStatus a status
+                $onusObject->status = $onuStatusData[$index] ?? 'Sin_Info_Estatus';
+
+                // Agregar la propiedad administrative_status basada en el valor de status
+                $onusObject->administrative_status = ($onusObject->status == 'Online') ? 'Enabled' : 'Disabled';
+
+                // Agregar la información de CATV al objeto
+                $onusObject->catv = $catvData[$index] ?? 'Sin_Info_CATV';
+
+                // Agregar la información de WanMode al objeto
+                $onusObject->wan_mode = $wanModeData[$index] ?? 'Sin_Info_WanMode';
+
+                // Crear un nuevo array asociativo con los valores específicos para onu
+                $onusObjects[] = [
+                    'name' => $onusObject->parsedValues['name'] ?? '',
+                    'zone' => $onusObject->parsedValues['zone'] ?? '',
+                    'address' => $onusObject->parsedValues['address'] ?? '',
+                    'unique_external_id' => $onusObject->parsedValues['unique_external_id'] ?? '',
+                    'authorization_date' => $onusObject->parsedValues['authorization_date'] ?? null,
+                    'model' => $onusObject->model,
+                    'signal_1310' => $onusObject->signal_1310['value'] ?? '',
+                    'signal' => $onusObject->signal_1310['signal'] ?? '',
+                    'status' => $onusObject->status,
+                    'administrative_status' => $onusObject->administrative_status,
+                    'catv' => $onusObject->catv,
+                    'wan_mode' => $onusObject->wan_mode,
+                ];
+
+                foreach ($onusObjects as $onuObject) {
+                    
+                    DB::table('onus')->insert([
+                        'name' => $onuObject['name'],
+                        'zone_id' => 49,
+                        'address' => $onuObject['address'],
+                        'unique_external_id' => $onuObject['unique_external_id'],
+                        'sn' => $onuObject['unique_external_id'],
+                        'olt_id' => $id,
+                        'authorization_date' => $onuObject['authorization_date'],
+                        'onu_type_id' => 11,
+                        'signal_1310' => $onuObject['signal_1310'],
+                        'signal' => $onuObject['signal'],
+                        'status' => $onuObject['status'],
+                        'administrative_status' => $onuObject['administrative_status'],
+                        'catv' => $onuObject['catv'],
+                        'wan_mode' => $onuObject['wan_mode'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                 }
-    
-                // Verificar si existe información de señal 1310 correspondiente en $onuSignalData
-                if (isset($onuSignalData[$index])) {
-                    // Agregar la información de señal 1310 al objeto
-                    $onusObject->signal_1310 = $onuSignalData[$index];
-                } else {
-                    // Manejar la situación donde no hay información de señal 1310 correspondiente
-                    $onusObject->signal_1310 = 'Sin_Info_Senal_1310';
-                }
-    
-                // Verificar si existe información de estatus correspondiente en $onuStatusData
-                if (isset($onuStatusData[$index])) {
-                    // Agregar la información de estatus al objeto
-                    $onusObject->onuStatus = $onuStatusData[$index];
-    
-                    // Agregar la propiedad administrative_status basada en el valor de onuStatus
-                    $onusObject->administrative_status = ($onuStatusData[$index] == 'Online') ? 'Enabled' : 'Disabled';
-                } else {
-                    // Manejar la situación donde no hay información de estatus correspondiente
-                    $onusObject->onuStatus = 'Sin_Info_Estatus';
-                    $onusObject->administrative_status = 'Unknown'; // O manejar según tus necesidades
-                }
-    
-                // Verificar si existe información de CATV correspondiente en $catvData
-                if (isset($catvData[$index])) {
-                    // Agregar la información de CATV al objeto
-                    $onusObject->catv = $catvData[$index];
-                } else {
-                    // Manejar la situación donde no hay información de CATV correspondiente
-                    $onusObject->catv = 'Sin_Info_CATV';
-                }
-    
-                // Verificar si existe información de WanMode correspondiente en $wanModeData
-                if (isset($wanModeData[$index])) {
-                    // Agregar la información de WanMode al objeto
-                    $onusObject->wanModeData = $wanModeData[$index];
-                } else {
-                    // Manejar la situación donde no hay información de WanMode correspondiente
-                    $onusObject->wanModeData = 'Sin_Info_WanMode';
-                }
+
+                // Eliminar las propiedades individuales que ahora están dentro de onu
+                unset(
+                    $onusObject->parsedValues,
+                    $onusObject->model,
+                    $onusObject->signal_1310,
+                    $onusObject->status,
+                    $onusObject->administrative_status,
+                    $onusObject->catv,
+                    $onusObject->wan_mode
+                );
             }
-            foreach ($onuData as $index => $onusObject) {
-                // Crear un nuevo objeto Onu con los datos del array
-                $onu = new Onu($onusObject->toArray());
-    
-                // Guardar en la base de datos
-                $onu->save();
-            }
-    
-            return $onuData;
+
+            // Puedes almacenar $onusObjects en la base de datos o devolverlo según tus necesidades
+            return $onusObjects;
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage() . PHP_EOL;
             // Manejar el error según tus necesidades
         }
     }
-    
 
+    public function getStatusOnu($id)
+    {
+        return 'Status de la onu';
+    }
     public function onusData($id)
     {
         do {
@@ -435,9 +454,9 @@ class SnmpController extends Controller
           $patterns = [
               'name' => '/^(.*?)_zone_/',
               'zone' => '/_zone_(.*?)_descr_/',
-              'descr' => '/_descr_(.*?)(?:_extid_|_odb_|_authd_)/',
-              'external_id' => '/_extid_(.*?)_authd_/',
-              'auth_date' => '/_authd_(.*)/',
+              'address' => '/_descr_(.*?)(?:_extid_|_odb_|_authd_)/',
+              'unique_external_id' => '/_extid_(.*?)_authd_/',
+              'authorization_date' => '/_authd_(.*)/',
           ];
         
           // Itera sobre cada patrón y busca coincidencias en la cadena SNMP
@@ -926,7 +945,7 @@ class SnmpController extends Controller
                         }
         
                         // Agregar el resultado al arreglo con el valor y el estado
-                        $onuCatvArray[] = ['status' => $status];
+                        $onuCatvArray[] = $status;
                     }
         
                     // Obtener el último OID devuelto para la siguiente iteración
@@ -1044,7 +1063,7 @@ class SnmpController extends Controller
                         }
         
                         // Agregar el resultado al arreglo con el valor ajustado y el campo de estado
-                        $onuStatusArray[] = ['status' => $status];
+                        $onuStatusArray[] =  $status;
                     }
         
                     // Obtener el último OID devuelto para la siguiente iteración
@@ -1115,9 +1134,7 @@ class SnmpController extends Controller
                         }
     
                         // Agregar el resultado al arreglo con el array asociativo
-                        $onuWanModeArray[] = [
-                            'label' => $wanModeLabel,
-                        ];
+                        $onuWanModeArray[] = $wanModeLabel;
                     }
     
                     // Obtener el último OID devuelto para la siguiente iteración

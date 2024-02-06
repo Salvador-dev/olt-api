@@ -33,7 +33,6 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer'], 200);
     }
-
     // Metodo para login
     public function login(Request $request)
     {
@@ -44,6 +43,37 @@ class AuthController extends Controller
         $user = User::where('email', $request->only('email'))->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer'], 200);
+    }
+
+    //Metodo para cambiar contraseña
+    public function changePassword(Request $request){
+        // Validar los datos del formulario
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:8|confirmed',
+            'id' => 'required'
+        ]);
+    
+        // Obtener el usuario autenticado
+        $userId = $request->input('user_id');
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+    
+        // Verificar si la contraseña actual es correcta
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->with('error', 'La contraseña actual es incorrecta');
+        }
+    
+        // Encriptar y actualizar la contraseña
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+    
+        // Redireccionar con un mensaje de éxito
+        return redirect()->route('dashboard')->with('success', 'Contraseña cambiada exitosamente');
     }
 
     // Metodo para logout
