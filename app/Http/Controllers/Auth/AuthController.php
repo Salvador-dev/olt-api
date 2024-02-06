@@ -47,24 +47,31 @@ class AuthController extends Controller
 
     //Metodo para cambiar contraseña
     public function changePassword(Request $request){
-        // Validar los datos del formulario
-        $request->validate([
+
+
+        $validator = Validator::make($request->all(), [
             'current_password' => 'required',
-            'new_password' => 'required|string|min:8|confirmed',
+            'new_password' => 'required|string|min:8',
             'id' => 'required'
         ]);
-    
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
         // Obtener el usuario autenticado
-        $userId = $request->input('user_id');
+        $userId = $request->id;
 
         $user = User::find($userId);
+
 
         if (!$user) {
             return back()->with('error', 'Usuario no encontrado');
         }
+        
     
-        // Verificar si la contraseña actual es correcta
-        if (!Hash::check($request->current_password, $user->password)) {
+         // Verificar si la contraseña actual es correcta
+         if (!Hash::check(trim($request->current_password), $user->password)) {
             return back()->with('error', 'La contraseña actual es incorrecta');
         }
     
@@ -73,7 +80,7 @@ class AuthController extends Controller
         $user->save();
     
         // Redireccionar con un mensaje de éxito
-        return redirect()->route('dashboard')->with('success', 'Contraseña cambiada exitosamente');
+        return response()->json(['¡Contraseña actualizada exitosamente!'], 200);
     }
 
     // Metodo para logout
