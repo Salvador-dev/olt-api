@@ -83,6 +83,12 @@ class AuthController extends Controller
         return response()->json(['¡Contraseña actualizada exitosamente!'], 200);
     }
 
+    public function getAllUsers(){
+        $users = User::select('id', 'name', 'email', 'created_at', 'updated_at')->get();
+        return $users;
+    }
+    
+
     // Metodo para logout
     public function logout()
     {
