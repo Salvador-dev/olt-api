@@ -88,11 +88,15 @@ class AuthController extends Controller
         return $users;
     }
     
-
     // Metodo para logout
     public function logout()
     {
         auth()->user()->tokens()->delete();
         return response()->json(['message' => 'Successfully logged out'], 200);
+    }
+
+    public function asingRole(){
+
+        return 'hola';
     }
 }
