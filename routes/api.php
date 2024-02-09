@@ -9,6 +9,7 @@ use App\Http\Controllers\OnuController;
 use App\Http\Controllers\OnuTypesController;
 use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\SnmpController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VpnTunnelController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
@@ -32,7 +33,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('change/password', [AuthController::class, 'changePassword']);
-Route::get('users/listing', [AuthController::class, 'getAllUsers']);
+
+//User Routes
+
+Route::get('/user/listing', [UserController::class, 'index']);
+Route::post('/user', [UserController::class, 'store']);
+Route::get('/user/{id}', [UserController::class, 'show']);
+Route::put('/user/{id}', [UserController::class, 'update']);
+Route::delete('/user/{id}', [UserController::class, 'destroy']);
 
 Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
 
