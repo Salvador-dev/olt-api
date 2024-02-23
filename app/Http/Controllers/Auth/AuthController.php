@@ -42,6 +42,21 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->only('email'))->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        $roles = $user->getRoleNames(); // Returns a collection
+        
+        if($roles->isNotEmpty()){
+    
+            $user->{'role'} = $roles[0];
+
+        } else {
+
+            $user->{'role'} = '';
+
+        }
+
+        unset($user->roles);
+
         return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer'], 200);
     }
 
@@ -95,8 +110,24 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out'], 200);
     }
 
-    public function asingRole(){
+    public function assignRole(Request $request){
 
-        return 'hola';
+        $user = User::find($request->id);
+        
+        if (!$user) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+
+        $roles = $user->getRoleNames(); // Returns a collection
+
+        if($roles->isNotEmpty()){
+
+            $user->removeRole($roles[0]);
+
+        }
+
+        $user->assignRole($request->input('role'));
+
+        return response()->json(['¡Rol asignado exitosamente!'], 200);
     }
 }
