@@ -9,11 +9,13 @@ use App\Http\Controllers\OnuController;
 use App\Http\Controllers\OnuTypesController;
 use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\SnmpController;
-    use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VpnTunnelController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,17 +34,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+   
+
+Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
+
+    // Change password
     Route::post('change/password', [AuthController::class, 'changePassword']);
 
-    //User Routes
+    // Roles  and permissions routes
 
+    Route::get('/role/listing', [RoleController::class, 'index']);
+    Route::post('/role', [RoleController::class, 'store']);
+
+    //User Routes
     Route::get('/user/listing', [UserController::class, 'index']);
     Route::post('/user', [UserController::class, 'store']);
     Route::get('/user/{id}', [UserController::class, 'show']);
     Route::patch('/user/{id}', [UserController::class, 'update']);
     Route::delete('/user/{id}', [UserController::class, 'destroy']);
-
-Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
     Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
