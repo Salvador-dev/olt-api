@@ -7,6 +7,7 @@ use App\Http\Controllers\OdbsController;
 use App\Http\Controllers\OltController;
 use App\Http\Controllers\OnuController;
 use App\Http\Controllers\OnuTypesController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\UserController;
@@ -45,6 +46,13 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
 
     Route::get('/role/listing', [RoleController::class, 'index']);
     Route::post('/role', [RoleController::class, 'store']);
+    Route::get('/role/{id}', [RoleController::class, 'show']);
+    Route::delete('/role/{id}', [RoleController::class, 'destroy']);
+
+    Route::get('/permission/listing', [PermissionController::class, 'index']);
+    Route::post('/permission', [PermissionController::class, 'store']);
+    Route::get('/permission/{id}', [PermissionController::class, 'show']);
+    Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
 
     //User Routes
     Route::get('/user/listing', [UserController::class, 'index']);
