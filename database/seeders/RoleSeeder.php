@@ -19,9 +19,8 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Eliminar permisos', 'guard_name' => 'sanctum']);
         Permission::create(['name' => 'Ver pantallas', 'guard_name' => 'sanctum']);
 
-        Role::create(['name' => 'admin', 'guard_name' => 'sanctum'])->syncPermissions(['Crear permisos', 'Eliminar permisos', 'Ver pantallas']); 
-        Role::create(['name' => 'usuario', 'guard_name' => 'sanctum'])->syncPermissions(['Crear permisos', 'Ver pantallas']);   
-        Role::create(['name' => 'consulta', 'guard_name' => 'sanctum'])->syncPermissions(['Ver pantallas']);   
-
+        Role::create(['name' => 'admin', 'guard_name' => 'sanctum'])->syncPermissions(['Crear permisos', 'Eliminar permisos', 'Ver pantallas']);
+        Role::create(['name' => 'usuario', 'guard_name' => 'sanctum'])->syncPermissions(['Crear permisos', 'Ver pantallas']);
+        Role::create(['name' => 'consulta', 'guard_name' => 'sanctum'])->syncPermissions(['Ver pantallas']);
     }
 }
