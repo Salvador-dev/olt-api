@@ -47,11 +47,13 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/role/listing', [RoleController::class, 'index']);
     Route::post('/role', [RoleController::class, 'store']);
     Route::get('/role/{id}', [RoleController::class, 'show']);
+    Route::patch('/role/{id}', [RoleController::class, 'update']);
     Route::delete('/role/{id}', [RoleController::class, 'destroy']);
 
     Route::get('/permission/listing', [PermissionController::class, 'index']);
     Route::post('/permission', [PermissionController::class, 'store']);
     Route::get('/permission/{id}', [PermissionController::class, 'show']);
+    Route::patch('/permission/{id}', [PermissionController::class, 'update']);
     Route::delete('/permission/{id}', [PermissionController::class, 'destroy']);
 
     //User Routes

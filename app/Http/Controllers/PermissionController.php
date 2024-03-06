@@ -43,7 +43,7 @@ class PermissionController extends Controller
         return $permission;
     }
 
-    // Método para actualizar un permiso NOT SUPORTED The PATCH method is not supported for route api/role/11. Supported methods: GET, HEAD, DELETE.",
+    // Método para actualizar un permiso
     public function update(Request $request, $id)
     {
         $permission = Permission::findOrFail($id);
