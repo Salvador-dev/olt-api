@@ -18,6 +18,14 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UserSeeder::class);
 
+        $this->call(HardwareVersionSeeder::class);
+
+        $this->call(PonTypeSeeder::class);
+
+        $this->call(ZoneSeeder::class);
+
+
+
 
     }
 }
