@@ -60,6 +60,8 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/user/listing', [UserController::class, 'index']);
     Route::post('/user', [UserController::class, 'store']);
     Route::get('/user/{id}', [UserController::class, 'show']);
+    Route::get('/user/roles/{id}', [UserController::class, 'getRoles']);
+    Route::get('/user/permissions/{id}', [UserController::class, 'getPermissions']);
     Route::patch('/user/{id}', [UserController::class, 'update']);
     Route::delete('/user/{id}', [UserController::class, 'destroy']);
 

@@ -71,6 +71,7 @@ class RoleController extends Controller
             return back()->with('error', 'Rol no encontrado');
         }
 
+        $role->syncPermissions([]);
         $role->delete();
 
         return response()->json('Rol eliminado', 200);

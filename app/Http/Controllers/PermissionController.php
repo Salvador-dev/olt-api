@@ -67,6 +67,7 @@ class PermissionController extends Controller
             return back()->with('error', 'Permiso no encontrado');
         }
 
+        $permission->syncRoles([]);
         $permission->delete();
 
         return response()->json('Permiso eliminado', 200);
