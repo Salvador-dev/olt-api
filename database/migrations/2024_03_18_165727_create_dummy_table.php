@@ -12,7 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('dummy', function (Blueprint $table) {
-            $table->id();
+            $table->bigInteger('id', true)->comment('ONU');
+            $table->string('unique_external_id')->comment('Unique External ID SN');
+            $table->string('sn')->comment('SERIAL');
+            $table->bigInteger('olt_id')->index('olt_id')->comment('OLT ID');
+            $table->bigInteger('onu_type_id')->index('onu_type_id');
+            $table->string('status')->nullable()->comment('Online | Ofline');
+            $table->bigInteger('zone_id')->index('zone_id');
             $table->string('name');
             $table->timestamps();
         });
