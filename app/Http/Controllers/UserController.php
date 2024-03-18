@@ -82,6 +82,36 @@ class UserController extends Controller
         return $user;
     }
 
+    // Método para roles de un usuario
+    public function getRoles($id)
+    {
+
+        $user = User::findOrFail($id);
+
+        $roles = $user->getRoleNames(); // Returns a collection
+        
+        if (!$user) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+
+        return $roles;
+    }
+
+    // Método para permisos de un usuario
+    public function getPermissions($id)
+    {
+
+        $user = User::findOrFail($id);
+
+        $permissions = $user->getPermissionsViaRoles()->pluck('name'); // Returns a collection
+
+        if (!$user) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+
+        return $permissions;
+    }
+
     // Método para actualizar un usuario
     public function update(Request $request, $id)
     {
