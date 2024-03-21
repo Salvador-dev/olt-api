@@ -25,4 +25,20 @@ class Dummy extends Model
     {
         return $this->belongsTo(Olt::class);
     }
+
+    // Filter scopes
+
+    public function scopeName($query, $name){
+
+        if($name){
+            return $query->where('name', 'LIKE', "%$name%");
+        }
+    }
+
+    public function scopeSn($query, $sn){
+
+        if($sn){
+            return $query->where('sn', 'LIKE', "%$sn%");
+        }
+    }
 }
