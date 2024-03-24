@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('use_prefix')->nullable();
             $table->string('preview_huawei')->nullable();
             $table->string('preview_zte')->nullable();
-            $table->string('type')->nullable()->comment('pendiente por definir');
+            $table->string('type_conexion')->nullable()->comment('pendiente por definir');
             $table->bigInteger('speed')->nullable();
             $table->string('direction')->nullable();
             $table->timestamps();
