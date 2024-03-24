@@ -5,41 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Onu extends Model
+class Dummy extends Model
 {
     use HasFactory;
-    protected $table = 'onus';
-    protected $fillable = [
-        'unique_external_id',
-        'pon_type_id',
-        'sn',
-        'olt_id',
-        'board',
-        'port',
-        'onu_type_id',
-        'zone_id',
-        'name',
-        'address',
-        'odb_name',
-        'mode',
-        'wan_mode',
-        'ip_address',
-        'subnet_mask',
-        'default_gateway',
-        'dns1',
-        'dns2',
-        'username',
-        'password',
-        'catv',
-        'administrative_status',
-        'authorization_date',
-        'status',
-        'signal',
-        'signal_1310',
-        'latitude',
-        'longitude',
-        'wifi_port_id',
-    ];
+    protected $table = 'dummy';
+    protected $fillable = ['unique_external_id', 'SERIAL', 'olt_id', 'onu_type_id', 'zone_id', 'name', 'status'];
 
     public function service_ports()
     {
@@ -56,12 +26,12 @@ class Onu extends Model
         return $this->belongsTo(Olt::class);
     }
 
-    // FILTER SCOPES
+    // Filter scopes
 
     public function scopeSearch($query, $search){
 
         if($search){
-            return $query->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.sn', 'LIKE', "%$search%");
+            return $query->where('dummy.name', 'LIKE', "%$search%")->orWhere('dummy.sn', 'LIKE', "%$search%");
         }
     }
 

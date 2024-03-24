@@ -5,56 +5,78 @@ namespace App\Http\Controllers;
 use App\Imports\OnusImport;
 use Illuminate\Support\Facades\Cache;
 use App\Models\EthernetPort;
-use App\Models\Onu;
+use App\Models\Dummy;
 use App\Models\ServicePort;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 
-class OnuController extends Controller
+class DummyController extends Controller
 {
     //
     public function getData(Request $request)
     {
 
-
+        
+      
         $search = $request->input("search") ?? null;
         $status = $request->input("status") ?? null;
         $oltName = $request->input("oltName") ?? null;
 
-        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
-            ->join('zones', 'onus.zone_id', 'zones.id')
-            ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
-            ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+
+        $data = Dummy::join('olts', 'dummy.olt_id', 'olts.id')
+            ->join('zones', 'dummy.zone_id', 'zones.id')
+            ->join('onu_types', 'dummy.onu_type_id', 'onu_types.id')
             ->select(
-                'onus.id',
-                'onus.name',
-                'onus.unique_external_id',
-                'onus.status',
-                'onus.sn',
-                'onus.signal',
-                'onus.catv',
-                'onus.authorization_date',
-                'onus.olt_id',
+                'dummy.id',
+                'dummy.name',
+                'dummy.unique_external_id',
+                'dummy.status',
+                'dummy.sn',
+                'dummy.olt_id',
                 'olts.name as olt_name',
-                'onus.zone_id',
+                'dummy.zone_id',
                 'zones.name as zone_name',
                 'onu_types.name as onu_type',
-                'onus.signal_1310'
             );
 
-        $data = $data->orderBy('id', 'DESC')
-            ->search($search)
-            ->status($status);
 
-        if ($oltName) {
+        $data = $data->orderBy('id', 'DESC')
+        ->search($search)
+        ->status($status);
+
+        if($oltName){
             $data = $data->where('olts.name', 'LIKE', "%$oltName%");
         }
 
         $data = $data->get();
-        
+
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    public function index()
+    {
+        $data = Dummy::join('olts', 'dummy.olt_id', 'olts.id')
+            ->join('zones', 'dummy.zone_id', 'zones.id')
+            ->join('onu_types', 'dummy.onu_type_id', 'onu_types.id')
+            ->select(
+                'dummy.id',
+                'dummy.name',
+                'dummy.unique_external_id',
+                'dummy.status',
+                'dummy.sn',
+                'dummy.olt_id',
+                'olts.name as olt_name',
+                'dummy.zone_id',
+                'zones.name as zone_name',
+                'onu_types.name as onu_type',
+            )
+            ->distinct()
+            ->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -62,20 +84,20 @@ class OnuController extends Controller
     {
         // Intenta obtener datos de la caché
         $cachedData = Cache::get('onus_unconfigured_data');
-
+    
         if ($cachedData) {
             // Si los datos están en caché, devuélvelos
             return response()->json(['data' => $cachedData], 200);
         }
-
+    
         try {
             $client = new \GuzzleHttp\Client();
             $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/onu/get_no_configurados');
             $res = $client->sendAsync($request)->wait();
             $data = json_decode($res->getBody());
-
+    
             $index = 1;
-
+    
             $response = array_map(function ($item) use (&$index) {
                 return [
                     'tipo_puerto' => $item->tipo_puerto ?? null,
@@ -88,20 +110,20 @@ class OnuController extends Controller
                     'olt_id' => $item->olt_id ?? null,
                 ];
             }, $data);
-
+    
             Cache::put('onus_unconfigured_data', $response, 3600);
-
+    
             return response()->json(['data' => $response], 200);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
 
     public function store(Request $request)
     {
@@ -139,7 +161,7 @@ class OnuController extends Controller
 
         $json = json_encode($ports);
 
-        $data = Onu::create([
+        $data = Dummy::create([
             'autoincrement' => $request['autoincrement'],
             'unique_external_id' => $request['onu_external'],
             'pon_type_id' => $request['pon_type'],
@@ -188,56 +210,56 @@ class OnuController extends Controller
     {
         try {
 
-            $onu = Onu::where('onus.id', $id)
-                ->join('olts', 'onus.olt_id', 'olts.id')
-                ->join('pon_types', 'onus.pon_type_id', 'pon_types.id')
-                ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
-                ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
-                ->join('zones', 'onus.zone_id', 'zones.id')
-                ->select(
-                    'onus.id',
-                    'onus.name as name',
-                    'onus.unique_external_id as onu_external',
-                    'onus.status',
-                    'onus.sn',
-                    'onus.signal',
-                    'onus.signal_1310',
-                    'onus.catv',
-                    'onus.authorization_date',
-                    'onus.olt_id',
-                    'onus.zone_id as zone',
-                    'onus.board',
-                    'onus.odb_name as odb',
-                    'onus.port',
-                    'onus.address',
-                    'onus.mode',
-                    'service_ports.vlan_id as vlan',
-                    'olts.name as olt_name',
-                    'pon_types.name as pon_type',
-                    'onu_types.name as onu_type_id',
-                    'zones.name as zone_name',
-                )
+            $onu = Dummy::where('dummy.id', $id)
+                 ->join('olts', 'dummy.olt_id', 'olts.id')
+                 ->join('pon_types', 'dummy.pon_type_id', 'pon_types.id')
+                 ->join('onu_types', 'dummy.onu_type_id', 'onu_types.id')
+                 ->leftJoin('service_ports', 'service_ports.onu_id', 'dummy.id')
+                 ->join('zones', 'dummy.zone_id', 'zones.id')
+                 ->select(
+                     'dummy.id',
+                     'dummy.name as name', 
+                     'dummy.unique_external_id as onu_external',
+                     'dummy.status',
+                     'dummy.sn',
+                     'dummy.signal',
+                     'dummy.signal_1310',
+                     'dummy.catv',
+                     'dummy.authorization_date',
+                     'dummy.olt_id',
+                     'dummy.zone_id as zone',
+                     'dummy.board',
+                     'dummy.odb_name as odb',
+                     'dummy.port',
+                     'dummy.address',
+                     'dummy.mode',
+                     'service_ports.vlan_id as vlan',
+                     'olts.name as olt_name',
+                     'pon_types.name as pon_type',
+                     'onu_types.name as onu_type_id',
+                     'zones.name as zone_name',
+                 )
                 ->first();
 
-            if ($onu) {
-                $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
-                $service_ports = ServicePort::join('speed_profiles', 'service_ports.download_speed_id', 'speed_profiles.id')
-                    ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
-                    ->where('service_ports.onu_id', $onu->id)
-                    ->select(
-                        'service_ports.id as service_port',
-                        'speed_profiles.name as download_speed',
-                        'up_speed.name as upload_speed',
-                        'service_ports.vlan_id as vlan',
-                        'service_ports.cvlan_id as cvlan',
-                        'service_ports.svlan_id as svlan',
-                        'service_ports.tag_mode'
-                    )
-                    ->get();
+                if ($onu) {
+                    $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
+                    $service_ports = ServicePort::join('speed_profiles', 'service_ports.download_speed_id', 'speed_profiles.id')
+                        ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
+                        ->where('service_ports.onu_id', $onu->id)
+                        ->select(
+                            'service_ports.id as service_port',
+                            'speed_profiles.name as download_speed',
+                            'up_speed.name as upload_speed',
+                            'service_ports.vlan_id as vlan',
+                            'service_ports.cvlan_id as cvlan',
+                            'service_ports.svlan_id as svlan',
+                            'service_ports.tag_mode'
+                        )
+                        ->get();
 
-                $onu['ethernet_ports'] = $ethernet_ports;
-                $onu['service_ports'] = $service_ports;
-            }
+                    $onu['ethernet_ports'] = $ethernet_ports;
+                    $onu['service_ports'] = $service_ports;
+                }
         } catch (Exception $e) {
 
             return response()->json(array('error' => $e), 200);
@@ -255,13 +277,13 @@ class OnuController extends Controller
 
     public function destroy($id)
     {
-        $data = DB::table('onus')->where('id', $id)->delete();
+        $data = DB::table('dummy')->where('id', $id)->delete();
         return response()->json(['data' => $data], 200);
     }
 
     public function showByOlt($id)
     {
-        $data = Onu::where('olt_id', $id)->get();
+        $data = Dummy::where('olt_id', $id)->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -308,3 +330,4 @@ class OnuController extends Controller
         return response()->json(['status' => true], 200);
     }
 }
+
