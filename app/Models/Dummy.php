@@ -31,7 +31,7 @@ class Dummy extends Model
     public function scopeName($query, $name){
 
         if($name){
-            return $query->where('name', 'LIKE', "%$name%");
+            return $query->where('dummy.name', 'LIKE', "%$name%");
         }
     }
 
@@ -39,6 +39,20 @@ class Dummy extends Model
 
         if($sn){
             return $query->where('sn', 'LIKE', "%$sn%");
+        }
+    }
+
+    public function scopeStatus($query, $status){
+
+        if($status){
+            return $query->where('status', $status);
+        }
+    }
+    
+    public function scopeCreatedAt($query, $date){
+
+        if($date){
+            return $query->where('created_at', '>=', now()->subDays($date));
         }
     }
 }

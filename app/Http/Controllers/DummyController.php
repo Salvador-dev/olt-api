@@ -12,11 +12,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 
 class DummyController extends Controller
 {
     //
-    public function getData($name, $sn)
+    public function getData(Request $request)
     {
 
 
@@ -38,12 +39,17 @@ class DummyController extends Controller
         //     ->distinct()
         //     ->get();
 
-        // $name = $request->get("name");
-        // $sn = $request->get("sn");
+      
+        $name = $request->input("name") ?? null;
+        $sn = $request->input("sn") ?? null;
+        $status = $request->input("status") ?? null;
 
         $data = Dummy::orderBy('id', 'DESC')
         ->name($name)
-        ->sn($sn);
+        ->sn($sn)
+        ->status($status)
+        ->get();
+
 
         return response()->json(['data' => $data], 200);
     }

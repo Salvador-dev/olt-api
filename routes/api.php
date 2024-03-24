@@ -41,7 +41,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
 
     //TODO: eliminar
-    Route::get('/dummy/listing/{name}/{sn}', [DummyController::class, 'getData']);
+    Route::get('/dummy/listing', [DummyController::class, 'getData']);
     Route::post('/dummy', [DummyController::class, 'store']);
     Route::get('/dummy/{id}', [DummyController::class, 'show']);
     Route::patch('/dummy/{id}', [DummyController::class, 'update']);
