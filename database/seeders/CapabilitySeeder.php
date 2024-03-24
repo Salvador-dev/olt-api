@@ -13,7 +13,7 @@ class CapabilitySeeder extends Seeder
      */
     public function run(): void
     {
-        Capability::create(['name' => 'Bridging)']);
+        Capability::create(['name' => 'Bridging']);
         Capability::create(['name' => 'Bridging/Routing']);
 
     }

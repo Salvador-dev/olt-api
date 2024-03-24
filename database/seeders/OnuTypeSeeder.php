@@ -22,7 +22,7 @@ class OnuTypeSeeder extends Seeder
 
         foreach ($onuTypeNames as $data) {
             OnuType::create([
-                'name' => Arr::random($data),
+                'name' => $data,
                 'pon_type_id' => PonType::inRandomOrder()->first()->id,
                 'capability_id' => Capability::inRandomOrder()->first()->id,
                 'allow_custom_profiles' => Arr::random($array1),

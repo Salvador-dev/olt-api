@@ -5,19 +5,15 @@ namespace Database\Factories;
 use App\Models\Olt;
 use App\Models\Onu;
 use App\Models\OnuType;
-use App\Models\PonType;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Onu>
  */
-class OnusFactory extends Factory
+class OnuFactory extends Factory
 {
-
-    protected $model = Onu::class;
-
     /**
      * Define the model's default state.
      *
@@ -38,3 +34,4 @@ class OnusFactory extends Factory
         ];
     }
 }
+
