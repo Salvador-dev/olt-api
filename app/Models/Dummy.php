@@ -28,17 +28,10 @@ class Dummy extends Model
 
     // Filter scopes
 
-    public function scopeName($query, $name){
+    public function scopeSearch($query, $search){
 
-        if($name){
-            return $query->where('dummy.name', 'LIKE', "%$name%");
-        }
-    }
-
-    public function scopeSn($query, $sn){
-
-        if($sn){
-            return $query->where('sn', 'LIKE', "%$sn%");
+        if($search){
+            return $query->where('dummy.name', 'LIKE', "%$search%")->orWhere('dummy.sn', 'LIKE', "%$search%");
         }
     }
 

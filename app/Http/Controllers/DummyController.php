@@ -20,35 +20,39 @@ class DummyController extends Controller
     public function getData(Request $request)
     {
 
-
-        // $data = Dummy::join('olts', 'dummy.olt_id', 'olts.id')
-        //     ->join('zones', 'dummy.zone_id', 'zones.id')
-        //     ->join('onu_types', 'dummy.onu_type_id', 'onu_types.id')
-        //     ->select(
-        //         'dummy.id',
-        //         'dummy.name',
-        //         'dummy.unique_external_id',
-        //         'dummy.status',
-        //         'dummy.sn',
-        //         'dummy.olt_id',
-        //         'olts.name as olt_name',
-        //         'dummy.zone_id',
-        //         'zones.name as zone_name',
-        //         'onu_types.name as onu_type',
-        //     )
-        //     ->distinct()
-        //     ->get();
-
+        
       
-        $name = $request->input("name") ?? null;
-        $sn = $request->input("sn") ?? null;
+        $search = $request->input("search") ?? null;
         $status = $request->input("status") ?? null;
+        $oltName = $request->input("oltName") ?? null;
 
-        $data = Dummy::orderBy('id', 'DESC')
-        ->name($name)
-        ->sn($sn)
-        ->status($status)
-        ->get();
+
+        $data = Dummy::join('olts', 'dummy.olt_id', 'olts.id')
+            ->join('zones', 'dummy.zone_id', 'zones.id')
+            ->join('onu_types', 'dummy.onu_type_id', 'onu_types.id')
+            ->select(
+                'dummy.id',
+                'dummy.name',
+                'dummy.unique_external_id',
+                'dummy.status',
+                'dummy.sn',
+                'dummy.olt_id',
+                'olts.name as olt_name',
+                'dummy.zone_id',
+                'zones.name as zone_name',
+                'onu_types.name as onu_type',
+            );
+
+
+        $data = $data->orderBy('id', 'DESC')
+        ->search($search)
+        ->status($status);
+
+        if($oltName){
+            $data = $data->where('olts.name', 'LIKE', "%$oltName%");
+        }
+
+        $data = $data->get();
 
 
         return response()->json(['data' => $data], 200);

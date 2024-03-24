@@ -55,4 +55,27 @@ class Onu extends Model
     {
         return $this->belongsTo(Olt::class);
     }
+
+    // FILTER SCOPES
+
+    public function scopeSearch($query, $search){
+
+        if($search){
+            return $query->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.sn', 'LIKE', "%$search%");
+        }
+    }
+
+    public function scopeStatus($query, $status){
+
+        if($status){
+            return $query->where('status', $status);
+        }
+    }
+    
+    public function scopeCreatedAt($query, $date){
+
+        if($date){
+            return $query->where('created_at', '>=', now()->subDays($date));
+        }
+    }
 }
