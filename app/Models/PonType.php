@@ -14,6 +14,6 @@ class PonType extends Model
     ];
 
     public function onu_type(){
-        return $this->belongsTo(OnuType::class);
+        return $this->hasMany(OnuType::class);
     }
 }

@@ -21,11 +21,11 @@ class OnuType extends Model
     ];
 
     public function capabilities(){
-        return $this->hasMany(Capability::class, 'id');
+        return $this->belongsTo(Capability::class, 'capability_id');
     }
 
     public function pon_types(){
-        return $this->hasMany(PonType::class, 'id');
+        return $this->belongsTo(PonType::class, 'pon_type_id');
     }
 
 }

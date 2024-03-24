@@ -12,4 +12,9 @@ class SoftwareVersion extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function olts()
+    {
+        return $this->hasMany(Olt::class);
+    }
 }

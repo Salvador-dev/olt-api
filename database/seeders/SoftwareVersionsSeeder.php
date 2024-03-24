@@ -15,14 +15,7 @@ class SoftwareVersionsSeeder extends Seeder
     public function run()
     {
         // Datos de ejemplo para insertar en la tabla software_versions
-        $softwareVersionsData = [
-            [
-                'name' => '1212',
-            ],
-            [
-                'name' => '1515',
-            ],
-        ];
+        $softwareVersionsData = [ ['name' => 'R018'], ['name' => 'R015'], ['name' => 'R011'], ['name' => 'R017'], ['name' => 'R019'], ['name' => '2.x'], ['name' => 'R008'], ['name' => 'R013'] ];
 
         foreach ($softwareVersionsData as $data) {
             SoftwareVersion::create($data);

@@ -12,7 +12,7 @@ class Onu extends Model
     protected $fillable = [
         'unique_external_id',
         'pon_type_id',
-        'sn',
+        'serial',
         'olt_id',
         'board',
         'port',

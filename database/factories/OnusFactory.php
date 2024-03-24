@@ -2,8 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Olt;
 use App\Models\Onu;
+use App\Models\OnuType;
+use App\Models\PonType;
+use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
@@ -21,7 +26,15 @@ class OnusFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'unique_external_id' => Str::random(10), 
+            'serial' => Str::random(10), 
+            'olt_id' => Olt::inRandomOrder()->first()->id, 
+            'onu_type_id' => OnuType::inRandomOrder()->first()->id, 
+            'zone_id' => Zone::inRandomOrder()->first()->id, 
+            'status' => $this->faker->randomElement(['Online', 'Offline']), 
+            'name' => Str::random(7) . '-' . $this->faker->name,
+            'signal' => $this->faker->randomElement(['Very good', 'Warning', 'Critial', 'Power fail', 'LOS']),
+            'administrative_status' => $this->faker->randomElement(['Enabled', 'Disabled'])
         ];
     }
 }

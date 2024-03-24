@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('onus', function (Blueprint $table) {
-            $table->bigInteger('id', true)->comment('ONU');
-            $table->string('unique_external_id')->comment('Unique External ID SN');
-            $table->string('sn')->comment('SERIAL');
-            $table->bigInteger('olt_id')->index('olt_id')->comment('OLT ID');
+            $table->bigInteger('id', true);
+            $table->string('unique_external_id');
+            $table->string('serial');
+            $table->bigInteger('olt_id')->index('olt_id');
             $table->string('board')->nullable();
             $table->string('port')->nullable();
             $table->bigInteger('onu_type_id')->index('onu_type_id');
@@ -35,15 +35,15 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('password')->nullable();
             $table->string('catv')->nullable();
-            $table->string('administrative_status')->nullable()->comment('Enabled | Disabled');
+            $table->string('administrative_status')->nullable();
             $table->timestamp('authorization_date')->nullable();
-            $table->string('status')->nullable()->comment('Online | Ofline');
+            $table->string('status')->nullable();
             $table->string('signal')->nullable();
-            $table->string('signal_1310')->nullable()->comment('-27.45');
+            $table->string('signal_1310')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->bigInteger('pon_type_id')->nullable()->index('onus_ibfk_7_idx');
-            $table->bigInteger('wifi_port_id')->nullable()->index('wifi_port_id')->comment('Wifi Ports');
+            $table->bigInteger('wifi_port_id')->nullable()->index('wifi_port_id');
             $table->timestamps();
         });
     }

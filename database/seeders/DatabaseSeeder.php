@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\OnuType;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,11 +22,19 @@ class DatabaseSeeder extends Seeder
 
         $this->call(HardwareVersionSeeder::class);
 
+        $this->call(SoftwareVersionsSeeder::class);
+
+        $this->call(CapabilitySeeder::class);
+
         $this->call(PonTypeSeeder::class);
+
+        $this->call(OnuTypeSeeder::class);
 
         $this->call(ZoneSeeder::class);
 
+        $this->call(OltSeeder::class);
 
+        $this->call(OnuSeeder::class);
 
 
     }
