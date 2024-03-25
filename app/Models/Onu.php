@@ -61,7 +61,7 @@ class Onu extends Model
     public function scopeSearch($query, $search){
 
         if($search){
-            return $query->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.sn', 'LIKE', "%$search%");
+            return $query->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
         }
     }
 

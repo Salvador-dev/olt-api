@@ -40,18 +40,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
 
-    //TODO: eliminar
-    Route::get('/dummy/listing', [DummyController::class, 'getData']);
-    Route::post('/dummy', [DummyController::class, 'store']);
-    Route::get('/dummy/{id}', [DummyController::class, 'show']);
-    Route::patch('/dummy/{id}', [DummyController::class, 'update']);
-    Route::delete('/dummy/{id}', [DummyController::class, 'destroy']);
-    Route::get('/dummy/showbyOlt/{olt}', [DummyController::class, 'showByOlt']);
-    Route::get('/dummy', [DummyController::class, 'onusUnconfigureds']);
-    Route::get('/dummy/get_all_status/{external_id}', [DummyController::class, 'getOnuFullStatus']);
-    Route::get('/dummy/get_running_config/{external_id}', [DummyController::class, 'getOnuRunningConfig']);
-    Route::post('/onus_imports', [DummyController::class, 'importOnus']);
-
     // Change password
     Route::post('change/password', [AuthController::class, 'changePassword']);
 

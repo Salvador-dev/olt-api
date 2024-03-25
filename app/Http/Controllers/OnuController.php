@@ -23,6 +23,9 @@ class OnuController extends Controller
         $search = $request->input("search") ?? null;
         $status = $request->input("status") ?? null;
         $oltName = $request->input("oltName") ?? null;
+        $orderBy = $request->input("orderBy") ?? 'DESC';
+        $pageOffset = $request->input("pageOffset") ?? 10;
+
 
         $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
@@ -45,7 +48,7 @@ class OnuController extends Controller
                 'onus.signal_1310'
             );
 
-        $data = $data->orderBy('id', 'DESC')
+        $data = $data->orderBy('id', $orderBy)
             ->search($search)
             ->status($status);
 
@@ -53,9 +56,9 @@ class OnuController extends Controller
             $data = $data->where('olts.name', 'LIKE', "%$oltName%");
         }
 
-        $data = $data->get();
+        $data = $data->paginate($pageOffset);
         
-        return response()->json(['data' => $data], 200);
+        return response()->json($data, 200);
     }
 
     public function onusUnconfigureds()
