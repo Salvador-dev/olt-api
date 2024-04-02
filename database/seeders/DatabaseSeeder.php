@@ -34,13 +34,14 @@ class DatabaseSeeder extends Seeder
 
         $this->call(SpeedProfileSeeder::class);
 
-        $this->call(ServicePortSeeder::class);
-
         $this->call(ZoneSeeder::class);
 
         $this->call(OltSeeder::class);
 
         $this->call(OnuSeeder::class);
+
+        $this->call(ServicePortSeeder::class);
+
 
 
     }
