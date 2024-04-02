@@ -32,9 +32,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call(OnuTypeSeeder::class);
 
-        $this->call(SpeedProfile::class);
+        $this->call(SpeedProfileSeeder::class);
 
-        $this->call(ServicePort::class);
+        $this->call(ServicePortSeeder::class);
 
         $this->call(ZoneSeeder::class);
 
