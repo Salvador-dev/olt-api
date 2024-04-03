@@ -22,6 +22,7 @@ class OnuController extends Controller
 
         $search = $request->input("search") ?? null;
         $status = $request->input("status") ?? null;
+        $signal = $request->input("signal") ?? null;
         $oltName = $request->input("oltName") ?? null;
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
@@ -50,6 +51,7 @@ class OnuController extends Controller
 
         $data = $data->orderBy('id', $orderBy)
             ->search($search)
+            ->signal($signal)
             ->status($status);
 
         if ($oltName) {

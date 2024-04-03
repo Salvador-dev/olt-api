@@ -71,6 +71,13 @@ class Onu extends Model
             return $query->where('status', $status);
         }
     }
+
+    public function scopeSignal($query, $signal){
+
+        if($signal){
+            return $query->where('signal', $signal);
+        }
+    }
     
     public function scopeCreatedAt($query, $date){
 
