@@ -24,6 +24,7 @@ class OnuController extends Controller
         $status = $request->input("status") ?? null;
         $signal = $request->input("signal") ?? null;
         $oltName = $request->input("oltName") ?? null;
+        $ponType = $request->input("ponType") ?? null;
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
@@ -32,6 +33,7 @@ class OnuController extends Controller
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+            ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
             ->select(
                 'onus.id',
                 'onus.name',
@@ -46,6 +48,7 @@ class OnuController extends Controller
                 'onus.zone_id',
                 'zones.name as zone_name',
                 'onu_types.name as onu_type',
+                'pon_types.name as pon_type',
                 'onus.signal_1310'
             );
 
@@ -56,6 +59,10 @@ class OnuController extends Controller
 
         if ($oltName) {
             $data = $data->where('olts.name', 'LIKE', "%$oltName%");
+        }
+
+        if ($ponType) {
+            $data = $data->where('pon_types.name', 'LIKE', "%$ponType%");
         }
 
         $data = $data->paginate($pageOffset);
