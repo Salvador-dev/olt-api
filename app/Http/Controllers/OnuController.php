@@ -24,6 +24,8 @@ class OnuController extends Controller
         $status = $request->input("status") ?? null;
         $signal = $request->input("signal") ?? null;
         $oltName = $request->input("oltName") ?? null;
+        $zoneName = $request->input("zone") ?? null;
+        $onuType = $request->input("onuType") ?? null;
         $ponType = $request->input("ponType") ?? null;
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
@@ -63,6 +65,14 @@ class OnuController extends Controller
 
         if ($ponType) {
             $data = $data->where('pon_types.name', 'LIKE', "%$ponType%");
+        }
+
+        if ($zoneName) {
+            $data = $data->where('zones.name', 'LIKE', "%$zoneName%");
+        }
+
+        if ($onuType) {
+            $data = $data->where('onu_types.name', 'LIKE', "%$onuType%");
         }
 
         $data = $data->paginate($pageOffset);
