@@ -24,7 +24,7 @@ return new class extends Migration
             $table->bigInteger('zone_id')->index('zone_id');
             $table->string('name');
             $table->string('address')->nullable();
-            $table->string('odb_name')->nullable();
+            $table->bigInteger('odb_id')->nullable();
             $table->string('mode')->nullable();
             $table->string('wan_mode')->nullable();
             $table->string('ip_address')->nullable();

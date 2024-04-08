@@ -36,6 +36,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(ZoneSeeder::class);
 
+        $this->call(OdbSeeder::class);
+
         $this->call(OltSeeder::class);
 
         $this->call(OnuSeeder::class);
