@@ -31,7 +31,8 @@ class OnuController extends Controller
         $pageOffset = $request->input("pageOffset") ?? 10;
 
 
-        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
+        $data = Onu::where('administrative_status', 'Enabled')
+            ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
@@ -78,6 +79,44 @@ class OnuController extends Controller
         $data = $data->paginate($pageOffset);
         
         return response()->json($data, 200);
+    }
+
+    public function unconfiguredOnus(Request $request){
+
+        $orderBy = $request->input("orderBy") ?? 'DESC';
+        $pageOffset = $request->input("pageOffset") ?? 10;
+        $search = $request->input("search") ?? null;
+        $oltName = $request->input("oltName") ?? null;
+
+
+        $data = Onu::where('administrative_status', 'Disabled')
+            ->join('olts', 'onus.olt_id', 'olts.id')
+            ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+            ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
+            ->select(
+                'onus.id',
+                'pon_types.name as pon_type',
+                'onus.board',
+                'onus.port',
+                'onus.serial',
+                'onu_types.name as onu_type',
+                'onus.olt_id',
+                'olts.name as olt_name',
+            );
+
+
+        $data = $data->orderBy('id', $orderBy)
+        ->search($search);
+ 
+        if ($oltName) {
+            $data = $data->where('olts.name', 'LIKE', "%$oltName%");
+        }
+
+    
+        $data = $data->paginate($pageOffset);
+        
+        return response()->json($data, 200);
+
     }
 
     public function onusUnconfigureds()

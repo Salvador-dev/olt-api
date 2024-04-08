@@ -93,7 +93,8 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::patch('/onus/{id}', [OnuController::class, 'update']);
     Route::delete('/onus/{id}', [OnuController::class, 'destroy']);
     Route::get('/onus/showbyOlt/{olt}', [OnuController::class, 'showByOlt']);
-    Route::get('/onus_unconfigured', [OnuController::class, 'onusUnconfigureds']);
+    // Route::get('/onus_unconfigured', [OnuController::class, 'onusUnconfigureds']);
+    Route::get('/onus_unconfigured', [OnuController::class, 'unconfiguredOnus']);
     Route::get('/onus/get_all_status/{external_id}', [OnuController::class, 'getOnuFullStatus']);
     Route::get('/onus/get_running_config/{external_id}', [OnuController::class, 'getOnuRunningConfig']);
     Route::post('/onus_imports', [OnuController::class, 'importOnus']);

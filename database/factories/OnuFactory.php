@@ -30,6 +30,8 @@ class OnuFactory extends Factory
             'status' => $this->faker->randomElement(['Online', 'Offline', 'Power fail', 'LOS']), 
             'name' => Str::random(7) . '-' . $this->faker->name,
             'signal' => $this->faker->randomElement(['Very good', 'Warning', 'Critical']),
+            'board' => (string) rand(1, 20),
+            'port' => (string) rand(1, 15),
             'administrative_status' => $this->faker->randomElement(['Enabled', 'Disabled'])
         ];
     }
