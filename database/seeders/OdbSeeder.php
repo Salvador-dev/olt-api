@@ -22,7 +22,7 @@ class OdbSeeder extends Seeder
             $randomData =  Arr::random($coordinates);
 
             Odb::create([
-                'name' => 'ODB' . $i,
+                'name' => 'ODB ' . $i,
                 'nr_of_ports' => (string) rand(1, 5),
                 'latitude' => $randomData["latitude"],
                 'longitude' => $randomData["longitude"],
