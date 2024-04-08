@@ -20,7 +20,7 @@ class Onu extends Model
         'zone_id',
         'name',
         'address',
-        'odb_name',
+        'odb_id',
         'mode',
         'wan_mode',
         'ip_address',
