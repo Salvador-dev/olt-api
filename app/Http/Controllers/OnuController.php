@@ -48,16 +48,15 @@ class OnuController extends Controller
                 'onus.status',
                 'onus.serial',
                 'onus.signal',
-                'onus.catv',
-                'onus.authorization_date',
                 'onus.olt_id',
                 'olts.name as olt_name',
                 'onus.zone_id',
-                'odbs.name as odb_ame',
                 'zones.name as zone_name',
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
-                'onus.signal_1310'
+                'onus.signal_1310',
+                'onus.catv',
+                'onus.authorization_date',
             );
 
         $data = $data->orderBy('id', $orderBy)
