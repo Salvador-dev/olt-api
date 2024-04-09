@@ -53,7 +53,7 @@ class OnuController extends Controller
                 'onus.olt_id',
                 'olts.name as olt_name',
                 'onus.zone_id',
-                'odbs.name',
+                'odbs.name as odb_ame',
                 'zones.name as zone_name',
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
