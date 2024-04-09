@@ -27,6 +27,9 @@ class OnuController extends Controller
         $zoneName = $request->input("zone") ?? null;
         $onuType = $request->input("onuType") ?? null;
         $ponType = $request->input("ponType") ?? null;
+        $board = (string) $request->input("board") ?? null;
+        $port = (string) $request->input("port") ?? null;
+        $odb = $request->input("odb") ?? null;
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
@@ -34,6 +37,7 @@ class OnuController extends Controller
         $data = Onu::where('administrative_status', 'Enabled')
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
+            ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
@@ -49,6 +53,7 @@ class OnuController extends Controller
                 'onus.olt_id',
                 'olts.name as olt_name',
                 'onus.zone_id',
+                'odbs.name',
                 'zones.name as zone_name',
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
@@ -58,6 +63,8 @@ class OnuController extends Controller
         $data = $data->orderBy('id', $orderBy)
             ->search($search)
             ->signal($signal)
+            ->port($port)
+            ->board($board)
             ->status($status);
 
         if ($oltName) {
@@ -74,6 +81,10 @@ class OnuController extends Controller
 
         if ($onuType) {
             $data = $data->where('onu_types.name', 'LIKE', "%$onuType%");
+        }
+
+        if ($odb) {
+            $data = $data->where('odbs.name', 'LIKE', "%$odb%");
         }
 
         $data = $data->paginate($pageOffset);

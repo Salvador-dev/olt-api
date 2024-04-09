@@ -78,6 +78,20 @@ class Onu extends Model
             return $query->where('signal', $signal);
         }
     }
+
+    public function scopePort($query, $port){
+
+        if($port){
+            return $query->where('port', $port);
+        }
+    }
+
+    public function scopeBoard($query, $board){
+
+        if($board){
+            return $query->where('board', $board);
+        }
+    }
     
     public function scopeCreatedAt($query, $date){
 

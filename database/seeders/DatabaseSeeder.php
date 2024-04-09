@@ -4,9 +4,6 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\OnuType;
-use App\Models\ServicePort;
-use App\Models\SpeedProfile;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
