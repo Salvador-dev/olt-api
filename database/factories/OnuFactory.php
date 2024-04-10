@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Odb;
 use App\Models\Olt;
 use App\Models\Onu;
 use App\Models\OnuType;
@@ -27,9 +28,12 @@ class OnuFactory extends Factory
             'olt_id' => Olt::inRandomOrder()->first()->id, 
             'onu_type_id' => OnuType::inRandomOrder()->first()->id, 
             'zone_id' => Zone::inRandomOrder()->first()->id, 
-            'status' => $this->faker->randomElement(['Online', 'Offline']), 
+            'odb_id' => Odb::inRandomOrder()->first()->id,
+            'status' => $this->faker->randomElement(['Online', 'Offline', 'Power fail', 'LOS']), 
             'name' => Str::random(7) . '-' . $this->faker->name,
-            'signal' => $this->faker->randomElement(['Very good', 'Warning', 'Critial', 'Power fail', 'LOS']),
+            'signal' => $this->faker->randomElement(['Very good', 'Warning', 'Critical']),
+            'board' => (string) rand(1, 20),
+            'port' => (string) rand(1, 15),
             'administrative_status' => $this->faker->randomElement(['Enabled', 'Disabled'])
         ];
     }

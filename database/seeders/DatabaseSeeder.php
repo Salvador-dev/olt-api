@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\OnuType;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -30,11 +29,18 @@ class DatabaseSeeder extends Seeder
 
         $this->call(OnuTypeSeeder::class);
 
+        $this->call(SpeedProfileSeeder::class);
+
         $this->call(ZoneSeeder::class);
+
+        $this->call(OdbSeeder::class);
 
         $this->call(OltSeeder::class);
 
         $this->call(OnuSeeder::class);
+
+        $this->call(ServicePortSeeder::class);
+
 
 
     }

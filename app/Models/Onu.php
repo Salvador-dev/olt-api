@@ -20,7 +20,7 @@ class Onu extends Model
         'zone_id',
         'name',
         'address',
-        'odb_name',
+        'odb_id',
         'mode',
         'wan_mode',
         'ip_address',
@@ -69,6 +69,27 @@ class Onu extends Model
 
         if($status){
             return $query->where('status', $status);
+        }
+    }
+
+    public function scopeSignal($query, $signal){
+
+        if($signal){
+            return $query->where('signal', $signal);
+        }
+    }
+
+    public function scopePort($query, $port){
+
+        if($port){
+            return $query->where('port', $port);
+        }
+    }
+
+    public function scopeBoard($query, $board){
+
+        if($board){
+            return $query->where('board', $board);
         }
     }
     
