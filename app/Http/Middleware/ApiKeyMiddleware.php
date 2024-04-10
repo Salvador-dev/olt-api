@@ -16,25 +16,25 @@ class ApiKeyMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $idTenant = $request->header('X-Tenant');
+        // $idTenant = $request->header('X-Tenant');
 
-        if (!$idTenant) {
-            $tenant = Tenant::find($idTenant);
+        // if (!$idTenant) {
+        //     $tenant = Tenant::find($idTenant);
 
-            tenancy()->initialize($tenant);
+        //     tenancy()->initialize($tenant);
 
-            $apiKey = $request->header('AK');
+        //     $apiKey = $request->header('AK');
 
-            if (!$apiKey || $apiKey !== config('app.api_key')) {
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
-        }
-
-        // $apiKey = $request->header('AK');
-
-        // if (!$apiKey || $apiKey !== config('app.api_key')) {
-        //     return response()->json(['error' => 'Unauthorized'], 401);
+        //     if (!$apiKey || $apiKey !== config('app.api_key')) {
+        //         return response()->json(['error' => 'Unauthorized'], 401);
+        //     }
         // }
+
+         $apiKey = $request->header('AK');
+
+         if (!$apiKey || $apiKey !== config('app.api_key')) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
 
         return $next($request);
     }

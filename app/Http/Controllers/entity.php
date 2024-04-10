@@ -37,7 +37,7 @@ class entity extends Controller
         'email' => $email,
         ]);
 
-        $tenant->domains()->create(['domain' => $id .'.apismartolt.test']);
+        $tenant->domains()->create(['domain' => $id]);
     
         Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
             User::create([
