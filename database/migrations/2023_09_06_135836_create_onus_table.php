@@ -37,8 +37,8 @@ return new class extends Migration
             $table->string('catv')->nullable();
             $table->string('administrative_status')->nullable();
             $table->timestamp('authorization_date')->nullable();
-            $table->string('status')->nullable();
-            $table->string('signal')->nullable();
+            $table->bigInteger('status_id');
+            $table->bigInteger('signal_id')->nullable();
             $table->string('signal_1310')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();

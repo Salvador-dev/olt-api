@@ -37,6 +37,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call(OltSeeder::class);
 
+        $this->call(StatusSeeder::class);
+        
+        $this->call(SignalSeeder::class);
+
         $this->call(OnuSeeder::class);
 
         $this->call(ServicePortSeeder::class);

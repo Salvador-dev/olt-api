@@ -36,6 +36,8 @@ class OnuController extends Controller
 
         $data = Onu::where('administrative_status', 'Enabled')
             ->join('olts', 'onus.olt_id', 'olts.id')
+            ->join('status', 'onus.status_id', 'status.id')
+            ->join('signal', 'onus.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
@@ -45,22 +47,22 @@ class OnuController extends Controller
                 'onus.id',
                 'onus.name',
                 'onus.unique_external_id',
-                'onus.status',
+                'status.description as status',
                 'onus.serial',
-                'onus.signal',
+                'signal.description as signal',
                 'onus.olt_id',
                 'olts.name as olt_name',
                 'onus.zone_id',
                 'zones.name as zone_name',
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
-                'onus.signal_1310',
+                // 'onus.signal_1310',
                 'onus.catv',
                 'onus.authorization_date',
             );
 
         $data = $data->orderBy('id', $orderBy)
-            ->search($search)
+            ->search($search) // TODO quitar señal y status porque ya no son directamente del onu
             ->signal($signal)
             ->port($port)
             ->board($board)
