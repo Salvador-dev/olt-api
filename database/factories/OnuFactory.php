@@ -7,6 +7,7 @@ use App\Models\Olt;
 use App\Models\Status;
 use App\Models\Signal;
 use App\Models\OnuType;
+use App\Models\SpeedProfile;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -33,6 +34,7 @@ class OnuFactory extends Factory
             'status_id' => Status::inRandomOrder()->first()->id, 
             'name' => Str::random(7) . '-' . $this->faker->name,
             'signal_id' => Signal::inRandomOrder()->first()->id,
+            'speed_profile_id' => SpeedProfile::inRandomOrder()->first()->id,
             'board' => (string) rand(1, 20),
             'port' => (string) rand(1, 15),
             'administrative_status' => $this->faker->randomElement(['Enabled', 'Disabled'])

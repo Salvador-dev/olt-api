@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('preview_huawei')->nullable();
             $table->string('preview_zte')->nullable();
             $table->string('type_conexion')->nullable()->comment('pendiente por definir');
-            $table->bigInteger('speed')->nullable();
-            $table->string('direction')->nullable();
+            $table->bigInteger('upload_speed');
+            $table->bigInteger('download_speed');
             $table->timestamps();
         });
     }

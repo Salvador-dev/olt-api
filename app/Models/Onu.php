@@ -33,9 +33,9 @@ class Onu extends Model
         'catv',
         'administrative_status',
         'authorization_date',
-        'status',
-        'signal',
-        'signal_1310',
+        'status_id',
+        'signal_id',
+        'speed_profile_id', // Posiblemente sea a traves de service ports
         'latitude',
         'longitude',
         'wifi_port_id',
@@ -62,20 +62,6 @@ class Onu extends Model
 
         if($search){
             return $query->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
-        }
-    }
-
-    public function scopeStatus($query, $status){
-
-        if($status){
-            return $query->where('status', $status);
-        }
-    }
-
-    public function scopeSignal($query, $signal){
-
-        if($signal){
-            return $query->where('signal', $signal);
         }
     }
 

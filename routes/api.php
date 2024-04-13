@@ -87,14 +87,14 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::patch('/capabilities/{id}', [CapabilityController::class, 'update']);
     Route::delete('/capabilities/{id}', [CapabilityController::class, 'destroy']);
 
-    Route::get('/onus/listing', [OnuController::class, 'getData']);
+    Route::get('/onus/listing', [OnuController::class, 'index']);
+    Route::get('/onus/configured', [OnuController::class, 'configuredOnus']);
+    Route::get('/onus/unconfigured', [OnuController::class, 'unconfiguredOnus']);
     Route::post('/onus', [OnuController::class, 'store']);
     Route::get('/onus/{id}', [OnuController::class, 'show']);
     Route::patch('/onus/{id}', [OnuController::class, 'update']);
     Route::delete('/onus/{id}', [OnuController::class, 'destroy']);
     Route::get('/onus/showbyOlt/{olt}', [OnuController::class, 'showByOlt']);
-    // Route::get('/onus_unconfigured', [OnuController::class, 'onusUnconfigureds']);
-    Route::get('/onus_unconfigured', [OnuController::class, 'unconfiguredOnus']);
     Route::get('/onus/get_all_status/{external_id}', [OnuController::class, 'getOnuFullStatus']);
     Route::get('/onus/get_running_config/{external_id}', [OnuController::class, 'getOnuRunningConfig']);
     Route::post('/onus_imports', [OnuController::class, 'importOnus']);

@@ -15,31 +15,17 @@ class SpeedProfileSeeder extends Seeder
     {
         $speeds = [["name" => "10Mb", "speed" => "10345"], ["name" => "30Mb", "speed" => "30565"], ["name" => "50Mb", "speed" => "50785"], ["name" => "60Mb", "speed" => "60345"], ["name" => "80Mb", "speed" => "80321"], ["name" => "100Mb", "speed" => "100345"], ["name" => "500Mb", "speed" => "500045"], ["name" => "1Gb", "speed" => "1049834"]];
 
-        $directions = ["download", "upload"];
 
-        foreach ($directions as $direction) {
-            foreach ($speeds as $speed) {
+        foreach ($speeds as $speed) {
 
-                $name = "";
-
-                if($direction == "download"){
-
-                    $name = " DOWN";
-
-                } else {
-
-                    $name = " UP";
-
-                }
-
-                SpeedProfile::create([
-                    'name' => $speed["name"] . $name,
-                    'type_conexion' => "internet",
-                    'speed' => $speed['speed'],
-                    'direction' => $direction
-                ]);
-            }
+            SpeedProfile::create([
+                'name' => $speed["name"],
+                'type_conexion' => "internet",
+                'upload_speed' => $speed['speed'],
+                'download_speed' => $speed['speed'],
+            ]);
         }
+        
 
     }
 }
