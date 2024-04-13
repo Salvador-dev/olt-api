@@ -21,8 +21,7 @@ return new class extends Migration
             $table->string('cvlan_id', 45)->nullable();
             $table->string('tag_mode')->nullable()->comment('Campo por definir');
             $table->string('service_port', 45)->nullable();
-            $table->bigInteger('download_speed_id')->index('download_speed_id');
-            $table->bigInteger('up_speed_id')->index('up_speed_id');
+            $table->bigInteger('speed_profile_id');
             $table->timestamps();
         });
     }

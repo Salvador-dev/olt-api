@@ -14,9 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('service_ports', function (Blueprint $table) {
-            $table->foreign(['up_speed_id'], 'service_ports_ibfk_3')->references(['id'])->on('speed_profiles');
+            $table->foreign(['speed_profile_id'], 'service_ports_ibfk_3')->references(['id'])->on('speed_profiles');
             $table->foreign(['onu_id'], 'service_ports_ibfk_5')->references(['id'])->on('onus');
-            $table->foreign(['download_speed_id'], 'service_ports_ibfk_4')->references(['id'])->on('speed_profiles');
         });
     }
 

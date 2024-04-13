@@ -19,9 +19,6 @@ return new class extends Migration
             $table->foreign(['pon_type_id'], 'onus_ibfk_7')->references(['id'])->on('pon_types');
             $table->foreign(['onu_type_id'], 'onus_ibfk_4')->references(['id'])->on('onu_types');
             $table->foreign(['wifi_port_id'], 'onus_ibfk_6')->references(['id'])->on('wifi_ports');
-            $table->foreign(['status_id'])->references(['id'])->on('status');
-            $table->foreign(['signal_id'])->references(['id'])->on('signal');
-
 
         });
     }
@@ -39,6 +36,9 @@ return new class extends Migration
             $table->dropForeign('onus_ibfk_7');
             $table->dropForeign('onus_ibfk_4');
             $table->dropForeign('onus_ibfk_6');
+            $table->dropForeign('onus_ibfk_10');
+            $table->dropForeign('onus_ibfk_8');
+            $table->dropForeign('onus_ibfk_9');
         });
     }
 };
