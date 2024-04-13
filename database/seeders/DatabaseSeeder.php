@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(StatusSeeder::class);
 
-        $this->call(AdministrativeStatus::class);
+        $this->call(AdministrativeStatusSeeder::class);
         
         $this->call(SignalSeeder::class);
 
