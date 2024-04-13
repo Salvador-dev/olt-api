@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('password')->nullable();
             $table->string('catv')->nullable();
-            $table->string('administrative_status')->nullable();
+            $table->bigInteger('administrative_status_id');
             $table->timestamp('authorization_date')->nullable();
             $table->bigInteger('status_id');
             $table->bigInteger('signal_id');

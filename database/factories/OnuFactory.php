@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\AdministrativeStatus;
 use App\Models\Odb;
 use App\Models\Olt;
 use App\Models\Status;
@@ -37,7 +38,7 @@ class OnuFactory extends Factory
             'speed_profile_id' => SpeedProfile::inRandomOrder()->first()->id,
             'board' => (string) rand(1, 20),
             'port' => (string) rand(1, 15),
-            'administrative_status' => $this->faker->randomElement(['Enabled', 'Disabled'])
+            'administrative_status' => AdministrativeStatus::inRandomOrder()->first()->id
         ];
     }
 }

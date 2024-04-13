@@ -112,7 +112,8 @@ class OnuController extends Controller
         $pageOffset = $request->input("pageOffset") ?? 10;
 
 
-        $data = Onu::where('administrative_status', 'Enabled')
+        $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+            ->where('administrative_status.description', 'Enabled')
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('status', 'onus.status_id', 'status.id')
             ->join('signal', 'onus.signal_id', 'signal.id')
