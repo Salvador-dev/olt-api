@@ -3,7 +3,6 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CapabilityController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DummyController;
 use App\Http\Controllers\OdbsController;
 use App\Http\Controllers\OltController;
 use App\Http\Controllers\OnuController;

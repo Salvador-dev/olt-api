@@ -185,7 +185,8 @@ class OnuController extends Controller
         $oltName = $request->input("oltName") ?? null;
 
 
-        $data = Onu::where('administrative_status', 'Disabled')
+        $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+            ->where('administrative_status.description', 'Disabled') // TODO cambiar parametro por speed profile en NULL
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
