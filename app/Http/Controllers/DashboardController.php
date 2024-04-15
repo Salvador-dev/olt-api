@@ -12,7 +12,7 @@ class DashboardController extends Controller
     public function dashboard()
     {
         $online = Onu::join('status', 'onus.status_id', 'status.id')->where('status.description', 'Online')->count();
-        $pending = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')->where('administrative_status.description', 'Disabled')->count();
+        $pending = Onu::where('speed_profile_id', null)->count();
         $offline = Onu::join('status', 'onus.status_id', 'status.id')->where('status.description', 'Offline')->count();
         $signal = Onu::join('signal', 'onus.signal_id', 'signal.id')->where('signal.description', '!=', 'Very good')->count();
 

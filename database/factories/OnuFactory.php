@@ -11,6 +11,7 @@ use App\Models\OnuType;
 use App\Models\SpeedProfile;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -25,6 +26,8 @@ class OnuFactory extends Factory
      */
     public function definition(): array
     {
+        $speedProfile = SpeedProfile::inRandomOrder()->first()->id; 
+
         return [
             'unique_external_id' => Str::random(10), 
             'serial' => Str::random(10), 
@@ -35,7 +38,7 @@ class OnuFactory extends Factory
             'status_id' => Status::inRandomOrder()->first()->id, 
             'name' => Str::random(7) . '-' . $this->faker->name,
             'signal_id' => Signal::inRandomOrder()->first()->id,
-            'speed_profile_id' => SpeedProfile::inRandomOrder()->first()->id,
+            'speed_profile_id' => Arr::random([$speedProfile, null]),
             'board' => (string) rand(1, 20),
             'port' => (string) rand(1, 15),
             'administrative_status_id' => AdministrativeStatus::inRandomOrder()->first()->id
