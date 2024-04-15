@@ -14,7 +14,7 @@ class SpeedProfileController extends Controller
     //
     public function getData()
     {
-        $data = SpeedProfile::select('id', 'name', 'speed', 'direction', 'type_conexion', 'use_prefix')->get();
+        $data = SpeedProfile::select('id', 'name', 'upload_speed', 'download_speed', 'type_conexion', 'use_prefix')->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -26,6 +26,8 @@ class SpeedProfileController extends Controller
             'speed' => 'required',
             'type_conexion' => 'required',
         ]);
+
+        // TODO: CORREGIR NUEVOS CAMPOS DE SPEED PROFILE CRUD
     
         $speedProfile = new SpeedProfile();
         $speedProfile->name = $request->input('name');

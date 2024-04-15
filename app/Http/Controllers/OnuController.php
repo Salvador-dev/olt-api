@@ -28,6 +28,7 @@ class OnuController extends Controller
         $board = (string) $request->input("board") ?? null;
         $port = (string) $request->input("port") ?? null;
         $odb = $request->input("odb") ?? null;
+        $speedProfile = $request->input("speedProfile") ?? null;
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
@@ -40,6 +41,7 @@ class OnuController extends Controller
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
+            ->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')
             ->select(
                 'onus.id',
                 'onus.name',
@@ -88,6 +90,10 @@ class OnuController extends Controller
 
         if ($odb) {
             $data = $data->where('odbs.name', 'LIKE', "%$odb%");
+        }
+
+        if ($speedProfile) {
+            $data = $data->where('speed_profiles.name', 'LIKE', "%$speedProfile%");
         }
 
         $data = $data->paginate($pageOffset);
@@ -108,6 +114,7 @@ class OnuController extends Controller
         $board = (string) $request->input("board") ?? null;
         $port = (string) $request->input("port") ?? null;
         $odb = $request->input("odb") ?? null;
+        $speedProfile = $request->input("speedProfile") ?? null;
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
@@ -122,6 +129,7 @@ class OnuController extends Controller
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
+            ->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')
             ->select(
                 'onus.id',
                 'onus.name',
@@ -170,6 +178,10 @@ class OnuController extends Controller
 
         if ($odb) {
             $data = $data->where('odbs.name', 'LIKE', "%$odb%");
+        }
+
+        if ($speedProfile) {
+            $data = $data->where('speed_profiles.name', 'LIKE', "%$speedProfile%");
         }
 
         $data = $data->paginate($pageOffset);
