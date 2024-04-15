@@ -14,8 +14,7 @@ class ServicePort extends Model
         'svlan_id',
         'cvlan_id',
         'tag_mode',
-        'download_speed_id',
-        'up_speed_id',
+        'speed_profile_id',
         'onu_id'
     ];
 
@@ -24,13 +23,10 @@ class ServicePort extends Model
         return $this->belongsTo(Onu::class, 'onu_id');
     }
 
-    public function download_speed()
+    public function speed_profile()
     {
-        return $this->belongsTo(SpeedProfile::class, 'download_speed_id');
+        return $this->belongsTo(SpeedProfile::class, 'id');
     }
 
-    public function up_speed()
-    {
-        return $this->belongsTo(SpeedProfile::class, 'up_speed_id');
-    }
+ 
 }

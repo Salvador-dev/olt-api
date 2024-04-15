@@ -35,11 +35,11 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('password')->nullable();
             $table->string('catv')->nullable();
-            $table->string('administrative_status')->nullable();
+            $table->bigInteger('administrative_status_id');
             $table->timestamp('authorization_date')->nullable();
-            $table->string('status')->nullable();
-            $table->string('signal')->nullable();
-            $table->string('signal_1310')->nullable();
+            $table->bigInteger('status_id');
+            $table->bigInteger('signal_id');
+            $table->bigInteger('speed_profile_id')->nullable(); // Posiblemente sea a traves de service ports
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->bigInteger('pon_type_id')->nullable()->index('onus_ibfk_7_idx');

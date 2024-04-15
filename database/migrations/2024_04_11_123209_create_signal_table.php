@@ -11,7 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::drop('dummy');
+        Schema::create('signal', function (Blueprint $table) {
+            $table->bigInteger('id', true);
+            $table->string('description');
+            $table->bigInteger('frequency')->nullable(); // TODO quitar nullable
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('signal');
     }
 };

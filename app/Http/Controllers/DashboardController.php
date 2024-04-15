@@ -11,11 +11,11 @@ class DashboardController extends Controller
     //
     public function dashboard()
     {
-        $onus = Onu::all();
-        $online = $onus->where('status', 'Online')->count();
-        $pending = $onus->where('administrative_status', 'Disabled')->count();
-        $offline = $onus->where('status', 'Offline')->count();
-        $signal = $onus->where('signal', '!=', 'Very good')->count();
+        $online = Onu::join('status', 'onus.status_id', 'status.id')->where('status.description', 'Online')->count();
+        $pending = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')->where('administrative_status.description', 'Disabled')->count();
+        $offline = Onu::join('status', 'onus.status_id', 'status.id')->where('status.description', 'Offline')->count();
+        $signal = Onu::join('signal', 'onus.signal_id', 'signal.id')->where('signal.description', '!=', 'Very good')->count();
+
         return response()->json(['online' => $online, 'pending' => $pending, 'offline' => $offline, 'low_signal' => $signal], 200);
     }
 

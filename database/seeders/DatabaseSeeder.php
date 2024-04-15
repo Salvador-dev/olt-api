@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\AdministrativeStatus;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -35,7 +36,13 @@ class DatabaseSeeder extends Seeder
 
         // $this->call(OdbSeeder::class);
 
-        // $this->call(OltSeeder::class);
+        $this->call(OltSeeder::class);
+
+        $this->call(StatusSeeder::class);
+
+        $this->call(AdministrativeStatusSeeder::class);
+        
+        $this->call(SignalSeeder::class);
 
         // $this->call(OnuSeeder::class);
 

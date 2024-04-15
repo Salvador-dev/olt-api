@@ -16,13 +16,8 @@ use App\Models\Tenant;
 
 class OnuController extends Controller
 {
-    //
-    private $tenant;
-
-
-    public function getData(Request $request)
+    public function index(Request $request)
     {
-
 
         $search = $request->input("search") ?? null;
         $status = $request->input("status") ?? null;
@@ -34,41 +29,49 @@ class OnuController extends Controller
         $board = (string) $request->input("board") ?? null;
         $port = (string) $request->input("port") ?? null;
         $odb = $request->input("odb") ?? null;
+        $speedProfile = $request->input("speedProfile") ?? null;
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
 
-        $data = Onu::where('administrative_status', 'Enabled')
-            ->join('olts', 'onus.olt_id', 'olts.id')
+        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
+            ->join('status', 'onus.status_id', 'status.id')
+            ->join('signal', 'onus.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
+            ->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')
             ->select(
                 'onus.id',
                 'onus.name',
                 'onus.unique_external_id',
-                'onus.status',
+                'status.description as status',
                 'onus.serial',
-                'onus.signal',
+                'signal.description as signal',
                 'onus.olt_id',
                 'olts.name as olt_name',
                 'onus.zone_id',
                 'zones.name as zone_name',
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
-                'onus.signal_1310',
                 'onus.catv',
                 'onus.authorization_date',
             );
 
         $data = $data->orderBy('id', $orderBy)
             ->search($search)
-            ->signal($signal)
             ->port($port)
-            ->board($board)
-            ->status($status);
+            ->board($board);
+
+        if ($status) {
+            $data = $data->where('status.description', $status);
+        }
+
+        if ($signal) {
+            $data = $data->where('signal.description', $signal);
+        }
 
         if ($oltName) {
             $data = $data->where('olts.name', 'LIKE', "%$oltName%");
@@ -90,6 +93,98 @@ class OnuController extends Controller
             $data = $data->where('odbs.name', 'LIKE', "%$odb%");
         }
 
+        if ($speedProfile) {
+            $data = $data->where('speed_profiles.name', 'LIKE', "%$speedProfile%");
+        }
+
+        $data = $data->paginate($pageOffset);
+        
+        return response()->json($data, 200);
+    }
+
+    public function configuredOnus(Request $request)
+    {
+
+        $search = $request->input("search") ?? null;
+        $status = $request->input("status") ?? null;
+        $signal = $request->input("signal") ?? null;
+        $oltName = $request->input("oltName") ?? null;
+        $zoneName = $request->input("zone") ?? null;
+        $onuType = $request->input("onuType") ?? null;
+        $ponType = $request->input("ponType") ?? null;
+        $board = (string) $request->input("board") ?? null;
+        $port = (string) $request->input("port") ?? null;
+        $odb = $request->input("odb") ?? null;
+        $speedProfile = $request->input("speedProfile") ?? null;
+        $orderBy = $request->input("orderBy") ?? 'DESC';
+        $pageOffset = $request->input("pageOffset") ?? 10;
+
+
+        $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+            ->where('administrative_status.description', 'Enabled')
+            ->join('olts', 'onus.olt_id', 'olts.id')
+            ->join('status', 'onus.status_id', 'status.id')
+            ->join('signal', 'onus.signal_id', 'signal.id')
+            ->join('zones', 'onus.zone_id', 'zones.id')
+            ->join('odbs', 'onus.odb_id', 'odbs.id')
+            ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
+            ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+            ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
+            ->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')
+            ->select(
+                'onus.id',
+                'onus.name',
+                'onus.unique_external_id',
+                'status.description as status',
+                'onus.serial',
+                'signal.description as signal',
+                'onus.olt_id',
+                'olts.name as olt_name',
+                'onus.zone_id',
+                'zones.name as zone_name',
+                'onu_types.name as onu_type',
+                'pon_types.name as pon_type',
+                'onus.catv',
+                'onus.authorization_date',
+            );
+
+        $data = $data->orderBy('id', $orderBy)
+            ->search($search)
+            ->port($port)
+            ->board($board);
+
+        if ($status) {
+            $data = $data->where('status.description', $status);
+        }
+
+        if ($signal) {
+            $data = $data->where('signal.description', $signal);
+        }
+
+        if ($oltName) {
+            $data = $data->where('olts.name', 'LIKE', "%$oltName%");
+        }
+
+        if ($ponType) {
+            $data = $data->where('pon_types.name', 'LIKE', "%$ponType%");
+        }
+
+        if ($zoneName) {
+            $data = $data->where('zones.name', 'LIKE', "%$zoneName%");
+        }
+
+        if ($onuType) {
+            $data = $data->where('onu_types.name', 'LIKE', "%$onuType%");
+        }
+
+        if ($odb) {
+            $data = $data->where('odbs.name', 'LIKE', "%$odb%");
+        }
+
+        if ($speedProfile) {
+            $data = $data->where('speed_profiles.name', 'LIKE', "%$speedProfile%");
+        }
+
         $data = $data->paginate($pageOffset);
         
         return response()->json($data, 200);
@@ -103,7 +198,8 @@ class OnuController extends Controller
         $oltName = $request->input("oltName") ?? null;
 
 
-        $data = Onu::where('administrative_status', 'Disabled')
+        $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+            ->where('administrative_status.description', 'Disabled') // TODO cambiar parametro por speed profile en NULL
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')

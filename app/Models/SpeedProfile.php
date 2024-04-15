@@ -16,8 +16,8 @@ class SpeedProfile extends Model
         'preview_zte', 
         'type', 
         'type_conexion', 
-        'speed',
-        'direction'
+        'upload_speed',
+        'download_speed',
     ];
 
     public function services_ports(){
