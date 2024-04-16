@@ -23,7 +23,8 @@ class SpeedProfileController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
-            'speed' => 'required',
+            'upload_speed' => 'required',
+            'download_speed' => 'required',
             'type_conexion' => 'required',
         ]);
 
@@ -32,8 +33,8 @@ class SpeedProfileController extends Controller
         $speedProfile = new SpeedProfile();
         $speedProfile->name = $request->input('name');
         $speedProfile->type_conexion = $request->input('type_conexion');
-        $speedProfile->direction = $request->input('direction');
-        $speedProfile->speed = $request->input('speed');
+        $speedProfile->speed = $request->input('upload_speed');
+        $speedProfile->speed = $request->input('download_speed');
         $speedProfile->use_prefix = $request->input('use_prefix');
         $speedProfile->save();
     
@@ -58,7 +59,6 @@ class SpeedProfileController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    // Pendiente por corregir
     public function update(Request $request, $id)
     {
         
@@ -66,8 +66,8 @@ class SpeedProfileController extends Controller
             'name' => $request['name'],
             // 'onu_id' => $request['onu_id'],
             'type_conexion' => $request['type_conexion'],
-            'direction' => $request['direction'],
-            'speed' => $request['speed'],
+            'upload_speed' => $request['upload_speed'],
+            'download_speed' => $request['download_speed'],
             'use_prefix' => $request['use_prefix'],
         ]);
         return response()->json(['data' => $data], 200);
