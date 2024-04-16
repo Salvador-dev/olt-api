@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\EthernetPort;
 use App\Models\Onu;
 use App\Models\ServicePort;
+use App\Models\SpeedProfile;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -42,7 +43,6 @@ class OnuController extends Controller
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
-            ->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')
             ->select(
                 'onus.id',
                 'onus.name',
@@ -94,7 +94,7 @@ class OnuController extends Controller
         }
 
         if ($speedProfile) {
-            $data = $data->where('speed_profiles.name', 'LIKE', "%$speedProfile%");
+            $data = $data->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')->where('speed_profiles.name', 'LIKE', "%$speedProfile%");
         }
 
         $data = $data->paginate($pageOffset);
@@ -121,7 +121,8 @@ class OnuController extends Controller
 
 
         $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
-            ->where('administrative_status.description', 'Enabled')
+            // ->where('administrative_status.description', 'Enabled') // TODO verificar si se quieren ver onus desactivadas en seccion de configuradas
+            ->where('onus.speed_profile_id', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('status', 'onus.status_id', 'status.id')
             ->join('signal', 'onus.signal_id', 'signal.id')
@@ -199,7 +200,7 @@ class OnuController extends Controller
 
 
         $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
-            ->where('administrative_status.description', 'Disabled') // TODO cambiar parametro por speed profile en NULL
+            ->where('speed_profile_id', null)
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
@@ -360,45 +361,51 @@ class OnuController extends Controller
         try {
 
             $onu = Onu::where('onus.id', $id)
+                ->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
                 ->join('olts', 'onus.olt_id', 'olts.id')
-                ->join('pon_types', 'onus.pon_type_id', 'pon_types.id')
                 ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+                ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
                 ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 ->join('zones', 'onus.zone_id', 'zones.id')
+                ->join('odbs', 'onus.odb_id', 'odbs.id')
+                ->join('status', 'onus.status_id', 'status.id')
+                ->join('signal', 'onus.signal_id', 'signal.id')
                 ->select(
                     'onus.id',
                     'onus.name as name',
-                    'onus.unique_external_id as onu_external',
-                    'onus.status',
+                    'onus.unique_external_id',
+                    'status.description as status',
                     'onus.serial',
-                    'onus.signal',
-                    'onus.signal_1310',
+                    'signal.description as signal',
+                    'signal.frequency as signal frequency',
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
-                    'onus.zone_id as zone',
+                    'olts.name as olt_name',
+                    'zones.name as zone_name',
+                    'zones.id as zone_id',
                     'onus.board',
-                    'onus.odb_name as odb',
                     'onus.port',
                     'onus.address',
                     'onus.mode',
+                    'odbs.name as odb_name',
+                    'odbs.id as odb_id',
                     'service_ports.vlan_id as vlan',
-                    'olts.name as olt_name',
                     'pon_types.name as pon_type',
-                    'onu_types.name as onu_type_id',
-                    'zones.name as zone_name',
+                    'pon_types.id as pon_type_id',
+                    'onu_types.name as onu_type',
+                    'administrative_status.description as administrative_status'
                 )
                 ->first();
 
             if ($onu) {
                 $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
-                $service_ports = ServicePort::join('speed_profiles', 'service_ports.download_speed_id', 'speed_profiles.id')
-                    ->leftJoin('speed_profiles as up_speed', 'service_ports.up_speed_id', 'up_speed.id')
+                $service_ports = ServicePort::join('speed_profiles', 'service_ports.speed_profile_id', 'speed_profiles.id')
                     ->where('service_ports.onu_id', $onu->id)
                     ->select(
                         'service_ports.id as service_port',
-                        'speed_profiles.name as download_speed',
-                        'up_speed.name as upload_speed',
+                        'speed_profiles.download_speed',
+                        'speed_profiles.upload_speed',
                         'service_ports.vlan_id as vlan',
                         'service_ports.cvlan_id as cvlan',
                         'service_ports.svlan_id as svlan',
@@ -409,11 +416,14 @@ class OnuController extends Controller
                 $onu['ethernet_ports'] = $ethernet_ports;
                 $onu['service_ports'] = $service_ports;
             }
+
+            return response()->json(['data' => $onu], 200);
+            
         } catch (Exception $e) {
 
             return response()->json(array('error' => $e), 200);
         }
-        return response()->json(['data' => [$onu]], 200);
+
     }
 
     public function update(Request $request, $id)
