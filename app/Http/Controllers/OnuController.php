@@ -336,7 +336,6 @@ class OnuController extends Controller
             'username' => $request['username'],
             'password' => $request['password'],
             'catv' => $request['catv'],
-            'administrative_status' => $request['administrative_status'],
             'auth_date' => $request['auth_date'],
             'status' => $request['status'],
             'signal' => $request['signal'],
