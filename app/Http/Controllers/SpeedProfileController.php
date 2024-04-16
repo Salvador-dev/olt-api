@@ -52,8 +52,7 @@ class SpeedProfileController extends Controller
 
         // $data = array_merge($data, $filter);
 
-        $data = DB::table('speed_profiles')
-        ->select('speed_profiles.id', 'speed_profiles.name', 'speed_profiles.use_prefix', 'speed_profiles.type_conexion', 'speed_profiles.speed', 'speed_profiles.direction' )
+        $data = SpeedProfile::select('id', 'name', 'upload_speed', 'download_speed', 'type_conexion', 'use_prefix')
         ->where('speed_profiles.id', $id)
         ->get();
         return response()->json(['data' => $data], 200);

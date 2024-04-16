@@ -41,7 +41,7 @@ class OdbsController extends Controller
     {
         $data = DB::table('odbs')
             ->join('zones', 'odbs.zone_id', 'zones.id')
-            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.name as zone_id')
+            ->select('odbs.id', 'odbs.name', 'odbs.nr_of_ports', 'odbs.latitude', 'odbs.longitude', 'zones.id as zone_id')
             ->where('odbs.id', $id)
             ->get();
         return response()->json(['data' => $data], 200);

@@ -366,7 +366,6 @@ class OnuController extends Controller
                 ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
                 ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 ->join('zones', 'onus.zone_id', 'zones.id')
-                ->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')
                 ->join('odbs', 'onus.odb_id', 'odbs.id')
                 ->join('status', 'onus.status_id', 'status.id')
                 ->join('signal', 'onus.signal_id', 'signal.id')
@@ -383,15 +382,17 @@ class OnuController extends Controller
                     'onus.olt_id',
                     'olts.name as olt_name',
                     'zones.name as zone_name',
+                    'zones.id as zone_id',
                     'onus.board',
                     'onus.port',
                     'onus.address',
                     'onus.mode',
                     'odbs.name as odb_name',
+                    'odbs.id as odb_id',
                     'service_ports.vlan_id as vlan',
                     'pon_types.name as pon_type',
+                    'pon_types.id as pon_type_id',
                     'onu_types.name as onu_type',
-                    'speed_profiles.name as speed_profile',
                     'administrative_status.description as administrative_status'
                 )
                 ->first();
