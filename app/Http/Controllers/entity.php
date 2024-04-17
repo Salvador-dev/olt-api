@@ -40,11 +40,12 @@ class entity extends Controller
         $tenant->domains()->create(['domain' => $id]);
     
         Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
-            User::create([
+            $user = User::create([
                 'name' => $id,
                 'email' => $email,
                 'password' => Hash::make($password)
             ]);
+            $user->assignRole('admin');
         });
         
         return response()->json(['created company successfully' => $id], 200);

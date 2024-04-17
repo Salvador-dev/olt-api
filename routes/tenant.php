@@ -109,7 +109,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain ;
           Route::patch('/capabilities/{id}', [CapabilityController::class, 'update']);
           Route::delete('/capabilities/{id}', [CapabilityController::class, 'destroy']);
     
-          Route::get('/onus/listing', [OnuController::class, 'getData']);
+          Route::get('/onus/listing', [OnuController::class, 'index']);
           Route::post('/onus', [OnuController::class, 'store']);
           Route::get('/onus/{id}', [OnuController::class, 'show']);
           Route::patch('/onus/{id}', [OnuController::class, 'update']);
