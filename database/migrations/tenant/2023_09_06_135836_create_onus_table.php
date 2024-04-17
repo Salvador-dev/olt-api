@@ -39,7 +39,7 @@ return new class extends Migration
             $table->bigInteger('administrative_status_id')->nullable();
             $table->timestamp('authorization_date')->nullable();
             $table->bigInteger('status_id')->nullable();
-            $table->bigInteger('signal_id');
+            $table->bigInteger('signal_id')->nullable();
             $table->bigInteger('speed_profile_id')->nullable(); // Posiblemente sea a traves de service ports
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
