@@ -293,7 +293,7 @@ class OnuController extends Controller
             'auth_date' => $request['auth_date'],
             'signal_1310' => $request['signal_1310'],
             'distance' => $request['distance'],
-            'administrative_status' => AdministrativeStatus::where('description', 'Enabled')->first()->id,
+            'administrative_status_id' => AdministrativeStatus::where('description', 'Enabled')->first()->id,
             'service_port' => $request['service_port'],
             'service_port_vlan' => $request['service_port_vlan'],
             'service_port_cvlan' => $request['service_port_cvlan'],
