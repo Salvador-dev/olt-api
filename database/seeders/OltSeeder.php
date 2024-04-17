@@ -6,6 +6,7 @@ use App\Models\HardwareVersion;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Olt;
+use App\Models\PonType;
 use App\Models\SoftwareVersion;
 use Illuminate\Support\Arr;
 
@@ -25,6 +26,7 @@ class OltSeeder extends Seeder
                 'name' => $data["name"],
                 'ip' => $data["ip"],
                 'olt_hardware_version_id' => HardwareVersion::inRandomOrder()->first()->id,
+                'pon_type_id' => PonType::inRandomOrder()->first()->id,
                 'olt_software_version_id' => SoftwareVersion::inRandomOrder()->first()->id,
             ]);
         }
