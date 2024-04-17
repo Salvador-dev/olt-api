@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('status', function (Blueprint $table) {
             $table->bigInteger('id', true);
+            $table->integer('status_id')->unique();
             $table->string('description');
             $table->timestamps();
         });

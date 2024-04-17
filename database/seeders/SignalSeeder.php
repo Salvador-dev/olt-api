@@ -13,10 +13,10 @@ class SignalSeeder extends Seeder
      */
     public function run(): void
     {
-        Signal::create(['description' => 'Very Good']);
-        Signal::create(['description' => 'Warning']);
-        Signal::create(['description' => 'Critical']);
-
+        Signal::create(['description' => 'Very Good', 'signal_id' => 1]);
+        Signal::create(['description' => 'Warning', 'signal_id' => 2]);
+        Signal::create(['description' => 'Critical', 'signal_id' => 3]);
+        Signal::create(['description' => 'Unknown', 'signal_id' => 4]);
   
     }
 }

@@ -9,5 +9,5 @@ class AdministrativeStatus extends Model
 {
     use HasFactory;
     protected $table = 'administrative_status';
-    protected $fillable = ['description'];
+    protected $fillable = ['description', 'status_id'];
 }

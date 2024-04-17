@@ -13,8 +13,8 @@ class AdministrativeStatusSeeder extends Seeder
      */
     public function run(): void
     {
-        AdministrativeStatus::create(['description' => 'Enabled']);
-        AdministrativeStatus::create(['description' => 'Disabled']);
+        AdministrativeStatus::create(['description' => 'Enabled', 'status_id' => 1]);
+        AdministrativeStatus::create(['description' => 'Disabled', 'status_id' => 2]);
 
     }
 }
