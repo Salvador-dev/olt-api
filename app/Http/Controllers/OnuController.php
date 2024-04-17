@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\OnusImport;
+use App\Models\AdministrativeStatus;
 use Illuminate\Support\Facades\Cache;
 use App\Models\EthernetPort;
 use App\Models\Onu;
@@ -229,51 +230,6 @@ class OnuController extends Controller
 
     }
 
-    public function onusUnconfigureds()
-    {
-        // Intenta obtener datos de la caché
-        $cachedData = Cache::get('onus_unconfigured_data');
-
-        if ($cachedData) {
-            // Si los datos están en caché, devuélvelos
-            return response()->json(['data' => $cachedData], 200);
-        }
-
-        try {
-            $client = new \GuzzleHttp\Client();
-            $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/onu/get_no_configurados');
-            $res = $client->sendAsync($request)->wait();
-            $data = json_decode($res->getBody());
-
-            $index = 1;
-
-            $response = array_map(function ($item) use (&$index) {
-                return [
-                    'tipo_puerto' => $item->tipo_puerto ?? null,
-                    'slot' => $item->slot ?? null,
-                    'puerto' => $item->puerto ?? null,
-                    'onu_id' => $item->onu_id ?? null,
-                    'numero_serial' => $item->numero_serial ?? null,
-                    'tipo_onu_id' => $item->tipo_onu_id ?? null,
-                    'tipo_onu_nombre' => $item->tipo_onu_nombre ?? null,
-                    'olt_id' => $item->olt_id ?? null,
-                ];
-            }, $data);
-
-            Cache::put('onus_unconfigured_data', $response, 3600);
-
-            return response()->json(['data' => $response], 200);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
-
-
-
-
-
-
-
     public function store(Request $request)
     {
         $request->validate([
@@ -323,8 +279,6 @@ class OnuController extends Controller
             'allocated_onu' => $request['allocated_onu'],
             'zone_id' => $request['zone'],
             'address' => $request['address'],
-            'lat' => $request['lat'],
-            'lng' => $request['lng'],
             'odb_name' => $request['odb'],
             'mode' => $request['mode'],
             'wam_mode' => $request['wam_mode'],
@@ -337,17 +291,14 @@ class OnuController extends Controller
             'password' => $request['password'],
             'catv' => $request['catv'],
             'auth_date' => $request['auth_date'],
-            'status' => $request['status'],
-            'signal' => $request['signal'],
             'signal_1310' => $request['signal_1310'],
-            'signal_1490' => $request['signal_1490'],
             'distance' => $request['distance'],
+            'administrative_status' => AdministrativeStatus::where('description', 'Enabled')->first()->id,
             'service_port' => $request['service_port'],
             'service_port_vlan' => $request['service_port_vlan'],
             'service_port_cvlan' => $request['service_port_cvlan'],
             'service_port_svlan' => $request['service_port_svlan'],
             'service_port_tag_transform_mode' => $request['service_port_tag_transform_mode'],
-            'speed_download_id' => $request['speed_download_id'],
         ]);
         $data->save();
 
@@ -460,6 +411,49 @@ class OnuController extends Controller
 
         return response()->json(['data' => $data], 200);
     }
+
+        // public function onusUnconfigureds()
+    // {
+    //     // Intenta obtener datos de la caché
+    //     $cachedData = Cache::get('onus_unconfigured_data');
+
+    //     if ($cachedData) {
+    //         // Si los datos están en caché, devuélvelos
+    //         return response()->json(['data' => $cachedData], 200);
+    //     }
+
+    //     try {
+    //         $client = new \GuzzleHttp\Client();
+    //         $request = new \GuzzleHttp\Psr7\Request('GET', env('API_URL') . '/onu/get_no_configurados');
+    //         $res = $client->sendAsync($request)->wait();
+    //         $data = json_decode($res->getBody());
+
+    //         $index = 1;
+
+    //         $response = array_map(function ($item) use (&$index) {
+    //             return [
+    //                 'tipo_puerto' => $item->tipo_puerto ?? null,
+    //                 'slot' => $item->slot ?? null,
+    //                 'puerto' => $item->puerto ?? null,
+    //                 'onu_id' => $item->onu_id ?? null,
+    //                 'numero_serial' => $item->numero_serial ?? null,
+    //                 'tipo_onu_id' => $item->tipo_onu_id ?? null,
+    //                 'tipo_onu_nombre' => $item->tipo_onu_nombre ?? null,
+    //                 'olt_id' => $item->olt_id ?? null,
+    //             ];
+    //         }, $data);
+
+    //         Cache::put('onus_unconfigured_data', $response, 3600);
+
+    //         return response()->json(['data' => $response], 200);
+    //     } catch (Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
+
+
+
+    
 
     /*
 

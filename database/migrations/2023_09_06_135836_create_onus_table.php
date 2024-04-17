@@ -37,8 +37,8 @@ return new class extends Migration
             $table->string('catv')->nullable();
             $table->bigInteger('administrative_status_id');
             $table->timestamp('authorization_date')->nullable();
-            $table->bigInteger('status_id');
-            $table->bigInteger('signal_id');
+            $table->bigInteger('status_id')->nullable(); // es nulo inicialmente cuando la onu no esta configurada
+            $table->bigInteger('signal_id')->nullable(); // es nulo inicialmente cuando la onu no esta configurada
             $table->bigInteger('speed_profile_id')->nullable(); // Posiblemente sea a traves de service ports
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
