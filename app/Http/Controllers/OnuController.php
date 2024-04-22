@@ -277,7 +277,6 @@ class OnuController extends Controller
             'board' => $request['board'],
             'port' => $request['port'],
             'allocated_onu' => $request['allocated_onu'],
-            'speed_profile_id' => $request['speed_profile_id'],
             'zone_id' => $request['zone_id'],
             'address' => $request['address'],
             'odb_id' => $request['odb_id'],
