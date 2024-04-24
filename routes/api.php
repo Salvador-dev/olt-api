@@ -12,15 +12,25 @@ use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VpnTunnelController;
-use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\entity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\entity;
-use App\Http\Middleware\Cors;
 
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
 
 Route::post('company', [entity::class, 'registered']);
 Route::get('company/{id}', [entity::class, 'show']);
+
 
 

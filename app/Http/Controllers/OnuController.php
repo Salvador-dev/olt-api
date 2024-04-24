@@ -270,7 +270,7 @@ class OnuController extends Controller
         $data = Onu::create([
             'autoincrement' => $request['autoincrement'],
             'unique_external_id' => $request['unique_external_id'],
-            'pon_type_id' => $request['pon_type'],
+            // 'pon_type_id' => $request['pon_type'],
             'serial' => $request['serial'],
             'onu_type_id' => $request['onu_type_id'],
             'name' => $request['name'],
@@ -281,7 +281,7 @@ class OnuController extends Controller
             'zone_id' => $request['zone_id'],
             'address' => $request['address'],
             'odb_id' => $request['odb_id'],
-            'mode' => $request['mode'],
+            // 'mode' => $request['mode'],
             'wam_mode' => $request['wam_mode'],
             'ip_address' => $request['ip_address'],
             'subnet_mask' => $request['subnet_mask'],
@@ -337,11 +337,13 @@ class OnuController extends Controller
                     'onus.address',
                     'onus.mode',
                     'odbs.name as odb_name',
+                    'onus.speed_profile_id',
                     'odbs.id as odb_id',
                     'service_ports.vlan_id as vlan',
                     'pon_types.name as pon_type',
                     'pon_types.id as pon_type_id',
                     'onu_types.name as onu_type',
+                    'onu_types.id as onu_type_id',
                     'administrative_status.description as administrative_status'
                 )
                 ->first();
@@ -376,12 +378,59 @@ class OnuController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = DB::table('onus')->where('id', $id)->update([
-            'name' => $request['name'],
-        ]);
+
+        $data = Onu::findOrFail($id);
+
+        if (!$data) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+
+        $data->name = $request->input('name');
+        $data->unique_external_id = $request->input('unique_external_id');
+        $data->pon_type_id = $request->input('pon_type_id');
+        $data->serial = $request->input('serial');
+        $data->onu_type_id = $request->input('onu_type_id');
+        $data->olt_id = $request->input('olt_id');
+        $data->board = $request->input('board');
+        $data->port = $request->input('port');
+        $data->odb_id = $request->input('odb_id');
+        $data->mode = $request->input('mode');
+        $data->speed_profile_id = $request->input('speed_profile_id');
+        $data->zone_id = $request->input('zone_id');
+    
+        $data->save();
+
         return response()->json(['data' => $data], 200);
     }
 
+    public function authorize_onu(Request $request, $id)
+    {
+
+        $data = Onu::findOrFail($id);
+
+        if (!$data) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+
+        $data->name = $request->input('name');
+        $data->unique_external_id = $request->input('unique_external_id');
+        $data->pon_type_id = $request->input('pon_type_id');
+        $data->serial = $request->input('serial');
+        $data->onu_type_id = $request->input('onu_type_id');
+        $data->olt_id = $request->input('olt_id');
+        $data->board = $request->input('board');
+        $data->port = $request->input('port');
+        $data->odb_id = $request->input('odb_id');
+        $data->mode = $request->input('mode');
+        $data->speed_profile_id = $request->input('speed_profile_id');
+        $data->zone_id = $request->input('zone_id');
+        $data->authorization_date = now();
+    
+        $data->save();
+
+        return response()->json(['data' => $data], 200);
+    }
+    
     public function destroy($id)
     {
         $data = DB::table('onus')->where('id', $id)->delete();
