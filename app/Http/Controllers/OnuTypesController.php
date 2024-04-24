@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OnuType;
+use App\Models\PonType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +18,7 @@ class OnuTypesController extends Controller
             ->select(
                 'onu_types.id',
                 'onu_types.name',
-                'pon_types.name as pon_type_id',
+                'pon_types.name as pon_type',
                 'capabilitys.name as capability',
                 'capabilitys.id as capability_id',
                 'onu_types.ethernet_ports',
@@ -30,6 +31,13 @@ class OnuTypesController extends Controller
             ->get();
 
         return response()->json(['data' => $data], 200);
+    }
+
+    public function getPonTypes(){
+
+        $data = PonType::select('id', 'name')->get();
+        return response()->json(['data' => $data], 200);
+
     }
 
     public function store(Request $request)

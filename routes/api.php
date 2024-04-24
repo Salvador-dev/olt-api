@@ -119,6 +119,7 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/get/pon/{id}', [OltController::class, 'getPONPort']);
 
     Route::get('/onuTypes/listing', [OnuTypesController::class, 'getData']);
+    Route::get('/ponTypes/listing', [OnuTypesController::class, 'getPonTypes']);
     Route::post('/onuTypes', [onuTypesController::class, 'store']);
     Route::get('/onuTypes/{id}', [onuTypesController::class, 'show']);
     Route::patch('/onuTypes/{id}', [onuTypesController::class, 'update']);

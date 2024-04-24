@@ -269,7 +269,7 @@ class OnuController extends Controller
         $data = Onu::create([
             'autoincrement' => $request['autoincrement'],
             'unique_external_id' => $request['unique_external_id'],
-            'pon_type_id' => $request['pon_type'],
+            // 'pon_type_id' => $request['pon_type'],
             'serial' => $request['serial'],
             'onu_type_id' => $request['onu_type_id'],
             'name' => $request['name'],
@@ -280,7 +280,7 @@ class OnuController extends Controller
             'zone_id' => $request['zone_id'],
             'address' => $request['address'],
             'odb_id' => $request['odb_id'],
-            'mode' => $request['mode'],
+            // 'mode' => $request['mode'],
             'wam_mode' => $request['wam_mode'],
             'ip_address' => $request['ip_address'],
             'subnet_mask' => $request['subnet_mask'],
