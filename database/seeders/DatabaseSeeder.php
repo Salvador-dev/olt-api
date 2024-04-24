@@ -24,25 +24,25 @@ class DatabaseSeeder extends Seeder
 
         $this->call(SoftwareVersionsSeeder::class);
 
-        $this->call(CapabilitySeeder::class);
+        // $this->call(CapabilitySeeder::class);
 
-        $this->call(PonTypeSeeder::class);
+        // $this->call(PonTypeSeeder::class);
 
-        $this->call(OnuTypeSeeder::class);
+        // $this->call(OnuTypeSeeder::class);
 
-        $this->call(SpeedProfileSeeder::class);
+        // $this->call(SpeedProfileSeeder::class);
 
-        $this->call(ZoneSeeder::class);
+        // $this->call(ZoneSeeder::class);
 
-        $this->call(OdbSeeder::class);
+        // $this->call(OdbSeeder::class);
 
-        $this->call(OltSeeder::class);
+        // $this->call(OltSeeder::class);
 
         $this->call(StatusSeeder::class);
 
         $this->call(AdministrativeStatusSeeder::class);
         
-        // $this->call(SignalSeeder::class);
+        $this->call(SignalSeeder::class);
 
         // $this->call(OnuSeeder::class);
 

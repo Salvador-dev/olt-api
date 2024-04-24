@@ -20,7 +20,7 @@ use App\Http\Controllers\entity;
 use App\Http\Middleware\Cors;
 
 
-Route::post('empresa', [entity::class, 'registered']);
-
+Route::post('company', [entity::class, 'registered']);
+Route::get('company/{id}', [entity::class, 'show']);
 
 

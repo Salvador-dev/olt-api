@@ -51,6 +51,15 @@ class entity extends Controller
         return response()->json(['created company successfully' => $id], 200);
     }
     
+   
+
+    public function show($id)
+    {
+        $exists = (bool) Tenant::where('id', $id)->exists();
+        
+        // Devolver una respuesta JSON con el resultado
+        return response()->json(['company' => $exists], 200);
+    }
     
 
 }

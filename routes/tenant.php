@@ -23,8 +23,8 @@ use App\Http\Controllers\VpnTunnelController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\entity;
-use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain ;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -62,10 +62,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain ;
 
 
     
-         Route::post('change/password', [AuthController::class, 'changePassword']);
-    
-    
-    
+          Route::post('change/password', [AuthController::class, 'changePassword']);
+
     
           Route::get('/role/listing', [RoleController::class, 'index']);
           Route::post('/role', [RoleController::class, 'store']);

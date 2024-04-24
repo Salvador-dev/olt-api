@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -36,10 +35,10 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('password')->nullable();
             $table->string('catv')->nullable();
-            $table->bigInteger('administrative_status_id')->nullable();
+            $table->integer('administrative_status_id')->default(2);
             $table->timestamp('authorization_date')->nullable();
-            $table->bigInteger('status_id')->nullable();
-            $table->bigInteger('signal_id')->nullable();
+            $table->integer('status_id')->default(5);
+            $table->integer('signal_id')->default(4);
             $table->bigInteger('speed_profile_id')->nullable(); // Posiblemente sea a traves de service ports
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();

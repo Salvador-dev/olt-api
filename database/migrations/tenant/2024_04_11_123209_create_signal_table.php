@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('signal', function (Blueprint $table) {
             $table->bigInteger('id', true);
+            $table->integer('signal_id')->unique();
             $table->string('description');
             $table->bigInteger('frequency')->nullable(); // TODO quitar nullable
             $table->timestamps();
