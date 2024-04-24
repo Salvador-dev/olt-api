@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\Tenant;
 
 class ApiKeyMiddleware
 {
@@ -15,11 +16,25 @@ class ApiKeyMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $apiKey = $request->header('AK');
+        // $idTenant = $request->header('X-Tenant');
 
-        if (!$apiKey || $apiKey !== config('app.api_key')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+        // if (!$idTenant) {
+        //     $tenant = Tenant::find($idTenant);
+
+        //     tenancy()->initialize($tenant);
+
+        //     $apiKey = $request->header('AK');
+
+        //     if (!$apiKey || $apiKey !== config('app.api_key')) {
+        //         return response()->json(['error' => 'Unauthorized'], 401);
+        //     }
+        // }
+
+         $apiKey = $request->header('AK');
+
+         if (!$apiKey || $apiKey !== config('app.api_key')) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
 
         return $next($request);
     }

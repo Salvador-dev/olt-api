@@ -8,9 +8,13 @@ use Validator;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Tenant;
 
 class AuthController extends Controller
 {
+
+
+
     // Metodo para registros
     public function register(Request $request)
     {
@@ -33,10 +37,15 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer'], 200);
     }
+
     // Metodo para login
+
     public function login(Request $request)
     {
+
         if (!Auth::attempt($request->only('email', 'password'))) {
+
+
             return response()->json(['message' => 'Email o contraseña invalidos']);
         }
 
@@ -44,9 +53,9 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $roles = $user->getRoleNames(); // Returns a collection
-        
-        if($roles->isNotEmpty()){
-    
+
+        if ($roles->isNotEmpty()) {
+
             $user->{'role'} = $roles[0];
 
         } else {
@@ -58,10 +67,13 @@ class AuthController extends Controller
         unset($user->roles);
 
         return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer'], 200);
+
+
     }
 
     //Metodo para cambiar contraseña
-    public function changePassword(Request $request){
+    public function changePassword(Request $request)
+    {
 
 
         $validator = Validator::make($request->all(), [
@@ -83,26 +95,27 @@ class AuthController extends Controller
         if (!$user) {
             return back()->with('error', 'Usuario no encontrado');
         }
-        
-    
-         // Verificar si la contraseña actual es correcta
-         if (!Hash::check(trim($request->current_password), $user->password)) {
+
+
+        // Verificar si la contraseña actual es correcta
+        if (!Hash::check(trim($request->current_password), $user->password)) {
             return back()->with('error', 'La contraseña actual es incorrecta');
         }
-    
+
         // Encriptar y actualizar la contraseña
         $user->password = Hash::make($request->new_password);
         $user->save();
-    
+
         // Redireccionar con un mensaje de éxito
         return response()->json(['¡Contraseña actualizada exitosamente!'], 200);
     }
 
-    public function getAllUsers(){
+    public function getAllUsers()
+    {
         $users = User::select('id', 'name', 'email', 'created_at', 'updated_at')->get();
         return $users;
     }
-    
+
     // Metodo para logout
     public function logout()
     {
@@ -110,17 +123,18 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out'], 200);
     }
 
-    public function assignRole(Request $request){
+    public function assignRole(Request $request)
+    {
 
         $user = User::find($request->id);
-        
+
         if (!$user) {
             return back()->with('error', 'Usuario no encontrado');
         }
 
         $roles = $user->getRoleNames(); // Returns a collection
 
-        if($roles->isNotEmpty()){
+        if ($roles->isNotEmpty()) {
 
             $user->removeRole($roles[0]);
 
