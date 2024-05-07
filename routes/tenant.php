@@ -43,9 +43,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
     return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
 }); */
 
-    Route::get('test', [AuthController::class, 'test']);
 
-    Route::post('register', [AuthController::class, 'register']);
+ Route::post('register', [AuthController::class, 'register']);
 
  Route::middleware([
      'web',
@@ -55,16 +54,17 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
      Route::post('login', [AuthController::class, 'login']);
 
+     Route::post('change/password', [AuthController::class, 'changePassword']);
+     
      Route::middleware([
          'auth.key',
          'auth:sanctum',
-     ])->group(function () {
+         ])->group(function () {
+             
+             
+             
+             
 
-
-         
-         
-    // Change password
-    Route::post('change/password', [AuthController::class, 'changePassword']);
 
     // Roles  and permissions routes
 
