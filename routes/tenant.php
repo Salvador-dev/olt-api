@@ -44,7 +44,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 }); */
 
 
- Route::post('register', [AuthController::class, 'register']);
+
 
  Route::middleware([
      'web',
@@ -52,9 +52,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
      PreventAccessFromCentralDomains::class,
  ])->group(function () {
 
-     Route::post('login', [AuthController::class, 'login']);
 
-     Route::post('change/password', [AuthController::class, 'changePassword']);
      
      Route::middleware([
          'auth.key',
@@ -62,7 +60,11 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
          ])->group(function () {
              
              
-             
+        Route::post('register', [AuthController::class, 'register']);      
+        
+        Route::post('login', [AuthController::class, 'login']);
+
+        Route::post('change/password', [AuthController::class, 'changePassword']);
              
 
 
