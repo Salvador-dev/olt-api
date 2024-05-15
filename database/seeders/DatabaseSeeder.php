@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(ServicePortSeeder::class);
 
-
+        $this->call(ReportSeeder::class);
 
     }
 }

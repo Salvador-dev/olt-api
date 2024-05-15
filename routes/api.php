@@ -13,6 +13,7 @@ use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VpnTunnelController;
 use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
@@ -85,6 +86,10 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/capabilities/{id}', [CapabilityController::class, 'show']);
     Route::patch('/capabilities/{id}', [CapabilityController::class, 'update']);
     Route::delete('/capabilities/{id}', [CapabilityController::class, 'destroy']);
+    
+    Route::get('/reports/listing', [ReportController::class, 'index']);
+    Route::post('/reports', [ReportController::class, 'store']);
+    Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
 
     Route::get('/onus/listing', [OnuController::class, 'index']);
     Route::get('/onus/configured', [OnuController::class, 'configuredOnus']);
