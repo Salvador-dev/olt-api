@@ -11,6 +11,8 @@ class Report extends Model
 
     protected $table = 'reports';
     protected $fillable = ['action', 'onu_id', 'user_id'];
+    // public $timestamps = true; TODO: CAMBIAR A TRUE LUEGO DE HACER PRUEBAS
+    public $timestamps = false;
 
     public function onu()
     {

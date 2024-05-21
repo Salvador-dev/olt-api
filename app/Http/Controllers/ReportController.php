@@ -30,7 +30,8 @@ class ReportController extends Controller
                 'reports.created_at as date'
             );
 
-        $data = $data->orderBy('id', $orderBy);
+        $data = $data->orderBy('reports.created_at', $orderBy);
+        // $data = $data->oldest('reports.created_at');
 
         if ($search) {
 
