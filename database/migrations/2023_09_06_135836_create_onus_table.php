@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('address')->nullable();
             $table->bigInteger('odb_id')->nullable();
-            $table->string('mode')->nullable();
+            // $table->string('mode')->nullable();
             $table->string('wan_mode')->nullable();
             $table->string('ip_address')->nullable();
             $table->string('subnet_mask')->nullable();
@@ -42,7 +42,7 @@ return new class extends Migration
             $table->bigInteger('speed_profile_id')->nullable(); // Posiblemente sea a traves de service ports
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-            $table->bigInteger('pon_type_id')->nullable()->index('onus_ibfk_7_idx');
+            // $table->bigInteger('pon_type_id')->nullable()->index('onus_ibfk_7_idx');
             $table->bigInteger('wifi_port_id')->nullable()->index('wifi_port_id');
             $table->timestamps();
         });
