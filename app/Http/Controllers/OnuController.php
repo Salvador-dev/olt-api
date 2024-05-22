@@ -6,9 +6,12 @@ use App\Imports\OnusImport;
 use App\Models\AdministrativeStatus;
 use Illuminate\Support\Facades\Cache;
 use App\Models\EthernetPort;
+use App\Models\Odb;
 use App\Models\Onu;
+use App\Models\Report;
 use App\Models\ServicePort;
 use App\Models\SpeedProfile;
+use App\Models\Zone;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -61,7 +64,7 @@ class OnuController extends Controller
                 'onus.authorization_date',
             );
 
-        $data = $data->orderBy('id', $orderBy)
+        $data = $data->orderBy('onus.updated_at', $orderBy)
             ->search($search)
             ->port($port)
             ->board($board);
@@ -150,7 +153,7 @@ class OnuController extends Controller
                 'onus.authorization_date',
             );
 
-        $data = $data->orderBy('id', $orderBy)
+        $data = $data->orderBy('onus.updated_at', $orderBy)
             ->search($search)
             ->port($port)
             ->board($board);
@@ -385,20 +388,54 @@ class OnuController extends Controller
             return back()->with('error', 'Usuario no encontrado');
         }
 
-        $data->name = $request->input('name');
-        $data->unique_external_id = $request->input('unique_external_id');
-        $data->pon_type_id = $request->input('pon_type_id');
-        $data->serial = $request->input('serial');
-        $data->onu_type_id = $request->input('onu_type_id');
-        $data->olt_id = $request->input('olt_id');
-        $data->board = $request->input('board');
-        $data->port = $request->input('port');
-        $data->odb_id = $request->input('odb_id');
-        $data->mode = $request->input('mode');
-        $data->speed_profile_id = $request->input('speed_profile_id');
-        $data->zone_id = $request->input('zone_id');
+        $data->update($request->all());
+
+        // $data->name = $request->input('name');
+        // $data->unique_external_id = $request->input('unique_external_id');
+        // $data->serial = $request->input('serial');
+        // $data->onu_type_id = $request->input('onu_type_id');
+        // $data->olt_id = $request->input('olt_id');
+        // $data->board = $request->input('board');
+        // $data->port = $request->input('port');
+        // $data->odb_id = $request->input('odb_id');
+        // $data->zone_id = $request->input('zone_id');
     
         $data->save();
+
+        $changes = $data->getChanges();
+
+        \Illuminate\Support\Facades\Log::debug($changes);
+
+        if(array_key_exists('unique_external_id', $changes)){
+
+            Report::create([
+                'action' => 'ONU external ID changed to "' . $data->unique_external_id . '"',
+                'onu_id' => $data->id,
+                'user_id' => $request->user()->id,        
+            ]);
+        }
+
+        if(array_key_exists('zone_id', $changes)){
+
+            $zone = Zone::find($changes['zone_id']);
+
+            Report::create([
+                'action' => 'Zone changed to "' . $zone->name . '"',
+                'onu_id' => $data->id,
+                'user_id' => $request->user()->id,        
+            ]);
+        }
+
+        if(array_key_exists('odb_id', $changes)){
+
+            $odb = Odb::find($changes['odb_id']);
+
+            Report::create([
+                'action' => 'ODB changed to "' . $odb->name . '"',
+                'onu_id' => $data->id,
+                'user_id' => $request->user()->id,        
+            ]);
+        }
 
         return response()->json(['data' => $data], 200);
     }
@@ -427,6 +464,12 @@ class OnuController extends Controller
         $data->authorization_date = now();
     
         $data->save();
+
+        $data = Report::create([
+            'action' => 'Authorized',
+            'onu_id' => $data->id,
+            'user_id' => $request->user()->id,        
+        ]);
 
         return response()->json(['data' => $data], 200);
     }
