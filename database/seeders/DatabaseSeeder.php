@@ -16,8 +16,6 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        // $this->call(UserSeeder::class);
-
         $this->call(RoleSeeder::class);
 
         $this->call(HardwareVersionSeeder::class);
@@ -31,6 +29,8 @@ class DatabaseSeeder extends Seeder
         $this->call(SignalSeeder::class);
 
         // SEEDERS DE ABAJO SON SOLO PARA PRUEBAS
+
+        $this->call(UserSeeder::class);
 
         $this->call(CapabilitySeeder::class);
 
