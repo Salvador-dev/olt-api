@@ -16,6 +16,7 @@ use App\Http\Controllers\OltController;
 use App\Http\Controllers\OnuController;
 use App\Http\Controllers\OnuTypesController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\UserController;
@@ -108,6 +109,10 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
         Route::get('/capabilities/{id}', [CapabilityController::class, 'show']);
         Route::patch('/capabilities/{id}', [CapabilityController::class, 'update']);
         Route::delete('/capabilities/{id}', [CapabilityController::class, 'destroy']);
+
+        Route::get('/reports/listing', [ReportController::class, 'index']);
+        Route::post('/reports', [ReportController::class, 'store']);
+        Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
 
         Route::get('/onus/listing', [OnuController::class, 'index']);
         Route::get('/onus/configured', [OnuController::class, 'configuredOnus']);
