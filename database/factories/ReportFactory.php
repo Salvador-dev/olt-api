@@ -22,10 +22,10 @@ class ReportFactory extends Factory
     {
 
         return [
-            'action' => Arr::random(['Authorized', 'ONU enabled', 'Reboot', 'CATV enabled', 'Download speed changed to -traffic-table_310', 'Upload speed changed to -traffic-table_310']),
+            'action' => Arr::random(['Authorized', 'ONU enabled', 'Reboot', 'CATV enabled', 'Authorized', 'Authorized', 'Authorized',]),
             'onu_id' => Onu::inRandomOrder()->first()->id,
             'user_id' => Arr::random([User::inRandomOrder()->first()->id, null]),
-            'created_at' => $this->faker->dateTimeBetween($startDate = '-6 month',$endDate = 'now')
+            'created_at' => $this->faker->dateTimeBetween($startDate = '-2 month', $endDate = 'now')
         ];
     }
 }
