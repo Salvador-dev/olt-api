@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -81,15 +82,23 @@ class ReportController extends Controller
 
     public function lastAuthorizations(){
 
-        $thirty_days_ago = date('Y-m-d', strtotime("-31 days")); 
-    
-        $data = Report::where('action', 'Authorized')
-        ->whereDate('created_at', ">=" , $thirty_days_ago)
-        ->orderBy('created_at', 'DESC')
-        ->skip(0)->take(10)->get();
-        
+        $labels = [];
+        $authorizationsPerDay = [];
 
-        return response()->json($data, 200);
+        for ($i = 30; $i >= 0; $i--) { 
+
+            $day = Carbon::now()->subDays($i);
+
+            array_push($labels, $day->toDateString());
+
+            $data = Report::where('action', 'Authorized')->whereDate('created_at', $day)->count();
+
+            array_push($authorizationsPerDay, $data);
+
+        }
+
+        
+        return response()->json(['labels' => $labels, 'authorizationsPerDay' => $authorizationsPerDay], 200);
 
     }
 

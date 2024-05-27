@@ -25,7 +25,7 @@ class ReportFactory extends Factory
             'action' => Arr::random(['Authorized', 'ONU enabled', 'Reboot', 'CATV enabled', 'Authorized', 'Authorized', 'Authorized',]),
             'onu_id' => Onu::inRandomOrder()->first()->id,
             'user_id' => Arr::random([User::inRandomOrder()->first()->id, null]),
-            'created_at' => $this->faker->dateTimeBetween($startDate = '-2 month', $endDate = 'now')
+            'created_at' => $this->faker->dateTimeBetween($startDate = '-2 month', $endDate = '-1 day')
         ];
     }
 }
