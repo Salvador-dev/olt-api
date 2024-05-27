@@ -90,6 +90,8 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/reports/listing', [ReportController::class, 'index']);
     Route::post('/reports', [ReportController::class, 'store']);
     Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
+    Route::get('/reports/authorizations', [ReportController::class, 'lastAuthorizations']);
+
 
     Route::get('/onus/listing', [OnuController::class, 'index']);
     Route::get('/onus/configured', [OnuController::class, 'configuredOnus']);

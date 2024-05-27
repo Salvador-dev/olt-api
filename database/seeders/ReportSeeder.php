@@ -14,7 +14,7 @@ class ReportSeeder extends Seeder
     {
 
 
-        Report::factory(100)->create();
+        Report::factory(700)->create();
 
     }
 }
