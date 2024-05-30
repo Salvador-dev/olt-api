@@ -18,19 +18,11 @@ class DatabaseSeeder extends Seeder
 
         $this->call(RoleSeeder::class);
 
+        $this->call(UserSeeder::class);
+
         $this->call(HardwareVersionSeeder::class);
 
         $this->call(SoftwareVersionsSeeder::class);
-
-        $this->call(StatusSeeder::class);
-
-        $this->call(AdministrativeStatusSeeder::class);
-        
-        $this->call(SignalSeeder::class);
-
-        // SEEDERS DE ABAJO SON SOLO PARA PRUEBAS
-
-        $this->call(UserSeeder::class);
 
         $this->call(CapabilitySeeder::class);
 
@@ -46,9 +38,17 @@ class DatabaseSeeder extends Seeder
 
         $this->call(OltSeeder::class);
 
+        $this->call(StatusSeeder::class);
+
+        $this->call(AdministrativeStatusSeeder::class);
+        
+        $this->call(SignalSeeder::class);
+
         $this->call(OnuSeeder::class);
 
         $this->call(ServicePortSeeder::class);
+        
+        $this->call(DiagnosticSeeder::class);
 
         $this->call(ReportSeeder::class);
 

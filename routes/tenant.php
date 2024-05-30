@@ -21,6 +21,7 @@ use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VpnTunnelController;
+use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RoleController;
@@ -68,6 +69,9 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
              
         // Roles  and permissions routes
 
+
+        // Roles  and permissions routes
+
         Route::get('/role/listing', [RoleController::class, 'index']);
         Route::post('/role', [RoleController::class, 'store']);
         Route::get('/role/{id}', [RoleController::class, 'show']);
@@ -109,11 +113,19 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
         Route::get('/capabilities/{id}', [CapabilityController::class, 'show']);
         Route::patch('/capabilities/{id}', [CapabilityController::class, 'update']);
         Route::delete('/capabilities/{id}', [CapabilityController::class, 'destroy']);
-
+        
         Route::get('/reports/listing', [ReportController::class, 'index']);
         Route::post('/reports', [ReportController::class, 'store']);
         Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
         Route::get('/reports/authorizations', [ReportController::class, 'lastAuthorizations']);
+
+        
+        Route::get('/diagnostics/listing', [DiagnosticController::class, 'index']);
+        Route::post('/diagnostics', [DiagnosticController::class, 'store']);
+        Route::get('/diagnostics/{id}', [DiagnosticController::class, 'show']);
+        Route::patch('/diagnostics/{id}', [DiagnosticController::class, 'update']);
+        Route::delete('/diagnostics/{id}', [DiagnosticController::class, 'destroy']);
+
 
         Route::get('/onus/listing', [OnuController::class, 'index']);
         Route::get('/onus/configured', [OnuController::class, 'configuredOnus']);

@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Tenant;
 
 class OnuController extends Controller
 {
@@ -40,8 +39,9 @@ class OnuController extends Controller
 
 
         $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
-            ->join('status', 'onus.status_id', 'status.id')
-            ->join('signal', 'onus.signal_id', 'signal.id')
+            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            ->join('status', 'diagnostics.status_id', 'status.id')
+            ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
@@ -128,8 +128,9 @@ class OnuController extends Controller
             // ->where('administrative_status.description', 'Enabled') // TODO verificar si se quieren ver onus desactivadas en seccion de configuradas
             ->where('onus.speed_profile_id', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
-            ->join('status', 'onus.status_id', 'status.id')
-            ->join('signal', 'onus.signal_id', 'signal.id')
+            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            ->join('status', 'diagnostics.status_id', 'status.id')
+            ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
@@ -319,8 +320,9 @@ class OnuController extends Controller
                 ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 ->join('zones', 'onus.zone_id', 'zones.id')
                 ->join('odbs', 'onus.odb_id', 'odbs.id')
-                ->join('status', 'onus.status_id', 'status.id')
-                ->join('signal', 'onus.signal_id', 'signal.id')
+                ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+                ->join('status', 'diagnostics.status_id', 'status.id')
+                ->join('signal', 'diagnostics.signal_id', 'signal.id')
                 ->select(
                     'onus.id',
                     'onus.name as name',
@@ -328,7 +330,7 @@ class OnuController extends Controller
                     'status.description as status',
                     'onus.serial',
                     'signal.description as signal',
-                    'signal.frequency as signal frequency',
+                    'diagnostics.signal_value as signal_frequency',
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
@@ -450,12 +452,14 @@ class OnuController extends Controller
 
         $data->name = $request->input('name');
         $data->unique_external_id = $request->input('unique_external_id');
+        $data->pon_type_id = $request->input('pon_type_id');
         $data->serial = $request->input('serial');
         $data->onu_type_id = $request->input('onu_type_id');
         $data->olt_id = $request->input('olt_id');
         $data->board = $request->input('board');
         $data->port = $request->input('port');
         $data->odb_id = $request->input('odb_id');
+        $data->mode = $request->input('mode');
         $data->speed_profile_id = $request->input('speed_profile_id');
         $data->zone_id = $request->input('zone_id');
         $data->authorization_date = now();

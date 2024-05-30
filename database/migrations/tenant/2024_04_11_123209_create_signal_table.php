@@ -15,7 +15,8 @@ return new class extends Migration
             $table->bigInteger('id', true);
             $table->integer('signal_id')->unique();
             $table->string('description');
-            $table->bigInteger('frequency')->nullable(); // TODO quitar nullable
+            $table->float('max_frequency')->nullable(); // TODO quitar nullable
+            $table->string('value_unit', 20)->default('dBm');
             $table->timestamps();
         });
     }

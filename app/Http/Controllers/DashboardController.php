@@ -11,12 +11,15 @@ class DashboardController extends Controller
     //
     public function dashboard()
     {
-        $online = Onu::join('status', 'onus.status_id', 'status.id')->where('status.description', 'Online')->count();
-        $pending = Onu::where('speed_profile_id', null)->count();
-        $offline = Onu::join('status', 'onus.status_id', 'status.id')->where('status.description', 'Offline')->count();
-        $signal = Onu::join('signal', 'onus.signal_id', 'signal.id')->where('signal.description', '!=', 'Very good')->count();
+        $online = Onu::join('diagnostics', 'diagnostics.onu_id', 'onus.id')->join('status', 'diagnostics.status_id', 'status.id')->where('status.description', 'Online')->count();
 
-        return response()->json(['online' => $online, 'pending' => $pending, 'offline' => $offline, 'low_signal' => $signal], 200);
+        $pending = Onu::where('speed_profile_id', null)->count();
+        
+        $offline = Onu::join('diagnostics', 'diagnostics.onu_id', 'onus.id')->join('status', 'diagnostics.status_id', 'status.id')->where('status.description', 'Offline')->count();
+
+        $low_signal = Onu::join('diagnostics', 'diagnostics.onu_id', 'onus.id')->join('signal', 'diagnostics.signal_id', 'signal.id')->where('signal.description', '!=', 'Very good')->count(); 
+
+        return response()->json(['online' => $online, 'pending' => $pending, 'offline' => $offline, 'low_signal' => $low_signal], 200);
     }
 
     public function showByOlt($olt_id)
