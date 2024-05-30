@@ -37,8 +37,8 @@ return new class extends Migration
             $table->string('catv')->nullable();
             $table->integer('administrative_status_id')->default(2);
             $table->timestamp('authorization_date')->nullable();
-            $table->integer('status_id')->default(5);
-            $table->integer('signal_id')->default(4);
+            // $table->integer('status_id')->default(5); SE MUEVEN STATUS Y SIGNAL A TABLA DIAGNOSTICS
+            // $table->integer('signal_id')->default(4);
             $table->bigInteger('speed_profile_id')->nullable(); // Posiblemente sea a traves de service ports
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();

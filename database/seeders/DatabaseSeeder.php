@@ -47,6 +47,8 @@ class DatabaseSeeder extends Seeder
         $this->call(OnuSeeder::class);
 
         $this->call(ServicePortSeeder::class);
+        
+        $this->call(DiagnosticSeeder::class);
 
         $this->call(ReportSeeder::class);
 

@@ -9,5 +9,5 @@ class Signal extends Model
 {
     use HasFactory;
     protected $table = 'signal';
-    protected $fillable = ['description', 'frequency', 'signal_id'];
+    protected $fillable = ['description', 'max_frequency', 'signal_id'];
 }

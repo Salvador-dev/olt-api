@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CapabilityController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\OdbsController;
 use App\Http\Controllers\OltController;
 use App\Http\Controllers\OnuController;
@@ -91,6 +92,13 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::post('/reports', [ReportController::class, 'store']);
     Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
     Route::get('/reports/authorizations', [ReportController::class, 'lastAuthorizations']);
+
+    
+    Route::get('/diagnostics/listing', [DiagnosticController::class, 'index']);
+    Route::post('/diagnostics', [DiagnosticController::class, 'store']);
+    Route::get('/diagnostics/{id}', [DiagnosticController::class, 'show']);
+    Route::patch('/diagnostics/{id}', [DiagnosticController::class, 'update']);
+    Route::delete('/diagnostics/{id}', [DiagnosticController::class, 'destroy']);
 
 
     Route::get('/onus/listing', [OnuController::class, 'index']);

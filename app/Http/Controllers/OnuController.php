@@ -39,8 +39,9 @@ class OnuController extends Controller
 
 
         $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
-            ->join('status', 'onus.status_id', 'status.id')
-            ->join('signal', 'onus.signal_id', 'signal.id')
+            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            ->join('status', 'diagnostics.status_id', 'status.id')
+            ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
@@ -127,8 +128,9 @@ class OnuController extends Controller
             // ->where('administrative_status.description', 'Enabled') // TODO verificar si se quieren ver onus desactivadas en seccion de configuradas
             ->where('onus.speed_profile_id', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
-            ->join('status', 'onus.status_id', 'status.id')
-            ->join('signal', 'onus.signal_id', 'signal.id')
+            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            ->join('status', 'diagnostics.status_id', 'status.id')
+            ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
@@ -318,8 +320,9 @@ class OnuController extends Controller
                 ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 ->join('zones', 'onus.zone_id', 'zones.id')
                 ->join('odbs', 'onus.odb_id', 'odbs.id')
-                ->join('status', 'onus.status_id', 'status.id')
-                ->join('signal', 'onus.signal_id', 'signal.id')
+                ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+                ->join('status', 'diagnostics.status_id', 'status.id')
+                ->join('signal', 'diagnostics.signal_id', 'signal.id')
                 ->select(
                     'onus.id',
                     'onus.name as name',
@@ -327,7 +330,7 @@ class OnuController extends Controller
                     'status.description as status',
                     'onus.serial',
                     'signal.description as signal',
-                    'signal.frequency as signal frequency',
+                    'diagnostics.signal_value as signal_frequency',
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
@@ -337,7 +340,6 @@ class OnuController extends Controller
                     'onus.board',
                     'onus.port',
                     'onus.address',
-                    'onus.mode',
                     'odbs.name as odb_name',
                     'onus.speed_profile_id',
                     'odbs.id as odb_id',
