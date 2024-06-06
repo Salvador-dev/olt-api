@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CapabilityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiagnosticController;
@@ -66,6 +67,8 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
     Route::get('/user/permissions/{id}', [UserController::class, 'getPermissions']);
     Route::patch('/user/{id}', [UserController::class, 'update']);
     Route::delete('/user/{id}', [UserController::class, 'destroy']);
+
+    Route::get('/billing/listing', [BillingController::class, 'index']);
 
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
     Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
