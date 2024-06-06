@@ -22,6 +22,7 @@ use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VpnTunnelController;
 use App\Http\Controllers\DiagnosticController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RoleController;
@@ -92,6 +93,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
         Route::get('/user/permissions/{id}', [UserController::class, 'getPermissions']);
         Route::patch('/user/{id}', [UserController::class, 'update']);
         Route::delete('/user/{id}', [UserController::class, 'destroy']);
+
+        Route::get('/billing/listing', [BillingController::class, 'index']);
 
         Route::get('/dashboard', [DashboardController::class, 'dashboard']);
         Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
