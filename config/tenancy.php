@@ -19,7 +19,8 @@ return [
     'central_domains' => [
         '127.0.0.1',
         'localhost',
-        'apismartolt.test'
+        'apismartolt.test',
+        'olt.management'
     ],
 
     /**
@@ -196,7 +197,7 @@ return [
      * Parameters used by the tenants:seed command.
      */
     'seeder_parameters' => [
-        'class' => 'databaseSeeder',// root seeder class
+        'class' => 'DatabaseSeeder',// root seeder class
         // 'seed_after_migration' => true,
     ],
 ];
