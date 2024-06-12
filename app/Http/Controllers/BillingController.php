@@ -22,7 +22,7 @@ class BillingController extends Controller
     
         foreach ($olts as $olt) {
             
-            array_push($data, ['olt_name' => $olt['name'], 'subscription_status' => 'Active', 'subscription_end_date' => '20-Aug-2024']);
+            array_push($data, ['olt_id' => $olt['id'], 'monthly_price_id' => 20, 'olt_name' => $olt['name'], 'subscription_status' => 'Active', 'subscription_end_date' => '20-Aug-2024']);
             
         }
 
