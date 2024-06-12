@@ -6,15 +6,17 @@ use App\Imports\OnusImport;
 use App\Models\AdministrativeStatus;
 use Illuminate\Support\Facades\Cache;
 use App\Models\EthernetPort;
+use App\Models\Odb;
 use App\Models\Onu;
+use App\Models\Report;
 use App\Models\ServicePort;
 use App\Models\SpeedProfile;
+use App\Models\Zone;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Tenant;
 
 class OnuController extends Controller
 {
@@ -37,8 +39,9 @@ class OnuController extends Controller
 
 
         $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
-            ->join('status', 'onus.status_id', 'status.id')
-            ->join('signal', 'onus.signal_id', 'signal.id')
+            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            ->join('status', 'diagnostics.status_id', 'status.id')
+            ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
@@ -61,7 +64,7 @@ class OnuController extends Controller
                 'onus.authorization_date',
             );
 
-        $data = $data->orderBy('id', $orderBy)
+        $data = $data->orderBy('onus.updated_at', $orderBy)
             ->search($search)
             ->port($port)
             ->board($board);
@@ -125,8 +128,9 @@ class OnuController extends Controller
             // ->where('administrative_status.description', 'Enabled') // TODO verificar si se quieren ver onus desactivadas en seccion de configuradas
             ->where('onus.speed_profile_id', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
-            ->join('status', 'onus.status_id', 'status.id')
-            ->join('signal', 'onus.signal_id', 'signal.id')
+            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            ->join('status', 'diagnostics.status_id', 'status.id')
+            ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
             ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
@@ -150,7 +154,7 @@ class OnuController extends Controller
                 'onus.authorization_date',
             );
 
-        $data = $data->orderBy('id', $orderBy)
+        $data = $data->orderBy('onus.updated_at', $orderBy)
             ->search($search)
             ->port($port)
             ->board($board);
@@ -316,8 +320,9 @@ class OnuController extends Controller
                 ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 ->join('zones', 'onus.zone_id', 'zones.id')
                 ->join('odbs', 'onus.odb_id', 'odbs.id')
-                ->join('status', 'onus.status_id', 'status.id')
-                ->join('signal', 'onus.signal_id', 'signal.id')
+                ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+                ->join('status', 'diagnostics.status_id', 'status.id')
+                ->join('signal', 'diagnostics.signal_id', 'signal.id')
                 ->select(
                     'onus.id',
                     'onus.name as name',
@@ -325,7 +330,7 @@ class OnuController extends Controller
                     'status.description as status',
                     'onus.serial',
                     'signal.description as signal',
-                    'signal.frequency as signal frequency',
+                    'diagnostics.signal_value as signal_frequency',
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
@@ -335,7 +340,6 @@ class OnuController extends Controller
                     'onus.board',
                     'onus.port',
                     'onus.address',
-                    'onus.mode',
                     'odbs.name as odb_name',
                     'onus.speed_profile_id',
                     'odbs.id as odb_id',
@@ -385,20 +389,54 @@ class OnuController extends Controller
             return back()->with('error', 'Usuario no encontrado');
         }
 
-        $data->name = $request->input('name');
-        $data->unique_external_id = $request->input('unique_external_id');
-        $data->pon_type_id = $request->input('pon_type_id');
-        $data->serial = $request->input('serial');
-        $data->onu_type_id = $request->input('onu_type_id');
-        $data->olt_id = $request->input('olt_id');
-        $data->board = $request->input('board');
-        $data->port = $request->input('port');
-        $data->odb_id = $request->input('odb_id');
-        $data->mode = $request->input('mode');
-        $data->speed_profile_id = $request->input('speed_profile_id');
-        $data->zone_id = $request->input('zone_id');
+        $data->update($request->all());
+
+        // $data->name = $request->input('name');
+        // $data->unique_external_id = $request->input('unique_external_id');
+        // $data->serial = $request->input('serial');
+        // $data->onu_type_id = $request->input('onu_type_id');
+        // $data->olt_id = $request->input('olt_id');
+        // $data->board = $request->input('board');
+        // $data->port = $request->input('port');
+        // $data->odb_id = $request->input('odb_id');
+        // $data->zone_id = $request->input('zone_id');
     
         $data->save();
+
+        $changes = $data->getChanges();
+
+        \Illuminate\Support\Facades\Log::debug($changes);
+
+        if(array_key_exists('unique_external_id', $changes)){
+
+            Report::create([
+                'action' => 'ONU external ID changed to "' . $data->unique_external_id . '"',
+                'onu_id' => $data->id,
+                'user_id' => $request->user()->id,        
+            ]);
+        }
+
+        if(array_key_exists('zone_id', $changes)){
+
+            $zone = Zone::find($changes['zone_id']);
+
+            Report::create([
+                'action' => 'Zone changed to "' . $zone->name . '"',
+                'onu_id' => $data->id,
+                'user_id' => $request->user()->id,        
+            ]);
+        }
+
+        if(array_key_exists('odb_id', $changes)){
+
+            $odb = Odb::find($changes['odb_id']);
+
+            Report::create([
+                'action' => 'ODB changed to "' . $odb->name . '"',
+                'onu_id' => $data->id,
+                'user_id' => $request->user()->id,        
+            ]);
+        }
 
         return response()->json(['data' => $data], 200);
     }
@@ -427,6 +465,12 @@ class OnuController extends Controller
         $data->authorization_date = now();
     
         $data->save();
+
+        $data = Report::create([
+            'action' => 'Authorized',
+            'onu_id' => $data->id,
+            'user_id' => $request->user()->id,        
+        ]);
 
         return response()->json(['data' => $data], 200);
     }

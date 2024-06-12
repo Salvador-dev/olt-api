@@ -49,7 +49,7 @@ return [
          */
         'template_ tenant_connection' => null,
 
-        /**
+        /** 
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
@@ -197,7 +197,7 @@ return [
      * Parameters used by the tenants:seed command.
      */
     'seeder_parameters' => [
-        'class' => 'DatabaseSeeder',// root seeder class
         // 'seed_after_migration' => true,
+        'class' => 'DatabaseSeeder',// root seeder class
     ],
 ];

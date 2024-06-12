@@ -33,8 +33,8 @@ class Onu extends Model
         'catv',
         'administrative_status',
         'authorization_date',
-        'status_id',
-        'signal_id',
+        // 'status_id', // SE MOVIERON A DIAGNOSTIC
+        // 'signal_id',
         'speed_profile_id', // Posiblemente sea a traves de service ports
         'latitude',
         'longitude',

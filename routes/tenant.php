@@ -16,15 +16,19 @@ use App\Http\Controllers\OltController;
 use App\Http\Controllers\OnuController;
 use App\Http\Controllers\OnuTypesController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SpeedProfileController;
 use App\Http\Controllers\SnmpController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VpnTunnelController;
+use App\Http\Controllers\DiagnosticController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RoleController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
+use App\Http\Middleware\Cors; // Agrega la importación de tu middleware Cors
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +54,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 
 
 
-    Route::middleware(['web', InitializeTenancyByPath::class])
+    Route::middleware(['web', 'cors', InitializeTenancyByPath::class])
     ->prefix('{tenant}')
     ->group(function () {
 
@@ -59,6 +63,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
     Route::middleware([
                       'auth.key',
                       'auth:sanctum',
+                      'cors'
                       ])->group(function () {
      Route::post('change/password', [AuthController::class, 'changePassword']);
 
@@ -87,6 +92,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
      Route::patch('/user/{id}', [UserController::class, 'update']);
      Route::delete('/user/{id}', [UserController::class, 'destroy']);
 
+     Route::get('/billing/listing', [BillingController::class, 'index']);
+
      Route::get('/dashboard', [DashboardController::class, 'dashboard']);
      Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
 
@@ -107,6 +114,18 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
      Route::get('/capabilities/{id}', [CapabilityController::class, 'show']);
      Route::patch('/capabilities/{id}', [CapabilityController::class, 'update']);
      Route::delete('/capabilities/{id}', [CapabilityController::class, 'destroy']);
+
+     Route::get('/reports/listing', [ReportController::class, 'index']);
+     Route::post('/reports', [ReportController::class, 'store']);
+     Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
+     Route::get('/reports/authorizations', [ReportController::class, 'lastAuthorizations']);
+
+     
+     Route::get('/diagnostics/listing', [DiagnosticController::class, 'index']);
+     Route::post('/diagnostics', [DiagnosticController::class, 'store']);
+     Route::get('/diagnostics/{id}', [DiagnosticController::class, 'show']);
+     Route::patch('/diagnostics/{id}', [DiagnosticController::class, 'update']);
+     Route::delete('/diagnostics/{id}', [DiagnosticController::class, 'destroy']);
 
      Route::get('/onus/listing', [OnuController::class, 'index']);
      Route::get('/onus/configured', [OnuController::class, 'configuredOnus']);

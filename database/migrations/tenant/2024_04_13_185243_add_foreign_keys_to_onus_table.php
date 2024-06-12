@@ -15,8 +15,6 @@ return new class extends Migration
     {
         Schema::table('onus', function (Blueprint $table) {
 
-            $table->foreign(['status_id'], 'onus_ibfk_10')->references(['status_id'])->on('status');
-            $table->foreign(['signal_id'], 'onus_ibfk_8')->references(['signal_id'])->on('signal');
             $table->foreign(['speed_profile_id'], 'onus_ibfk_9')->references(['id'])->on('speed_profiles');
             $table->foreign(['administrative_status_id'], 'onus_ibfk_11')->references(['status_id'])->on('administrative_status');
 
@@ -31,8 +29,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('onus', function (Blueprint $table) {
-            $table->dropForeign('onus_ibfk_10');
-            $table->dropForeign('onus_ibfk_8');
+
             $table->dropForeign('onus_ibfk_9');
             $table->dropForeign('onus_ibfk_11');
 
