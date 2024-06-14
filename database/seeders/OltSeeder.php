@@ -18,8 +18,7 @@ class OltSeeder extends Seeder
     public function run(): void
     {
 
-        $oltData = [['name' => 'OLT-BARINAS', 'ip' => '190.97.236.254'], ['name' => 'OLT-HUAWEI-CIUDAD-ALIANZA', 'ip' => '190.103.30.76'], ['name' => 'OLT-HUAWEI-SAN-DIEGO', 'ip' => '190.120.253.220'], ['name' => 'OLT-HUAWEI-UNICENTER', 'ip' => '190.103.31.160'], ['name' => 'OLT-HUAWEI-PARAISO', 'ip' => '190.89.29.37'], ['name' => 'OLT-HUAWEI-BARCELONA', 'ip' => '190.97.236.254'], ['name' => 'OLT-BARINAS',
-        'ip' => '190.120.253.176']];
+        $oltData = [['name' => 'OLT-BARINAS', 'ip' => '190.97.236.254'], ['name' => 'OLT-HUAWEI-CIUDAD-ALIANZA', 'ip' => '190.103.30.76'], ['name' => 'OLT-HUAWEI-SAN-DIEGO', 'ip' => '190.120.253.220'], ['name' => 'OLT-HUAWEI-UNICENTER', 'ip' => '190.103.31.160'], ['name' => 'OLT-HUAWEI-PARAISO', 'ip' => '190.89.29.37'], ['name' => 'OLT-HUAWEI-BARCELONA', 'ip' => '190.97.236.254']];
 
         foreach ($oltData as $data) {
             Olt::create([
