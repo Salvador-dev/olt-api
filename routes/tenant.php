@@ -95,6 +95,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
         Route::delete('/user/{id}', [UserController::class, 'destroy']);
 
         Route::get('/billing/listing', [BillingController::class, 'index']);
+        Route::get('/billing/history', [BillingController::class, 'history']);
 
         Route::get('/dashboard', [DashboardController::class, 'dashboard']);
         Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
