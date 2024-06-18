@@ -16,6 +16,7 @@ class BillingController extends Controller
         ->join('subscription_status', 'billings.subscription_status_id', 'subscription_status.id')
         ->select(
             'olts.name as olt_name',
+            'billings.monthly_price as monthly_price_id',
             'subscription_status.description as subscription_status',
             'subscription_end_date'
         )->get();
