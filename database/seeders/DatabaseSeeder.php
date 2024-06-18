@@ -36,11 +36,11 @@ class DatabaseSeeder extends Seeder
 
         $this->call(OdbSeeder::class);
 
+        $this->call(AdministrativeStatusSeeder::class);
+
         $this->call(OltSeeder::class);
 
         $this->call(StatusSeeder::class);
-
-        $this->call(AdministrativeStatusSeeder::class);
         
         $this->call(SignalSeeder::class);
 
@@ -51,6 +51,10 @@ class DatabaseSeeder extends Seeder
         $this->call(DiagnosticSeeder::class);
 
         $this->call(ReportSeeder::class);
+
+        $this->call(SubscriptionStatusSeeder::class);
+
+        $this->call(BillingSeeder::class);
 
     }
 }

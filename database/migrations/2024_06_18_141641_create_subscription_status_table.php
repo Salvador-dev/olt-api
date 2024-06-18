@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('olts', function (Blueprint $table) {
-            $table->integer('olt_active')->default(0)->after('name');
-
-            $table->foreign(['olt_active'], 'olts_ibfk_8')->references(['status_id'])->on('administrative_status');
+        Schema::create('subscription_status', function (Blueprint $table) {
+            $table->bigInteger('id', true);
+            $table->integer('status_id')->unique();
+            $table->string('description');
+            $table->timestamps();
         });
     }
 
@@ -23,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('olts', function (Blueprint $table) {
-            $table->dropColumn('olt_active');
-        });
+        Schema::dropIfExists('subscription_status');
     }
 };
