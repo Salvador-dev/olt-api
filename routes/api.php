@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\BillMailController;
 use App\Http\Controllers\CapabilityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiagnosticController;
@@ -70,6 +71,9 @@ Route::middleware(['auth.key', 'auth:sanctum'])->group(function () {
 
     Route::get('/billing/listing', [BillingController::class, 'index']);
     Route::get('/billing/history', [BillingController::class, 'history']);
+    Route::patch('/billing/{id}', [BillingController::class, 'update']);
+    Route::post('/billing/history', [BillingController::class, 'storeHistory']);
+    Route::post('/billing/sendBill', [BillMailController::class, 'sendBill']);
 
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
     Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);

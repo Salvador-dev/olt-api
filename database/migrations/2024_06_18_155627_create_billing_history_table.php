@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('billing_id');
             $table->string('transaction_id');
             $table->bigInteger('user_id');
-            $table->float('amount');
+            $table->integer('months_paid');
             $table->timestamps();
 
             $table->foreign('billing_id', 'billing_history_ibfk_1')->references('id')->on('billings')->onUpdate('CASCADE')->onDelete('CASCADE');

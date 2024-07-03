@@ -10,7 +10,7 @@ class BillingHistory extends Model
     use HasFactory;
     
     protected $table = 'billing_history';
-    protected $fillable = ['billing_id', 'transaction_id', 'user_id', 'amount'];
+    protected $fillable = ['billing_id', 'transaction_id', 'user_id', 'months_paid'];
     public $timestamps = true; 
 
     public function billing()
