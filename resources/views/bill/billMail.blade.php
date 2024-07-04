@@ -1,6 +1,3 @@
-<div>
-    <!-- Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less. - Marie Curie -->
-</div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,7 +101,7 @@
                 </div>
                 <div class="col-6">
                     <div class="company-details">
-                        <p class="text-white">assdad asd  asda asdad a sd</p>
+                        <p class="text-white">Fibex Telecom</p>
                         <p class="text-white">assdad asd asd</p>
                         <p class="text-white">+91 888555XXXX</p>
                     </div>
@@ -115,16 +112,16 @@
         <div class="body-section">
             <div class="row">
                 <div class="col-6">
-                    <h2 class="heading">Invoice No.: 001</h2>
-                    <p class="sub-heading">Tracking No. fabcart2025 </p>
-                    <p class="sub-heading">Order Date: 20-20-2021 </p>
-                    <p class="sub-heading">Email Address: customer@gfmail.com </p>
+                    <h2 class="heading">Invoice No.: {{ $transaction_id }}</h2>
+                    <p class="sub-heading">Tracking No. {{ $order_date }} </p>
+                    <p class="sub-heading">Order Date: {{ $order_date }} </p>
+                    <p class="sub-heading">Email Address: {{ $email }} </p>
                 </div>
                 <div class="col-6">
                     <p class="sub-heading">Full Name: {{ $name }} </p>
-                    <p class="sub-heading">Address:  </p>
-                    <p class="sub-heading">Phone Number:  </p>
-                    <p class="sub-heading">City,State,Pincode:  </p>
+                    <p class="sub-heading">Address:  {{ $address }}</p>
+                    <p class="sub-heading">Phone Number:  {{ $telephone }}</p>
+                    <p class="sub-heading">City,State,Pincode:  {{ $city, $state, $zipCode }}</p>
                 </div>
             </div>
         </div>
@@ -142,12 +139,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($pages as $page)
+                    @foreach($items as $item)
                     <tr>
-                        <td>Product Name</td>
-                        <td>10</td>
-                        <td>1</td>
-                        <td>10</td>
+                        <td>{{ $item->item_name }}</td>
+                        <td>{{ $item->item_price }}</td>
+                        <td>{{ $item->item_quantity }}</td>
+                        <td>{{ $item->item_price * $item->item_quantity }}</td>
                     </tr>
                     @endforeach
                     <tr>
