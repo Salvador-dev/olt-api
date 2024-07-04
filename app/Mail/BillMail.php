@@ -45,8 +45,20 @@ class BillMail extends Mailable implements ShouldQueue
         return new Content(
             view: 'bill.billMail',
             with: [
+                'subject' => $this->data['subject'],
                 'name' => $this->data['name'],
-                'pages' => $this->data['pages']
+                'address' => $this->data['address'],
+                'city' => $this->data['city'],
+                'companyCode' => $this->data['companyCode'],
+                'companyName' => $this->data['companyName'],
+                'country' => $this->data['country'],
+                'email' => $this->data['email'],
+                'state' => $this->data['state'],
+                'telephone' => $this->data['telephone'],
+                'zipCode' => $this->data['zipCode'],
+                'transaction_id' => $this->data['transaction_id'],
+                'order_date' => $this->data['order_date'],
+                'items' => $this->data['items'],
             ]
         );
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\BillMail;
+use App\Models\BillingHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -11,26 +12,43 @@ class BillMailController extends Controller
 {
     public function sendBill(Request $request)
     {
-        $data = [
-            'subject' => $request->input('subject'),
-            'name' => $request->input('name'),
-            'pages' => [1=>1, 2=>2, 3=>3],
-            'file' => $request->file ?? ''
-        ];
 
-        // $pdf = PDF::loadView('bill.billMail', $data);
+        if(BillingHistory::where('transaction_id', $request->input('transaction_id'))->exists()){
 
-        // if($request->hasFile('file')){
+            $billings = BillingHistory::where('transaction_id', $request->input('transaction_id'))
+            ->join('billings', 'billings.id', 'billing_history.billing_id')
+            ->join('olts', 'billings.olt_id', 'olts.id')
+            ->select(
+                'olts.name as item_name',
+                'billings.monthly_price as item_price',
+                'billing_history.months_paid as item_quantity'
+            )->get();
 
-        //     $file = $request->file('file');
-        //     $filename = $file->getClientOriginalName();
-        //     $file->storeAs('pdfs', $filename);
-        //     $data['file'] = $filename;
+            $data = [
+                'subject' => "Fibex OLT Billing",
+                'name' => $request->input('name'),
+                'address' => $request->input('address'),
+                'city' => $request->input('city'),
+                'companyCode' => $request->input('companyCode'),
+                'companyName' => $request->input('companyName'),
+                'country' => $request->input('country'),
+                'email' => $request->input('email'),
+                'state' => $request->input('state'),
+                'telephone' => $request->input('telephone'),
+                'zipCode' => $request->input('zipCode'),
+                'transaction_id' => $request->input('transaction_id'),
+                'order_date' => $request->input('order_date'),
+                'items' => $billings,
+            ];
+    
+            Mail::to($request->input('email'))->send(new BillMail($data));
+    
+            return "MENSAJE ENVIADO";
 
-        // }
+        } else {
 
-        Mail::to($request->input('email'))->send(new BillMail($data));
-
-        return "MENSAJE ENVIADO";
+            return "No Items Found";
+        }
+     
     }
 }
