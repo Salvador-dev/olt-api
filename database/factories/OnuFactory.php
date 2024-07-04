@@ -39,7 +39,7 @@ class OnuFactory extends Factory
             'speed_profile_id' => Arr::random([$speedProfile, null]),
             'board' => (string) rand(1, 20),
             'port' => (string) rand(1, 15),
-            'administrative_status_id' => AdministrativeStatus::inRandomOrder()->first()->id
+            'administrative_status_id' => AdministrativeStatus::inRandomOrder()->first()->status_id
         ];
     }
 }
