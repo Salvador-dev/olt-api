@@ -24,6 +24,7 @@
   use App\Http\Controllers\DiagnosticController;
   use App\Http\Controllers\BillingController;
   use App\Http\Controllers\ZoneController;
+  use App\Http\Controllers\BillMailController;
   use Illuminate\Http\Request;
   use App\Http\Controllers\RoleController;
   use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
@@ -88,7 +89,11 @@
     Route::delete('/user/{id}', [UserController::class, 'destroy']);
     
     Route::get('/billing/listing', [BillingController::class, 'index']);
-    Route::get('/billing/history', [BillingController::class, 'history']);  
+    Route::get('/billing/history', [BillingController::class, 'history']);
+    Route::patch('/billing/{id}', [BillingController::class, 'update']);
+    Route::post('/billing/history', [BillingController::class, 'storeHistory']);
+    Route::post('/billing/sendBill', [BillMailController::class, 'sendBill']);
+
     Route::get('/dashboard', [DashboardController::class, 'dashboard']);
     Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
     

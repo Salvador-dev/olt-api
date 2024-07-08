@@ -65,7 +65,7 @@ class BillingSeeder extends Seeder
                     'billing_id' => $billing->id,
                     'transaction_id' => Str::random(10),
                     'user_id' => User::inRandomOrder()->first()->id,
-                    'amount' => rand(20, 700) / 10
+                    'months_paid' => 1
                 ]);
 
             }
