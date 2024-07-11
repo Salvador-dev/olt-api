@@ -16,6 +16,7 @@ use App\Http\Controllers\entity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
+use App\Http\Middleware\Cors; // Agrega la importación de tu middleware Cors
 
 
 /*
@@ -29,8 +30,12 @@ use App\Http\Controllers\RoleController;
 |
 */
 
-Route::post('company', [entity::class, 'registered']);
-Route::get('company/{id}', [entity::class, 'show']);
+
+    Route::post('company', [entity::class, 'registered']);
+    Route::get('company/{id}', [entity::class, 'show']);
+
+
+
 
 
 

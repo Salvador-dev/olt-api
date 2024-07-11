@@ -14,6 +14,9 @@ class AuthController extends Controller
 {
 
 
+    public function get(){
+        return 'data';
+    }
 
     // Metodo para registros
     public function register(Request $request)
