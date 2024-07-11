@@ -59,6 +59,7 @@ class BillMail extends Mailable implements ShouldQueue
                 'transaction_id' => $this->data['transaction_id'],
                 'order_date' => $this->data['order_date'],
                 'items' => $this->data['items'],
+                'total_amount'=> $this->data['total_amount']
             ]
         );
     }
