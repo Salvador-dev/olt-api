@@ -151,7 +151,7 @@
                     @endforeach
                     <tr>
                         <td colspan="3" class="text-right">Sub Total</td>
-                        <td>${{ total_amount }}</td>
+                        <td><b>${{ $total_amount }}</b></td>
                     </tr>
                     <!-- <tr>
                         <td colspan="3" class="text-right">Tax Total %1X</td>
