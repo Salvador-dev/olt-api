@@ -24,7 +24,7 @@ class OltSeeder extends Seeder
             Olt::create([
                 'name' => $data["name"],
                 'ip' => $data["ip"],
-                'olt_active' => 1,
+                'olt_active' => rand(0,1),
                 'olt_hardware_version_id' => HardwareVersion::inRandomOrder()->first()->id,
                 'pon_type_id' => PonType::inRandomOrder()->first()->id,
                 'olt_software_version_id' => SoftwareVersion::inRandomOrder()->first()->id,
