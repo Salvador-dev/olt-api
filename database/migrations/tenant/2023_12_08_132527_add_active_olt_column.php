@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('olts', function (Blueprint $table) {
             $table->integer('olt_active')->default(0)->after('name');
 
-            $table->foreign(['olt_active'], 'olts_ibfk_8')->references(['status_id'])->on('administrative_status');
+            // $table->foreign(['olt_active'], 'olts_ibfk_8')->references(['status_id'])->on('administrative_status');
         });
     }
 

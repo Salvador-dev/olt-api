@@ -14,7 +14,7 @@ class BillingController extends Controller
     public function index()
     {
         $data = Billing::join('olts', 'billings.olt_id', 'olts.id')
-        ->join('subscription_status', 'billings.subscription_status_id', 'subscription_status.id')
+        ->join('subscription_status', 'billings.subscription_status_id', 'subscription_status.status_id')
         ->select(
             'billings.id as id',
             'olts.name as olt_name',
@@ -26,21 +26,54 @@ class BillingController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    public function history()
+    public function history(Request $request)
     {
+        $search = $request->input("search") ?? null;
+        $oltName = $request->input("oltName") ?? null;
+        $fromDate = $request->input("fromDate") ?? null;
+        $toDate = $request->input("toDate") ?? null;
+        $orderBy = $request->input("orderBy") ?? 'DESC';
+        $pageOffset = $request->input("pageOffset") ?? 10;
+
         $data = BillingHistory::join('billings', 'billing_history.billing_id', 'billings.id')
         ->join('olts', 'billings.olt_id', 'olts.id')
         ->join('users', 'billing_history.user_id', 'users.id')
         ->join('subscription_status', 'billings.subscription_status_id', 'subscription_status.id')
         ->select(
             'olts.name as olt_name',
-            'transaction_id',
+            'transaction_id as transaction_no.',
             'users.email as user',
             'months_paid',
             'billing_history.created_at as date'
-        )->orderBy('billing_history.created_at','DESC')->get();
+        );
 
-        return response()->json(['data' => $data], 200);
+        $data = $data->orderBy('billing_history.created_at', $orderBy);
+        // $data = $data->oldest('reports.created_at');
+
+        if ($oltName) {
+            $data = $data->where('olts.name', 'LIKE', "%$oltName%");
+        }
+
+        if($fromDate){
+
+            $data = $data->where('billing_history.created_at', '>=', $fromDate . ' 00:00:00');
+
+        }
+
+        if($toDate){
+
+            $data = $data->where('billing_history.created_at', '<=', $toDate . ' 00:00:00');
+
+        }
+
+        if ($search) {
+            $data = $data->where('transaction_id', 'LIKE', "%$search%")->orWhere('users.email', 'LIKE', "%$search%");
+        
+        }
+
+        $data = $data->paginate($pageOffset);
+        
+        return response()->json($data, 200);
     }
 
     public function store(Request $request){
