@@ -10,6 +10,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Generator;
 use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class BillingSeeder extends Seeder
@@ -50,15 +51,25 @@ class BillingSeeder extends Seeder
 
         $olts = Olt::all();
 
+        $oltData = [
+            ['subscription_end_date' => $this->faker->dateTimeBetween($startDate = '-2 months', $endDate = 'now'), 'subscription_status_id' => 0], 
+            ['subscription_end_date' => $this->faker->dateTimeBetween($startDate = '+15 days', $endDate = '+2 months'), 'subscription_status_id' => 1], 
+            ['subscription_end_date' => $this->faker->dateTimeBetween($startDate = '+15 days', $endDate = '+2 months'), 'subscription_status_id' => 2], 
+            ['subscription_end_date' => $this->faker->dateTimeBetween($startDate = '+15 days', $endDate = '+2 months'), 'subscription_status_id' => 3]
+        ];
+
+
         foreach ($olts as $olt) {
 
             if($olt->olt_active){
 
+                $data = Arr::random($oltData);
+
                 $billing = Billing::create([
                     'olt_id' => $olt->id,
                     'monthly_price' => 20,
-                    'subscription_status_id' => rand(0,3),
-                    'subscription_end_date' => $this->faker->dateTimeBetween($startDate = '+1 month', $endDate = '+16 month')
+                    'subscription_status_id' => $data['subscription_status_id'],
+                    'subscription_end_date' => $data['subscription_end_date']
                 ]);
 
                 BillingHistory::create([
