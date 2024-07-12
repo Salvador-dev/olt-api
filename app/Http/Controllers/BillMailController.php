@@ -23,6 +23,14 @@ class BillMailController extends Controller
                 'billings.monthly_price as item_price',
                 'billing_history.months_paid as item_quantity'
             )->get();
+            
+            $total_amount = 0;
+
+            foreach($billings as $billing){
+
+                $total_amount += $billing->item_price * $billing->item_quantity;
+
+            }
 
             $data = [
                 'subject' => "Fibex OLT Billing",
@@ -39,6 +47,7 @@ class BillMailController extends Controller
                 'transaction_id' => $request->input('transaction_id'),
                 'order_date' => $request->input('order_date'),
                 'items' => $billings,
+                'total_amount' => $total_amount
             ];
     
             Mail::to($request->input('email'))->send(new BillMail($data));

@@ -32,7 +32,7 @@ class BillMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('soporte@olt.management', 'Smart OLT'),
+            from: new Address('soporte@olt.management', 'Fibez Olt'),
             subject: $this->data['subject'],
         );
     }
@@ -59,6 +59,7 @@ class BillMail extends Mailable implements ShouldQueue
                 'transaction_id' => $this->data['transaction_id'],
                 'order_date' => $this->data['order_date'],
                 'items' => $this->data['items'],
+                'total_amount'=> $this->data['total_amount']
             ]
         );
     }
