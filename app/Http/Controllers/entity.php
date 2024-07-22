@@ -17,7 +17,6 @@ class entity extends Controller
 
     public function registered(Request $request) {
         
-
         $id = $request->id;
         $email = $request->email;
         $password = $request->password;
@@ -26,30 +25,55 @@ class entity extends Controller
         $description = $request->description;
         $address = $request->address;
         $phone = $request->phone;
-        
 
-        $tenant = Tenant::create([
-        'id' => $id,
-        'company_fullname' => $company_fullname,
-        'rif' => $rif,
-        // 'address' => $address,
-        'description' => $description,
-        'phone' => $phone,
-        'email' => $email,
-        ]);
+        $users = [];
 
-        $tenant->domains()->create(['domain' => $id]);
+        $tenants  = Tenant::all();
+        Foreach($tenants as $tenant){
+
+            tenancy()->initialize($tenant->id);
+
+            $tenantUsers = User::all();
+
+            Foreach($tenantUsers as $user){
+
+                $users[$user->email] = $tenant->id;
     
-        Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
-            $user = User::create([
-                'name' => $id,
-                'email' => $email,
-                'password' => Hash::make($password)
-            ]);
-            $user->assignRole('admin');
-        });
+            }
+        }
 
-        return response()->json(['created company successfully' => $id], 200);
+        if(!array_key_exists($request->email, $users)){
+
+            $tenant = Tenant::create([
+                'id' => $id,
+                'company_fullname' => $company_fullname,
+                'rif' => $rif,
+                // 'address' => $address,
+                'description' => $description,
+                'phone' => $phone,
+                'email' => $email,
+                ]);
+        
+                $tenant->domains()->create(['domain' => $id]);
+            
+                Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
+                    $user = User::create([
+                        'name' => $id,
+                        'email' => $email,
+                        'password' => Hash::make($password)
+                    ]);
+                    $user->assignRole('admin');
+                });
+        
+                return response()->json(['created company successfully' => $id], 200);
+
+        } else {
+
+            return response()->json('Email ya utilizado', 500);
+
+
+        }
+        
     }
 
     public function login(Request $request){
