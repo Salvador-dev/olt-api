@@ -6,6 +6,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Facades\Tenancy;
@@ -47,8 +48,66 @@ class entity extends Controller
             ]);
             $user->assignRole('admin');
         });
-        
+
         return response()->json(['created company successfully' => $id], 200);
+    }
+
+    public function login(Request $request){
+
+        $users = [];
+
+        $tenants  = Tenant::all();
+        Foreach($tenants as $tenant){
+
+            tenancy()->initialize($tenant->id);
+
+            $tenantUsers = User::all();
+
+            Foreach($tenantUsers as $user){
+
+                $users[$user->email] = $tenant->id;
+    
+            }
+        }
+
+
+        if(array_key_exists($request->email, $users)){
+
+            tenancy()->initialize($users[$request->email]);
+            
+            $user = User::where('email', $request->email)->first();
+
+            if (!Auth::attempt($request->only('email', 'password'))) {
+
+                return response()->json(['message' => 'Email o contraseña invalidos', 'company' => $tenant->id]);
+            }
+    
+            $user = User::where('email', $request->only('email'))->firstOrFail();
+            $token = $user->createToken('auth_token')->plainTextToken;
+    
+            $roles = $user->getRoleNames(); // Returns a collection
+    
+            if ($roles->isNotEmpty()) {
+    
+                $user->{'role'} = $roles[0];
+    
+            } else {
+    
+                $user->{'role'} = '';
+    
+            }
+    
+            unset($user->roles);
+    
+            return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer', 'company'=>$users[$request->email]], 200);
+           
+
+        } else {
+
+            return response()->json(['message' => 'Email o contraseña invalidos']);
+
+        }
+
     }
     
    
