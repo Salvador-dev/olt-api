@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -36,23 +37,52 @@ class UserController extends Controller
     // Método para crear un nuevo usuario
     public function store(Request $request)
     {
-        $user = new User;
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->password = bcrypt($request->input('password'));
-        $user->save();
 
-        if($request->input('role')){
+        $users = [];
 
-            $user->assignRole($request->input('role'));
+        $tenants  = Tenant::all();
+        Foreach($tenants as $tenant){
+
+            tenancy()->initialize($tenant->id);
+
+            $tenantUsers = User::all();
+
+            Foreach($tenantUsers as $user){
+
+                $users[$user->email] = $tenant->id;
+    
+            }
+        }
+
+        if(!array_key_exists($request->email, $users)){
+
+            tenancy()->initialize($request->company);
+
+            $user = new User;
+            $user->name = $request->input('name');
+            $user->email = $request->input('email');
+            $user->password = bcrypt($request->input('password'));
+            $user->save();
+
+            if($request->input('role')){
+
+                $user->assignRole($request->input('role'));
+
+            } else {
+
+                $user->assignRole('consulta');
+
+            }
+
+            return response()->json($user, 201);
 
         } else {
 
-            $user->assignRole('consulta');
+            return response()->json('Email ya utilizado', 500);
+
 
         }
 
-        return response()->json($user, 201);
     }
 
     // Método para obtener un usuario por su ID
@@ -103,11 +133,11 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
 
-        $permissions = $user->getPermissionsViaRoles()->pluck('name'); // Returns a collection
-
         if (!$user) {
             return back()->with('error', 'Usuario no encontrado');
         }
+
+        $permissions = $user->getPermissionsViaRoles()->pluck('name'); // Returns a collection
 
         return $permissions;
     }

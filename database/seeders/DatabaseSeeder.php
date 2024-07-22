@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(RoleSeeder::class);
 
-        $this->call(UserSeeder::class);
+        // $this->call(UserSeeder::class);
 
         $this->call(HardwareVersionSeeder::class);
 
@@ -52,11 +52,11 @@ class DatabaseSeeder extends Seeder
         
         $this->call(DiagnosticSeeder::class);
 
-        $this->call(ReportSeeder::class);
+        // $this->call(ReportSeeder::class);
 
         $this->call(SubscriptionStatusSeeder::class);
 
-        $this->call(BillingSeeder::class);
+        // $this->call(BillingSeeder::class);
 
     }
 }
