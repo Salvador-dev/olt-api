@@ -13,6 +13,6 @@ class OnuSeeder extends Seeder
      */
     public function run(): void
     {
-        Onu::factory(20)->create();
+        Onu::factory(200)->create();
     }
 }

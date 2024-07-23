@@ -13,7 +13,7 @@ class ReportSeeder extends Seeder
     public function run(): void
     {
         
-        Report::factory(20)->create();
+        Report::factory(100)->create();
 
     }
 }
