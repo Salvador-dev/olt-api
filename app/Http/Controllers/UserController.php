@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -38,23 +39,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        $users = [];
+        $emails = DB::connection('mysql')->select('select * from login_emails where email = ?', [$request->email]);
 
-        $tenants  = Tenant::all();
-        Foreach($tenants as $tenant){
-
-            tenancy()->initialize($tenant->id);
-
-            $tenantUsers = User::all();
-
-            Foreach($tenantUsers as $user){
-
-                $users[$user->email] = $tenant->id;
-    
-            }
-        }
-
-        if(!array_key_exists($request->email, $users)){
+        if(empty($emails)){
 
             tenancy()->initialize($request->company);
 
@@ -74,12 +61,15 @@ class UserController extends Controller
 
             }
 
+            $currentDB = DB::connection()->getDatabaseName();
+            $tenant = explode('tenant', $currentDB)[1];
+            DB::connection('mysql')->insert('insert into login_emails (email, company) values (?, ?)', [$user->email, $tenant]);
+
             return response()->json($user, 201);
 
         } else {
 
             return response()->json('Email ya utilizado', 500);
-
 
         }
 
@@ -151,6 +141,8 @@ class UserController extends Controller
             return back()->with('error', 'Usuario no encontrado');
         }
 
+        $oldEmail = $user->email;
+
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         if($request->input('password')){
@@ -168,6 +160,12 @@ class UserController extends Controller
 
         $user->assignRole($request->input('role'));
 
+        $emails = DB::connection('mysql')->select('select * from login_emails where email = ?', [$oldEmail]);
+
+        if(!empty($emails)){
+            DB::connection('mysql')->update('update login_emails set email = ? where email = ?', [$request->email, $oldEmail]);
+        }
+
         return response()->json($user, 200);
     }
 
@@ -181,6 +179,8 @@ class UserController extends Controller
             return back()->with('error', 'Usuario no encontrado');
         }
 
+        $oldEmail = $user->email;
+
         $roles = $user->getRoleNames(); // Returns a collection
 
         if($roles->isNotEmpty()){
@@ -190,6 +190,12 @@ class UserController extends Controller
         }
 
         $user->delete();
+
+        $emails = DB::connection('mysql')->select('select * from login_emails where email = ?', [$oldEmail]);
+
+        if(!empty($emails)){
+            DB::connection('mysql')->delete('delete from login_emails where email = ?', [$oldEmail]);
+        }
 
         return response()->json('Usuario eliminado', 200);
     }

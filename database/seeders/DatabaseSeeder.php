@@ -18,11 +18,16 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
+        $this->call(SuperAdminRoleSeeder::class);
+
         $user = User::create([
             'name' => 'Thomas ADMIN',
             'email' => 'admin@admin.com',
             'password' => Hash::make('12345678'),
         ]);
+
+        $user->assignRole('super admin');
+
 
     }
 }

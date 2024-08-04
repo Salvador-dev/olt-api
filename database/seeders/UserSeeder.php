@@ -27,6 +27,8 @@ class UserSeeder extends Seeder
 
         $user->assignRole('admin');
 
+        DB::connection('mysql')->insert('insert into login_emails (email, company) values (?, ?)', [$user->email, $tenant]);
+
         $user = User::create([
             'name' => 'Thomas USUARIO',
             'email' => 'usuario@' . $tenant . '.com',
@@ -34,6 +36,8 @@ class UserSeeder extends Seeder
         ]);
 
         $user->assignRole('usuario');
+
+        DB::connection('mysql')->insert('insert into login_emails (email, company) values (?, ?)', [$user->email, $tenant]);
 
         $user = User::create([
             'name' => 'Thomas CONSULTA',
@@ -43,6 +47,7 @@ class UserSeeder extends Seeder
 
         $user->assignRole('consulta');
 
+        DB::connection('mysql')->insert('insert into login_emails (email, company) values (?, ?)', [$user->email, $tenant]);
 
     }
 }
