@@ -25,6 +25,7 @@ use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\BillMailController;
+use App\Http\Controllers\entity;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\super_admin\SuperAdminController;
@@ -44,15 +45,28 @@ use App\Http\Middleware\Cors;
   |
   */
 
-/* Route::get('/', function () {
-      dd(tenant('id'));
-      return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
-  }); */
+//  Route::get('/', function () {
+//       dd(tenant('id'));
+//       return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
+//   }); 
+  
+
+Route::middleware([
+  'auth.key',
+  // 'auth:sanctum',
+])->prefix('admin')->group(function () {
+
+  Route::get('/tenants', [SuperAdminController::class, 'getTenants']);
+  Route::get('/user/permissions/{id}', [UserController::class, 'getPermissions']);
+
+});
 
 
 Route::middleware(['tenant', InitializeTenancyByPath::class])
     ->prefix('{tenant}')
     ->group(function () {
+
+        Route::get('logout', [entity::class, 'logout']);
 
         Route::middleware([
             'auth.key',
@@ -183,8 +197,6 @@ Route::middleware(['tenant', InitializeTenancyByPath::class])
             Route::get('/get/snmp/mode/{id}', [SnmpController::class, 'onuMode']);
             Route::get('/get/snmp/onu/{id}', [SnmpController::class, 'onusRegister']);
 
-
-            Route::get('logout', [AuthController::class, 'logout']);
         });
     });
   

@@ -65,54 +65,73 @@ class entity extends Controller
         
     }
 
-    // public function logout(Request $request){
+    public function logout(Request $request){
 
-    //     tenancy()->end();
+        tenancy()->end();
 
-    //     return response()->json(['Logout successfully'], 200);
+        Auth::logout();
+        
+        return response()->json(['Logout successfully'], 200);
 
-    // }
+    }
 
     public function login(Request $request){
 
         $tenant = DB::select('select * from login_emails where email = ?', [$request->email]);
 
+        $response = ['token_type' => 'Bearer'];
+
         if(isset($tenant[0])){
 
             tenancy()->initialize($tenant[0]->company);
             
-            $user = User::where('email', $request->email)->first();
-
             if (!Auth::attempt($request->only('email', 'password'))) {
 
                 return response()->json(['message' => 'Email o contraseña invalidos']);
             }
     
             $user = User::where('email', $request->only('email'))->firstOrFail();
-            $token = $user->createToken('auth_token')->plainTextToken;
-    
-            $roles = $user->getRoleNames(); // Returns a collection
-    
-            if ($roles->isNotEmpty()) {
-    
-                $user->{'role'} = $roles[0];
-    
-            } else {
-    
-                $user->{'role'} = '';
-    
-            }
-    
-            unset($user->roles);
-    
-            return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer', 'company'=>$tenant[0]->company], 200);
-           
+
+            $response['company'] = $tenant[0]->company;
 
         } else {
 
-            return response()->json(['message' => 'Email o contraseña invalidos']);
+            $user = User::where('email', $request->only('email'))->firstOrFail();
+
+            if (!$user) {
+                return back()->with('error', 'Email o contraseña invalidos');
+            }
+
+            if (!Auth::attempt($request->only('email', 'password'))) {
+
+                return response()->json(['message' => 'Email o contraseña invalidos']);
+            }
+
+            $response['company'] = 'admin';
 
         }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response['access_token'] = $token;
+    
+        $roles = $user->getRoleNames(); // Returns a collection
+
+        if ($roles->isNotEmpty()) {
+
+            $user->{'role'} = $roles[0];
+
+        } else {
+
+            $user->{'role'} = '';
+
+        }
+
+        unset($user->roles);
+
+        $response['data'] = $user;
+
+        return response()->json($response, 200);
 
     }
     
