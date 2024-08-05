@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Facades\Tenancy;
@@ -26,23 +27,10 @@ class entity extends Controller
         $address = $request->address;
         $phone = $request->phone;
 
-        $users = [];
+        $tenants = DB::select('select * from login_emails where id = ?', [$id]);
+        $emails = DB::select('select * from login_emails where email = ?', [$email]);
 
-        $tenants  = Tenant::all();
-        Foreach($tenants as $tenant){
-
-            tenancy()->initialize($tenant->id);
-
-            $tenantUsers = User::all();
-
-            Foreach($tenantUsers as $user){
-
-                $users[$user->email] = $tenant->id;
-    
-            }
-        }
-
-        if(!array_key_exists($request->email, $users)){
+        if(empty($tenants) && empty($emails)){
 
             $tenant = Tenant::create([
                 'id' => $id,
@@ -52,85 +40,98 @@ class entity extends Controller
                 'description' => $description,
                 'phone' => $phone,
                 'email' => $email,
+            ]);
+        
+            $tenant->domains()->create(['domain' => $id]);
+        
+            Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
+                $user = User::create([
+                    'name' => $id,
+                    'email' => $email,
+                    'password' => Hash::make($password)
                 ]);
-        
-                $tenant->domains()->create(['domain' => $id]);
-            
-                Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
-                    $user = User::create([
-                        'name' => $id,
-                        'email' => $email,
-                        'password' => Hash::make($password)
-                    ]);
-                    $user->assignRole('admin');
-                });
-        
-                return response()->json(['created company successfully' => $id], 200);
+                $user->assignRole('admin');
+            });
+
+            DB::insert('insert into login_emails (email, company) values (?, ?)', [$email, $id]);
+    
+            return response()->json(['created company successfully' => $id], 200);
 
         } else {
 
-            return response()->json('Email ya utilizado', 500);
-
+            return response()->json('El email o la empresa ya han sido registrados', 500);
 
         }
         
     }
 
+    public function logout(Request $request){
+
+        tenancy()->end();
+
+        Auth::logout();
+        
+        return response()->json(['Logout successfully'], 200);
+
+    }
+
     public function login(Request $request){
 
-        $users = [];
+        $tenant = DB::select('select * from login_emails where email = ?', [$request->email]);
 
-        $tenants  = Tenant::all();
-        Foreach($tenants as $tenant){
+        $response = ['token_type' => 'Bearer'];
 
-            tenancy()->initialize($tenant->id);
+        if(isset($tenant[0])){
 
-            $tenantUsers = User::all();
-
-            Foreach($tenantUsers as $user){
-
-                $users[$user->email] = $tenant->id;
-    
-            }
-        }
-
-
-        if(array_key_exists($request->email, $users)){
-
-            tenancy()->initialize($users[$request->email]);
+            tenancy()->initialize($tenant[0]->company);
             
-            $user = User::where('email', $request->email)->first();
-
             if (!Auth::attempt($request->only('email', 'password'))) {
 
-                return response()->json(['message' => 'Email o contraseña invalidos', 'company' => $tenant->id]);
+                return response()->json(['message' => 'Email o contraseña invalidos']);
             }
     
             $user = User::where('email', $request->only('email'))->firstOrFail();
-            $token = $user->createToken('auth_token')->plainTextToken;
-    
-            $roles = $user->getRoleNames(); // Returns a collection
-    
-            if ($roles->isNotEmpty()) {
-    
-                $user->{'role'} = $roles[0];
-    
-            } else {
-    
-                $user->{'role'} = '';
-    
-            }
-    
-            unset($user->roles);
-    
-            return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer', 'company'=>$users[$request->email]], 200);
-           
+
+            $response['company'] = $tenant[0]->company;
 
         } else {
 
-            return response()->json(['message' => 'Email o contraseña invalidos']);
+            $user = User::where('email', $request->only('email'))->firstOrFail();
+
+            if (!$user) {
+                return back()->with('error', 'Email o contraseña invalidos');
+            }
+
+            if (!Auth::attempt($request->only('email', 'password'))) {
+
+                return response()->json(['message' => 'Email o contraseña invalidos']);
+            }
+
+            $response['company'] = 'admin';
 
         }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response['access_token'] = $token;
+    
+        $roles = $user->getRoleNames(); // Returns a collection
+
+        if ($roles->isNotEmpty()) {
+
+            $user->{'role'} = $roles[0];
+
+        } else {
+
+            $user->{'role'} = '';
+
+        }
+
+        unset($user->roles);
+
+        $response['data'] = $user;
+
+        return response()->json($response, 200);
 
     }
     
