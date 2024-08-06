@@ -57,7 +57,7 @@ Route::middleware([
 ])->prefix('admin')->group(function () {
 
   Route::get('/tenants', [SuperAdminController::class, 'getTenants']);
-  Route::get('/user/permissions/{id}', [UserController::class, 'getPermissions']);
+  Route::get('/permissions/{id}', [UserController::class, 'getPermissions']);
 
 });
 
