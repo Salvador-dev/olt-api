@@ -17,52 +17,63 @@ class entity extends Controller
    
 
     public function registered(Request $request) {
-        
-        $id = $request->id;
-        $email = $request->email;
-        $password = $request->password;
-        $company_fullname = $request->company_fullname;
-        $rif = $request->rif;
-        $description = $request->description;
-        $address = $request->address;
-        $phone = $request->phone;
 
-        $tenants = DB::select('select * from login_emails where id = ?', [$id]);
-        $emails = DB::select('select * from login_emails where email = ?', [$email]);
+        try {
 
-        if(empty($tenants) && empty($emails)){
-
-            $tenant = Tenant::create([
-                'id' => $id,
-                'company_fullname' => $company_fullname,
-                'rif' => $rif,
-                // 'address' => $address,
-                'description' => $description,
-                'phone' => $phone,
-                'email' => $email,
-            ]);
-        
-            $tenant->domains()->create(['domain' => $id]);
-        
-            Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
-                $user = User::create([
-                    'name' => $id,
-                    'email' => $email,
-                    'password' => Hash::make($password)
-                ]);
-                $user->assignRole('admin');
-            });
-
-            DB::insert('insert into login_emails (email, company) values (?, ?)', [$email, $id]);
+            $id = $request->id;
+            $email = $request->email;
+            $password = $request->password;
+            $company_fullname = $request->company_fullname;
+            $rif = $request->rif;
+            $description = $request->description;
+            $address = $request->address;
+            $phone = $request->phone;
     
-            return response()->json(['created company successfully' => $id], 200);
+            $tenants = DB::select('select * from login_emails where id = ?', [$id]);
+            $emails = DB::select('select * from login_emails where email = ?', [$email]);
+    
+            if(empty($tenants) && empty($emails)){
 
-        } else {
+                // DB::beginTransaction();
+    
+                $tenant = Tenant::create([
+                    'id' => $id,
+                    'company_fullname' => $company_fullname,
+                    'rif' => $rif,
+                    // 'address' => $address,
+                    'description' => $description,
+                    'phone' => $phone,
+                    'email' => $email,
+                ]);
+            
+                $tenant->domains()->create(['domain' => $id]);
+            
+                Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password) {
+                    $user = User::create([
+                        'name' => $id,
+                        'email' => $email,
+                        'password' => Hash::make($password)
+                    ]);
+                    $user->assignRole('admin');
+                });
+    
+                // DB::commit();
 
-            return response()->json('El email o la empresa ya han sido registrados', 500);
+                DB::connection('mysql')->insert('insert into login_emails (email, company) values (?, ?)', [$email, $id]);
 
+                return response()->json(['created company successfully' => $id], 200);
+    
+            } else {
+    
+                return response()->json('El email o la empresa ya han sido registrados', 500);
+    
+            }
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
         }
-        
+         
     }
 
     public function logout(Request $request){
