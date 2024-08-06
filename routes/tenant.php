@@ -66,8 +66,6 @@ Route::middleware(['tenant', InitializeTenancyByPath::class])
     ->prefix('{tenant}')
     ->group(function () {
 
-        Route::get('logout', [entity::class, 'logout']);
-
         Route::middleware([
             'auth.key',
             'auth:sanctum',
