@@ -107,18 +107,18 @@ class entity extends Controller
 
         } else {
 
-            $user = User::where('email', $request->only('email'))->firstOrFail();
+            $user = User::where('email', $request->only('email'))->first();
 
-            if (!$user) {
-                return back()->with('error', 'Email o contraseña invalidos');
-            }
-
-            if (!Auth::attempt($request->only('email', 'password'))) {
-
+            if($user) {
+                if (Auth::attempt($request->only('email', 'password'))) {
+                    $response['company'] = 'admin';
+                } else {
+                    return response()->json(['message' => 'Email o contraseña invalidos']);
+                } 
+            } else {
                 return response()->json(['message' => 'Email o contraseña invalidos']);
             }
 
-            $response['company'] = 'admin';
 
         }
 
