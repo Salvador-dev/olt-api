@@ -31,8 +31,8 @@ use App\Http\Middleware\Cors;
 |
 */
 
+    Route::get('company/{id}', [entity::class, 'show']);
     Route::post('company', [entity::class, 'registered']);
     Route::post('login', [entity::class, 'login']);
     Route::get('logout', [entity::class, 'logout']);
-    Route::get('company/{id}', [entity::class, 'show']);
 

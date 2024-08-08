@@ -198,6 +198,6 @@ return [
      */
     'seeder_parameters' => [
         // 'seed_after_migration' => true,
-        'class' => 'TenantSeeder',// root seeder class
+        'class' => 'TenantSeeder',
     ],
 ];
