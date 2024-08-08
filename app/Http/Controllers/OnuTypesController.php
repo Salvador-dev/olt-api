@@ -93,7 +93,7 @@ class OnuTypesController extends Controller
             'ethernet_ports' => $request['ethernet_ports'],
             'wifi_ports' => $request['wifi_ports'],
             'voip_ports' => $request['voip_ports'],
-            'catv' => $request['catv'],
+            'catv' => 1,
             'allow_custom_profiles' => $request['allow_custom_profiles']
         ]);
         return response()->json(['data' => $data], 200);
