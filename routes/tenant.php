@@ -56,7 +56,11 @@ Route::middleware([
   // 'auth:sanctum',
 ])->prefix('admin')->group(function () {
 
-  Route::get('/tenants', [SuperAdminController::class, 'getTenants']);
+  Route::get('/companies/listing', [SuperAdminController::class, 'index']);
+  Route::post('/companies', [entity::class, 'registered']);
+  Route::get('/companies/{id}', [SuperAdminController::class, 'show']);
+  Route::patch('/companies/{id}', [SuperAdminController::class, 'update']);
+  Route::delete('/companies/{id}', [SuperAdminController::class, 'destroy']);
   Route::get('/permissions/{id}', [UserController::class, 'getPermissions']);
 
 });

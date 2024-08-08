@@ -452,14 +452,13 @@ class OnuController extends Controller
 
         $data->name = $request->input('name');
         $data->unique_external_id = $request->input('unique_external_id');
-        $data->pon_type_id = $request->input('pon_type_id');
         $data->serial = $request->input('serial');
         $data->onu_type_id = $request->input('onu_type_id');
         $data->olt_id = $request->input('olt_id');
         $data->board = $request->input('board');
         $data->port = $request->input('port');
         $data->odb_id = $request->input('odb_id');
-        $data->mode = $request->input('mode');
+        // $data->mode = $request->input('mode');
         $data->speed_profile_id = $request->input('speed_profile_id');
         $data->zone_id = $request->input('zone_id');
         $data->authorization_date = now();

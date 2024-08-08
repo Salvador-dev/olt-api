@@ -27,7 +27,7 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Ver pantallas', 'guard_name' => 'sanctum']);
  
 
-        Role::create(['name' => 'admin', 'guard_name' => 'sanctum'])->syncPermissions(['Administrar permisos', 'Administrar roles', 'Administrar Usuarios', 'Autorizar onus', 'Editar registros', 'Eliminar registros', 'Crear registros', 'Acceder a reportes', 'Configurar sistema', 'Ver pantallas', ]);
+        Role::create(['name' => 'admin', 'guard_name' => 'sanctum'])->syncPermissions(['Administrar permisos', 'Administrar roles', 'Administrar Usuarios', 'Autorizar onus', 'Editar registros', 'Eliminar registros', 'Crear registros', 'Acceder a reportes', 'Configurar sistema', 'Ver pantallas']);
         Role::create(['name' => 'usuario', 'guard_name' => 'sanctum'])->syncPermissions(['Crear registros', 'Ver pantallas', 'Administrar Usuarios', 'Acceder a reportes']);
         Role::create(['name' => 'consulta', 'guard_name' => 'sanctum'])->syncPermissions(['Ver pantallas']);
     }

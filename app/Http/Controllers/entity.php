@@ -26,7 +26,7 @@ class entity extends Controller
             $company_fullname = $request->company_fullname;
             $rif = $request->rif;
             $description = $request->description;
-            $address = $request->address;
+            // $address = $request->address;
             $phone = $request->phone;
     
             $tenants = DB::select('select * from login_emails where id = ?', [$id]);
@@ -65,7 +65,7 @@ class entity extends Controller
     
             } else {
     
-                return response()->json('El email o la empresa ya han sido registrados', 500);
+                return response()->json(['message' => 'El email o la empresa ya han sido registrados'], 500);
     
             }
 
@@ -118,7 +118,6 @@ class entity extends Controller
             } else {
                 return response()->json(['message' => 'Email o contraseña invalidos']);
             }
-
 
         }
 
