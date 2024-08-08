@@ -33,8 +33,8 @@ class SpeedProfileController extends Controller
         $speedProfile = new SpeedProfile();
         $speedProfile->name = $request->input('name');
         $speedProfile->type_conexion = $request->input('type_conexion');
-        $speedProfile->speed = $request->input('upload_speed');
-        $speedProfile->speed = $request->input('download_speed');
+        $speedProfile->upload_speed = $request->input('upload_speed');
+        $speedProfile->download_speed = $request->input('download_speed');
         $speedProfile->use_prefix = $request->input('use_prefix');
         $speedProfile->save();
     
