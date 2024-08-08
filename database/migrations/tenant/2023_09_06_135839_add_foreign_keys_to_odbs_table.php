@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('odbs', function (Blueprint $table) {
-            $table->foreign(['zone_id'], 'odbs_ibfk_1')->references(['id'])->on('zones');
+            $table->foreign(['zone_id'], 'odbs_ibfk_1')->references(['id'])->on('zones')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
