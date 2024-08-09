@@ -92,7 +92,7 @@ class entity extends Controller
 
         $response = ['token_type' => 'Bearer'];
 
-        if(isset($tenant[0])){
+        if(isset($tenant[0]) && $tenant[0]->company != 'admin'){
 
             tenancy()->initialize($tenant[0]->company);
             
