@@ -303,6 +303,7 @@ class OnuController extends Controller
             'service_port_cvlan' => $request['service_port_cvlan'],
             'service_port_svlan' => $request['service_port_svlan'],
             'service_port_tag_transform_mode' => $request['service_port_tag_transform_mode'],
+            'administrative_status_id' => 1
         ]);
 
         return response()->json(['data' => $data], 200);

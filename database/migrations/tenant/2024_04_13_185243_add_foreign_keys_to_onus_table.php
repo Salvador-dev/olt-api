@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::table('onus', function (Blueprint $table) {
 
-            $table->foreign(['speed_profile_id'], 'onus_ibfk_9')->references(['id'])->on('speed_profiles');
-            $table->foreign(['administrative_status_id'], 'onus_ibfk_11')->references(['status_id'])->on('administrative_status');
+            $table->foreign(['speed_profile_id'], 'onus_ibfk_9')->references(['id'])->on('speed_profiles')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign(['administrative_status_id'], 'onus_ibfk_11')->references(['status_id'])->on('administrative_status')->onUpdate('cascade')->onDelete('cascade');
 
         });
     }

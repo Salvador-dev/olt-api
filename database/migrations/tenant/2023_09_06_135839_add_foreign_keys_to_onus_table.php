@@ -33,12 +33,9 @@ return new class extends Migration
         Schema::table('onus', function (Blueprint $table) {
             $table->dropForeign('onus_ibfk_1');
             $table->dropForeign('onus_ibfk_5');
-            $table->dropForeign('onus_ibfk_7');
             $table->dropForeign('onus_ibfk_4');
             $table->dropForeign('onus_ibfk_6');
-            $table->dropForeign('onus_ibfk_10');
-            $table->dropForeign('onus_ibfk_8');
-            $table->dropForeign('onus_ibfk_9');
+         
         });
     }
 };
