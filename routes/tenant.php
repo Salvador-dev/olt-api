@@ -72,7 +72,7 @@ Route::middleware(['tenant', InitializeTenancyByPath::class])
 
         Route::middleware([
             'auth.key',
-            // 'auth:sanctum',
+            'auth:sanctum',
         ])->group(function () {
             Route::post('change/password', [AuthController::class, 'changePassword']);
 

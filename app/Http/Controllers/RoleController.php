@@ -23,10 +23,12 @@ class RoleController extends Controller
     {
         $role = new Role;
         $role->name = $request->input('name');
-        $role->save();
 
         $permissions = $request->input('permissions');
         $role->syncPermissions($permissions);
+
+        $role->save();
+
 
         return response()->json($role, 201);
     }
@@ -35,7 +37,7 @@ class RoleController extends Controller
     public function show($id)
     {
 
-        $role = Role::findOrFail($id)->with('permissions')->get();
+        $role = Role::where('id', $id)->with('permissions')->get();
 
         if (!$role) {
             return back()->with('error', 'Rol no encontrado');
@@ -63,8 +65,7 @@ class RoleController extends Controller
     }
 
     // Método para eliminar un rol
-    public function destroy($id)
-    {
+    public function destroy($id){
         $role = Role::findOrFail($id);
 
         if (!$role) {
