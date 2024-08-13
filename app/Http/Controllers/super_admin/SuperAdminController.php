@@ -4,8 +4,11 @@ namespace App\Http\Controllers\super_admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Stancl\Tenancy\Facades\Tenancy;
 
 class SuperAdminController extends Controller
 {
@@ -47,24 +50,48 @@ class SuperAdminController extends Controller
         }   
 
         $oldEmail = $data->email;
-        $oldEmail = $data->email;
 
-        $data->id = $request->input('id');
+        $data->id = $request->input('company_fullname');
         $data->company_fullname = $request->input('company_fullname');
         $data->email = $request->input('email');
         $data->phone = $request->input('phone');
         $data->rif = $request->input('rif');
 
-        if($request->input('password')){
-            $data->password = bcrypt($request->input('password'));        
+        $email = $request->input('email');
+        $password = $request->input('password');
+
+        if($password){
+            
+            Tenancy::find($id)->run(function ($tenant) use ($id, $email, $password, $oldEmail) {
+
+                $user = User::where('email', $oldEmail)->first();
+                
+                \Illuminate\Support\Facades\Log::debug($user);
+
+
+                if (!$user) {
+                    return back()->with('error', 'Registro no encontrado');
+                }  
+
+                $user->email = $email;
+                $user->password = bcrypt($password);     
+
+                $user->save();
+            });
         }
+
         $data->save();
 
         $emails = DB::connection('mysql')->select('select * from login_emails where email = ?', [$oldEmail]);
 
         if(!empty($emails)){
-            DB::connection('mysql')->update('update login_emails set email = ? where email = ?', [$request->email, $oldEmail]);
-            DB::connection('mysql')->update('update login_emails set company = ? where email = ?', [$request->id, $oldEmail]);
+            DB::connection('mysql')->update('update login_emails set email = ?, company = ? where email = ?', [$request->email, $request->company_fullname, $oldEmail]);
+        }
+
+        $companies = DB::connection('mysql')->select('select * from login_emails where company = ?', [$id]);
+
+        if(!empty($companies)){
+            DB::connection('mysql')->update('update login_emails set company = ? where company = ?', [$request->company_fullname, $id]);
         }
 
         return response()->json($data, 200);
