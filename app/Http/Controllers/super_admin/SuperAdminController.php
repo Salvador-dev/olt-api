@@ -51,11 +51,8 @@ class SuperAdminController extends Controller
 
         $oldEmail = $data->email;
 
-        $data->id = $request->input('company_fullname');
-        $data->company_fullname = $request->input('company_fullname');
         $data->email = $request->input('email');
         $data->phone = $request->input('phone');
-        $data->rif = $request->input('rif');
 
         $email = $request->input('email');
         $password = $request->input('password');
@@ -85,13 +82,7 @@ class SuperAdminController extends Controller
         $emails = DB::connection('mysql')->select('select * from login_emails where email = ?', [$oldEmail]);
 
         if(!empty($emails)){
-            DB::connection('mysql')->update('update login_emails set email = ?, company = ? where email = ?', [$request->email, $request->company_fullname, $oldEmail]);
-        }
-
-        $companies = DB::connection('mysql')->select('select * from login_emails where company = ?', [$id]);
-
-        if(!empty($companies)){
-            DB::connection('mysql')->update('update login_emails set company = ? where company = ?', [$request->company_fullname, $id]);
+            DB::connection('mysql')->update('update login_emails set email = ? where email = ?', [$request->email, $oldEmail]);
         }
 
         return response()->json($data, 200);
