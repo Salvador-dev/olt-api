@@ -64,10 +64,23 @@ class OnuController extends Controller
                 'onus.authorization_date',
             );
 
-        $data = $data->orderBy('onus.updated_at', $orderBy)
-            ->search($search)
-            ->port($port)
-            ->board($board);
+        $data = $data->orderBy('onus.updated_at', $orderBy);
+            // ->search($search)
+            // ->port($port)
+            // ->board($board);
+
+        if($search){
+            return $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
+        }
+
+
+        if($port){
+            return $data->where('port', $port);
+        }
+
+        if($board){
+            return $data->where('board', $board);
+        }
 
         if ($status) {
             $data = $data->where('status.description', $status);
@@ -154,10 +167,27 @@ class OnuController extends Controller
                 'onus.authorization_date',
             );
 
-        $data = $data->orderBy('onus.updated_at', $orderBy)
-            ->search($search)
-            ->port($port)
-            ->board($board);
+        $data = $data->orderBy('onus.updated_at', $orderBy);
+            // ->search($search)
+            // ->port($port)
+            // ->board($board);
+
+        if($search){
+            return $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
+        }
+
+
+        if($port){
+            return $data->where('port', $port);
+        }
+
+        if($board){
+            return $data->where('board', $board);
+        }
+
+        // if($date){
+        //     return $data->where('created_at', '>=', now()->subDays($date));
+        // }
 
         if ($status) {
             $data = $data->where('status.description', $status);
@@ -221,8 +251,12 @@ class OnuController extends Controller
             );
 
 
-        $data = $data->orderBy('id', $orderBy)
-        ->search($search);
+        $data = $data->orderBy('id', $orderBy);
+        // ->search($search);
+
+        if($search){
+            return $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
+        }
  
         if ($oltName) {
             $data = $data->where('olts.name', 'LIKE', "%$oltName%");
