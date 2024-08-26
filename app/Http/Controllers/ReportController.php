@@ -19,7 +19,7 @@ class ReportController extends Controller
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
-        $data = Report::join('onus', 'reports.onu_id', 'onus.id')
+        $data = DB::table('reports')->join('onus', 'reports.onu_id', 'onus.id')
             ->leftJoin('users', 'reports.user_id', 'users.id')
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->select(
@@ -91,7 +91,7 @@ class ReportController extends Controller
 
             array_push($labels, $day->toDateString());
 
-            $data = Report::where('action', 'Authorized')->whereDate('created_at', $day)->count();
+            $data = DB::table('reports')->where('action', 'Authorized')->whereDate('created_at', $day)->count();
 
             array_push($authorizationsPerDay, $data);
 

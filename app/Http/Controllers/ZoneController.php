@@ -12,7 +12,7 @@ class ZoneController extends Controller
     public function getData()
     {
         // Usando el método all() ya que es más simple y directo
-        $data = Zone::select('id', 'name')->get();
+        $data = DB::table('zones')->select('id', 'name')->get();
 
         return response()->json(['data' => $data], 200);
     }

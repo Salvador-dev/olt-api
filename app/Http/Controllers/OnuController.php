@@ -38,7 +38,7 @@ class OnuController extends Controller
         $pageOffset = $request->input("pageOffset") ?? 10;
 
 
-        $data = Onu::join('olts', 'onus.olt_id', 'olts.id')
+        $data = DB::table('onus')->join('olts', 'onus.olt_id', 'olts.id')
             ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
             ->join('status', 'diagnostics.status_id', 'status.id')
             ->join('signal', 'diagnostics.signal_id', 'signal.id')
@@ -124,7 +124,7 @@ class OnuController extends Controller
         $pageOffset = $request->input("pageOffset") ?? 10;
 
 
-        $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+        $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
             // ->where('administrative_status.description', 'Enabled') // TODO verificar si se quieren ver onus desactivadas en seccion de configuradas
             ->where('onus.speed_profile_id', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
@@ -204,7 +204,7 @@ class OnuController extends Controller
         $oltName = $request->input("oltName") ?? null;
 
 
-        $data = Onu::join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+        $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
             ->where('speed_profile_id', null)
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
@@ -483,7 +483,7 @@ class OnuController extends Controller
 
     public function showByOlt($id)
     {
-        $data = Onu::where('olt_id', $id)->get();
+        $data = DB::table('onus')->where('olt_id', $id)->get();
         return response()->json(['data' => $data], 200);
     }
 

@@ -10,7 +10,7 @@ class CapabilityController extends Controller
 {
     public function getData()
     {
-        $data = Capability::select('id', 'name')->get();
+        $data = DB::table('capabilitys')->select('id', 'name')->get();
         return response()->json(['data' => $data], 200);
     }
 

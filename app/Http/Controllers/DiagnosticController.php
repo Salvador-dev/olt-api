@@ -26,7 +26,7 @@ class DiagnosticController extends Controller
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
-        $data = Diagnostic::join('onus', 'diagnostics.onu_id', 'onus.id')
+        $data = DB::table('diagnostics')->join('onus', 'diagnostics.onu_id', 'onus.id')
             ->where('onus.speed_profile_id', '!=',  null)
             ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('status', 'diagnostics.status_id', 'status.id')

@@ -14,7 +14,7 @@ class SpeedProfileController extends Controller
     //
     public function getData()
     {
-        $data = SpeedProfile::select('id', 'name', 'upload_speed', 'download_speed', 'type_conexion', 'use_prefix')->get();
+        $data = DB::table('speed_profiles')->select('id', 'name', 'upload_speed', 'download_speed', 'type_conexion', 'use_prefix')->get();
         return response()->json(['data' => $data], 200);
     }
 
@@ -53,7 +53,7 @@ class SpeedProfileController extends Controller
 
         // $data = array_merge($data, $filter);
 
-        $data = SpeedProfile::select('id', 'name', 'upload_speed', 'download_speed', 'type_conexion', 'use_prefix')
+        $data = DB::table('speed_profiles')->select('id', 'name', 'upload_speed', 'download_speed', 'type_conexion', 'use_prefix')
         ->where('speed_profiles.id', $id)
         ->get();
         return response()->json(['data' => $data], 200);

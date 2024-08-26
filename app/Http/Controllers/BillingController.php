@@ -7,15 +7,15 @@ use App\Models\BillingHistory;
 use App\Models\Olt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class BillingController extends Controller
 {
 
     public function index()
     {
-        $data = Billing::join('olts', 'billings.olt_id', 'olts.id')
-        ->join('subscription_status', 'billings.subscription_status_id', 'subscription_status.status_id')
-        ->select(
+
+        $data = DB::table('billings')->leftJoin('olts', 'billings.olt_id', '=', 'olts.id')->leftJoin('subscription_status', 'billings.subscription_status_id', '=', 'subscription_status.status_id')->select(
             'billings.id as id',
             'olts.name as olt_name',
             'billings.monthly_price as monthly_price_id',
@@ -35,10 +35,11 @@ class BillingController extends Controller
         $orderBy = $request->input("orderBy") ?? 'DESC';
         $pageOffset = $request->input("pageOffset") ?? 10;
 
-        $data = BillingHistory::join('billings', 'billing_history.billing_id', 'billings.id')
-        ->join('olts', 'billings.olt_id', 'olts.id')
-        ->join('users', 'billing_history.user_id', 'users.id')
-        ->join('subscription_status', 'billings.subscription_status_id', 'subscription_status.id')
+
+        $data = DB::table('billing_history')->leftJoin('billings', 'billing_history.billing_id', '=','billings.id')
+        ->leftJoin('olts', 'billings.olt_id', '=', 'olts.id')
+        ->leftJoin('users', 'billing_history.user_id', '=', 'users.id')
+        ->leftJoin('subscription_status', 'billings.subscription_status_id', '=', 'subscription_status.id')
         ->select(
             'olts.name as olt_name',
             'transaction_id as transaction_no.',

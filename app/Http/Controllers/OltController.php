@@ -14,15 +14,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Models\OltTemperature;
 use FreeDSx\Snmp\SnmpClient;
-
-
+use Illuminate\Support\Facades\DB;
 
 class OltController extends Controller
 {
 
     public function getData()
     {
-        $data = Olt::join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
+        $data = DB::table('olts')->join('hardware_versions', 'olts.olt_hardware_version_id', 'hardware_versions.id')
             ->select(
                 'olts.id',
                 'olts.name',
@@ -75,7 +74,7 @@ class OltController extends Controller
 
     public function show($id)
     {
-        $olt = Olt::where('olts.id', $id)
+        $olt = DB::table('olts')->where('olts.id', $id)
             ->join(
                 'hardware_versions',
                 'olts.olt_hardware_version_id',

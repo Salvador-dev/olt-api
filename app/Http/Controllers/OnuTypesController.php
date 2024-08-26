@@ -35,7 +35,7 @@ class OnuTypesController extends Controller
 
     public function getPonTypes(){
 
-        $data = PonType::select('id', 'name')->get();
+        $data = DB::table('pon_types')->select('id', 'name')->get();
         return response()->json(['data' => $data], 200);
 
     }
