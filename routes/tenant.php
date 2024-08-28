@@ -61,6 +61,9 @@ Route::middleware([
   Route::get('/companies/{id}', [SuperAdminController::class, 'show']);
   Route::patch('/companies/{id}', [SuperAdminController::class, 'update']);
   Route::delete('/companies/{id}', [SuperAdminController::class, 'destroy']);
+  Route::get('/companies/billings', [SuperAdminController::class, 'billings']);
+
+
   Route::get('/permissions/{id}', [UserController::class, 'getPermissions']);
 
 });

@@ -30,6 +30,92 @@ class SuperAdminController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
+    public function billings(){
+
+        $tenants = DB::table('tenants')->select('id as company')->get();
+
+        $data = [];
+
+        foreach ($tenants as $tenant) {
+
+            $tenant->pending_to_pay = null;
+            $tenant->pending_to_process = null;
+            $tenant->trial = null;
+
+            Tenancy::find($tenant->company)->run(function ($item) use ($tenant){
+
+                \Illuminate\Support\Facades\Log::debug($item);
+
+                $billings = DB::table('billings')->get();
+
+                \Illuminate\Support\Facades\Log::debug($billings);
+
+                $expiredArray = $billings->filter(function($billing){
+                    return $billing->subscription_status_id == 0;
+                });
+
+                if($expiredArray->isEmpty()){
+
+                    $processingArray = $billings->filter(function($billing){
+                        return $billing->subscription_status_id == 3;
+                    });
+
+                    if($processingArray->isEmpty()){
+
+                        $trialArray = $billings->filter(function($billing){
+                            return $billing->subscription_status_id == 2;
+                        });
+
+                        if($trialArray->isEmpty()){
+
+                            $activeArray = $billings->filter(function($billing){
+                                return $billing->subscription_status_id == 3;
+                            });
+
+                            if(!$activeArray->isEmpty()){
+            
+                                $tenant->subscription_status = 'Active';
+            
+                            }
+        
+                        } else {
+        
+                            foreach ($trialArray as $trial) {
+                                $tenant->trial += $trial->monthly_price;
+                            }
+        
+                            $tenant->subscription_status = 'Trial';
+        
+                        }
+    
+                    } else {
+    
+                        foreach ($processingArray as $processing) {
+                            $tenant->pending_to_process += $processing->monthly_price;
+                        }
+    
+                        $tenant->subscription_status = 'Processing';
+    
+                    }
+
+                } else {
+
+                    foreach ($expiredArray as $expired) {
+                        $tenant->pending_to_pay += $expired->monthly_price;
+                    }
+
+                    $tenant->subscription_status = 'Expired';
+
+                }
+
+            });
+
+            array_push($data, $tenant);
+        }
+    
+        return response()->json(['data' => $data], 200);
+    }
+
     public function show($id){
         
         $data = Tenant::find($id);
