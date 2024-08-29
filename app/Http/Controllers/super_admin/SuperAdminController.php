@@ -150,7 +150,7 @@ class SuperAdminController extends Controller
                         if($trialArray->isEmpty()){
 
                             $activeArray = $billings->filter(function($billing){
-                                return $billing->subscription_status_id == 3;
+                                return $billing->subscription_status_id == 1;
                             });
 
                             if(!$activeArray->isEmpty()){
