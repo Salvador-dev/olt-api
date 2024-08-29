@@ -58,6 +58,8 @@ Route::middleware([
 
   Route::get('/companies/listing', [SuperAdminController::class, 'index']);
   Route::get('/companies/billings', [SuperAdminController::class, 'billings']);
+  Route::get('/companies/billings/{id}', [SuperAdminController::class, 'showBilling']);
+  Route::get('/billing/history/{id}', [SuperAdminController::class, 'billingHistory']);
   Route::post('/companies', [entity::class, 'registered']);
   Route::get('/companies/{id}', [SuperAdminController::class, 'show']);
   Route::patch('/companies/{id}', [SuperAdminController::class, 'update']);
