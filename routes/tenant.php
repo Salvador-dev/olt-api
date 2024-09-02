@@ -55,7 +55,6 @@ Route::middleware([
   'auth.key',
   // 'auth:sanctum',
 ])->prefix('admin')->group(function () {
-
   Route::get('/companies/listing', [SuperAdminController::class, 'index']);
   Route::get('/companies/billings', [SuperAdminController::class, 'billings']);
   Route::get('/companies/billings/{id}', [SuperAdminController::class, 'showBilling']);
@@ -64,6 +63,7 @@ Route::middleware([
   Route::get('/companies/{id}', [SuperAdminController::class, 'show']);
   Route::patch('/companies/{id}', [SuperAdminController::class, 'update']);
   Route::delete('/companies/{id}', [SuperAdminController::class, 'destroy']);
+  Route::post('change/password', [AuthController::class, 'changePassword']);
 
 
   Route::get('/permissions/{id}', [UserController::class, 'getPermissions']);
@@ -74,12 +74,14 @@ Route::middleware([
 Route::middleware(['tenant', InitializeTenancyByPath::class])
     ->prefix('{tenant}')
     ->group(function () {
-
+      Route::post('change/password', [AuthController::class, 'changePassword']);
         Route::middleware([
             'auth.key',
             'auth:sanctum',
         ])->group(function () {
-            Route::post('change/password', [AuthController::class, 'changePassword']);
+
+
+  
 
             Route::get('/user/listing', [UserController::class, 'index']);
 
