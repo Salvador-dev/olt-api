@@ -113,6 +113,7 @@ Route::middleware(['tenant', InitializeTenancyByPath::class])
             Route::patch('/billing/{id}', [BillingController::class, 'update']);
             Route::post('/billing/history', [BillingController::class, 'storeHistory']);
             Route::post('/billing/sendBill', [BillMailController::class, 'sendBill']);
+            Route::post('/billing/stripeCheckout', [BillingController::class, 'stripeCheckout']);
 
             Route::get('/dashboard', [DashboardController::class, 'dashboard']);
             Route::get('/dashboard/showByOlt/{olt_id}', [DashboardController::class, 'showByOlt']);
