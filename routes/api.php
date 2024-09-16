@@ -16,6 +16,7 @@ use App\Http\Controllers\entity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\super_admin\SuperAdminController;
 use App\Http\Middleware\Cors; 
 
@@ -35,4 +36,5 @@ use App\Http\Middleware\Cors;
     Route::post('company', [entity::class, 'registered']);
     Route::post('login', [entity::class, 'login']);
     Route::get('logout', [entity::class, 'logout']);
+
 
