@@ -11,37 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class BillingController extends Controller
 {
-
-    public function stripeCheckout(Request $request){
-
-        $stripeSecretKey = 'sk_test_51PvkQjLyDYmMLfv5xxFrEgJZbr8LCY8JDzsuya0bnORcMdkBLhZAh8L25ByCJROnLchJO0EHLdjm05SsrpGQWWAu00pDGNv52f';
-        $companyId = $request->company;
-
-        \Stripe\Stripe::setApiKey($stripeSecretKey);
-        header('Content-Type: application/json');
-
-        $YOUR_DOMAIN = 'https://olt.management';
-
-        $checkout_session = \Stripe\Checkout\Session::create([
-        'line_items' => [[
-            # Provide the exact Price ID (e.g. pr_1234) of the product you want to sell
-            'price' => 'price_1PvoLELyDYmMLfv5QBSumsxt',
-            'quantity' => 1,
-        ]],
-        'mode' => 'subscription',
-        'success_url' => $YOUR_DOMAIN . '/' . $companyId . '/dashboard/billing?payment=success',
-        'cancel_url' => $YOUR_DOMAIN . '/' . $companyId . '/dashboard/billing?payment=cancel',
-        ]);
-
-        header("HTTP/1.1 303 See Other");
-        header("Location: " . $checkout_session->url);
-
-        return response()->json([
-            'data' => $checkout_session
-        ]);
-
-    }
-
+    
     public function index()
     {
 
