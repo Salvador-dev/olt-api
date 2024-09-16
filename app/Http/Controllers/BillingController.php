@@ -20,7 +20,7 @@ class BillingController extends Controller
         \Stripe\Stripe::setApiKey($stripeSecretKey);
         header('Content-Type: application/json');
 
-        $YOUR_DOMAIN = 'http://localhost:3333';
+        $YOUR_DOMAIN = 'https://olt.management';
 
         $checkout_session = \Stripe\Checkout\Session::create([
         'line_items' => [[
