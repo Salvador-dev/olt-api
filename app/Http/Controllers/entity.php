@@ -34,7 +34,7 @@ class entity extends Controller
     
             if(empty($tenants) && empty($emails)){
 
-                DB::beginTransaction();
+                // DB::beginTransaction();
     
                 $tenant = Tenant::create([
                     'id' => $id,
@@ -57,7 +57,7 @@ class entity extends Controller
                     $user->assignRole('admin');
                 });
     
-                DB::commit();
+                // DB::commit();
 
                 DB::connection('mysql')->insert('insert into login_emails (email, company) values (?, ?)', [$email, $id]);
 
