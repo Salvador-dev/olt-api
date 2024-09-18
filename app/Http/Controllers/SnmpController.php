@@ -24,7 +24,8 @@ class SnmpController extends Controller
          $olt = Olt::where("id",$id)->first();
 
          $host = $olt->ip;
-         $community = $olt->snmp_read_only;
+         //Aquí en la comunidad es variable, pero para los get, se utiliza 'public'
+         $community = 'public';
 
          $snmp = new Snmp();
          
@@ -1198,6 +1199,36 @@ class SnmpController extends Controller
             }
         }
     }
+
+    public function testOlt($id)
+    {
+        $snmp = $this->getSnmpClient($id);
+        $oid = '1.3.6.1.2.1.2.2.1.8'; // OID para el estado de las interfaces
+        $maxRepetitions = 10; // Número de repeticiones (debe ser un entero)
+        $nonRepeaters = 0; // Usualmente se mantiene en 0 para getBulk
+    
+        try {
+            // Realizar un getBulk con los parámetros correctos
+            $bulkResponse = $snmp->getBulk($nonRepeaters, $maxRepetitions, $oid);
+            $results = [];
+    
+            foreach ($bulkResponse as $responseOid) {
+                $value = $responseOid->getValue()->getValue();
+                $oidName = $responseOid->getOid();
+    
+                // Convertir el valor SNMP en un estado legible
+                $status = ($value == 1) ? 'up' : (($value == 2) ? 'down' : 'unknown');
+                $results[$oidName] = $status;
+            }
+    
+            return response()->json($results);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al recuperar OID: ' . $e->getMessage()]);
+        }
+    }
+    
+    
+
     protected function saveOidToDatabase($oid, $description)
     {
         // Crear un nuevo registro en la tabla oids

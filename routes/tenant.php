@@ -205,6 +205,7 @@ Route::middleware(['tenant', InitializeTenancyByPath::class])
           Route::get('/get/snmp/wan/{id}', [SnmpController::class, 'wanModeOnu']);
           Route::get('/get/snmp/mode/{id}', [SnmpController::class, 'onuMode']);
           Route::get('/get/snmp/onu/{id}', [SnmpController::class, 'onusRegister']);
+          Route::get('/get/snmp/test/{id}', [SnmpController::class, 'testOlt']);
 
         });
     });
