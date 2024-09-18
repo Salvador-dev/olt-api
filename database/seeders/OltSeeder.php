@@ -20,7 +20,7 @@ class OltSeeder extends Seeder
 
         // $oltData = [['name' => 'OLT-BARINAS', 'ip' => '190.97.236.254'], ['name' => 'OLT-HUAWEI-CIUDAD-ALIANZA', 'ip' => '190.103.30.76'], ['name' => 'OLT-HUAWEI-SAN-DIEGO', 'ip' => '190.120.253.220'], ['name' => 'OLT-HUAWEI-UNICENTER', 'ip' => '190.103.31.160'], ['name' => 'OLT-HUAWEI-PARAISO', 'ip' => '190.89.29.37'], ['name' => 'OLT-HUAWEI-BARCELONA', 'ip' => '190.97.236.254']];
 
-        $oltData = [['name' => 'OLT-BARINAS', 'ip' => '190.97.236.254'], ['name' => 'OLT-HUAWEI-BARQUISIMETO-OESTE-I(PRADO)', 'ip' => '190.120.252.184', 'snmp_read_ony' => 'public']];
+        $oltData = [['name' => 'OLT-HUAWEI-UNICENTER', 'ip' => '172.29.0.2'], ['name' => 'OLT-HUAWEI-BARQUISIMETO-OESTE-I(PRADO)', 'ip' => '190.120.252.184'], ['name' => 'OLT-HUAWEI-FLOR-AMARILLO', 'ip' => '190.120.253.215']];
 
 
         foreach ($oltData as $data) {
