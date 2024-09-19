@@ -1204,28 +1204,54 @@ class SnmpController extends Controller
     {
         $snmp = $this->getSnmpClient($id);
         $oid = '1.3.6.1.2.1.2.2.1.8'; // OID para el estado de las interfaces
-        $maxRepetitions = 10; // Número de repeticiones (debe ser un entero)
+        $stopOid = '1.3.6.1.2.1.2.2.1.8'; // OID de detención para dejar de iterar
+        $maxRepetitions = 10; // Número de repeticiones
         $nonRepeaters = 0; // Usualmente se mantiene en 0 para getBulk
+        $results = []; // Array para almacenar los resultados
+        $startOid = $oid; // OID de inicio para cada iteración
     
         try {
-            // Realizar un getBulk con los parámetros correctos
-            $bulkResponse = $snmp->getBulk($nonRepeaters, $maxRepetitions, $oid);
-            $results = [];
+            do {
+                // Realizar un getBulk con los parámetros correctos
+                $bulkResponse = $snmp->getBulk($nonRepeaters, $maxRepetitions, $startOid);
     
-            foreach ($bulkResponse as $responseOid) {
-                $value = $responseOid->getValue()->getValue();
-                $oidName = $responseOid->getOid();
+                // Verificar si no hay más OIDs para recorrer
+                if (empty($bulkResponse)) {
+                    break; // Salir si no hay más respuestas
+                }
     
-                // Convertir el valor SNMP en un estado legible
-                $status = ($value == 1) ? 'up' : (($value == 2) ? 'down' : 'unknown');
-                $results[$oidName] = $status;
-            }
+                // Iterar a través de las respuestas del getBulk
+                foreach ($bulkResponse as $responseOid) {
+                    $currentOid = $responseOid->getOid();
+                    $value = $responseOid->getValue()->getValue();
     
+                    // Verificar si se alcanzó el OID de detención antes de agregar el resultado
+                    if (strpos($currentOid, $stopOid) !== 0) {
+                        break 2; // Salir de los dos bucles si alcanzamos el OID de detención
+                    }
+    
+                    // Agregar el resultado al arreglo sin validar el estado
+                    $results[$currentOid] = $value;
+    
+                    // Actualizar el OID de inicio para la próxima iteración
+                    $startOid = $currentOid;
+                }
+    
+            } while (true); // Continuar hasta que no haya más respuestas
+    
+            // Devolver los resultados como JSON
             return response()->json($results);
+    
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al recuperar OID: ' . $e->getMessage()]);
         }
     }
+    
+    
+    
+    
+    
+    
     
     
 
