@@ -72,16 +72,15 @@ class OnuController extends Controller
             // ->board($board);
 
         if($search){
-            return $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
+            $data = $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
         }
 
-
         if($port){
-            return $data->where('port', $port);
+            $data = $data->where('port', $port);
         }
 
         if($board){
-            return $data->where('board', $board);
+            $data = $data->where('board', $board);
         }
 
         if ($status) {
@@ -175,16 +174,16 @@ class OnuController extends Controller
             // ->board($board);
 
         if($search){
-            return $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
+            $data = $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
         }
 
 
         if($port){
-            return $data->where('port', $port);
+            $data = $data->where('port', $port);
         }
 
         if($board){
-            return $data->where('board', $board);
+            $data = $data->where('board', $board);
         }
 
         // if($date){
@@ -257,7 +256,7 @@ class OnuController extends Controller
         // ->search($search);
 
         if($search){
-            return $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
+            $data = $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
         }
  
         if ($oltName) {
