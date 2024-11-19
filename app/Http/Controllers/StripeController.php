@@ -10,7 +10,7 @@ class StripeController extends Controller
 {
     public function stripeCheckout(Request $request){
 
-        $stripeSecretKey = 'sk_test_51PvkQjLyDYmMLfv5xxFrEgJZbr8LCY8JDzsuya0bnORcMdkBLhZAh8L25ByCJROnLchJO0EHLdjm05SsrpGQWWAu00pDGNv52f';
+        $stripeSecretKey = '';
         $companyId = $request->company;
 
         \Stripe\Stripe::setApiKey($stripeSecretKey);
