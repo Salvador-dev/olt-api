@@ -17,7 +17,7 @@ return new class extends Migration
 
             $table->foreign(['speed_profile_id'], 'onus_ibfk_9')->references(['id'])->on('speed_profiles')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign(['administrative_status_id'], 'onus_ibfk_11')->references(['status_id'])->on('administrative_status')->onUpdate('cascade')->onDelete('cascade');
-
+// CORRER MIGRACIONES
         });
     }
 

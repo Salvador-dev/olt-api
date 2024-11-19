@@ -32,7 +32,7 @@ class BillMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('soporte@olt.management', 'Fibex Olt'),
+            from: new Address('soporte@olt.management', 'OLT Manager'),
             subject: $this->data['subject'],
         );
     }

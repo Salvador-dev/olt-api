@@ -38,6 +38,8 @@ class OnuFactory extends Factory
             'name' => Str::random(7) . '-' . $this->faker->name,
             'speed_profile_id' => Arr::random([$speedProfile, null]),
             'board' => (string) rand(1, 20),
+            'latitude' => '10.487271745341458',
+            'longitude' => '-66.93616104021204',
             'port' => (string) rand(1, 15),
             'administrative_status_id' => AdministrativeStatus::inRandomOrder()->first()->status_id
         ];

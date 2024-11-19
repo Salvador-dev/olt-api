@@ -97,7 +97,7 @@
         <div class="brand-section">
             <div class="row">
                 <div class="col-6">
-                    <h1 class="text-white">FIBEX OLT</h1>
+                    <h1 class="text-white">OLT Manager</h1>
                 </div>
                 <div class="col-6">
                     <div class="company-details">

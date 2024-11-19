@@ -61,6 +61,8 @@ class OnuController extends Controller
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
                 'onus.catv',
+                'onus.latitude',
+                'onus.longitude',
                 'onus.authorization_date',
             );
 
@@ -137,7 +139,7 @@ class OnuController extends Controller
         $pageOffset = $request->input("pageOffset") ?? 10;
 
 
-        $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+        $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.status_id')
             // ->where('administrative_status.description', 'Enabled') // TODO verificar si se quieren ver onus desactivadas en seccion de configuradas
             ->where('onus.speed_profile_id', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
@@ -234,7 +236,7 @@ class OnuController extends Controller
         $oltName = $request->input("oltName") ?? null;
 
 
-        $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+        $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.status_id')
             ->where('speed_profile_id', null)
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
@@ -332,6 +334,8 @@ class OnuController extends Controller
             'auth_date' => $request['auth_date'],
             'signal_1310' => $request['signal_1310'],
             'distance' => $request['distance'],
+            'latitude' => $request['latitude'],
+            'longitude' => $request['longitude'],
             'service_port' => $request['service_port'],
             'service_port_vlan' => $request['service_port_vlan'],
             'service_port_cvlan' => $request['service_port_cvlan'],
@@ -348,7 +352,7 @@ class OnuController extends Controller
         try {
 
             $onu = Onu::where('onus.id', $id)
-                ->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.id')
+                ->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.status_id')
                 ->join('olts', 'onus.olt_id', 'olts.id')
                 ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
                 ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
@@ -375,6 +379,8 @@ class OnuController extends Controller
                     'onus.board',
                     'onus.port',
                     'onus.address',
+                    'onus.latitude',
+                    'onus.longitude',
                     'odbs.name as odb_name',
                     'onus.speed_profile_id',
                     'odbs.id as odb_id',

@@ -33,7 +33,7 @@ class BillMailController extends Controller
             }
 
             $data = [
-                'subject' => "Fibex OLT Billing",
+                'subject' => "OLT Manager Billing",
                 'name' => $request->input('name'),
                 'address' => $request->input('address'),
                 'city' => $request->input('city'),

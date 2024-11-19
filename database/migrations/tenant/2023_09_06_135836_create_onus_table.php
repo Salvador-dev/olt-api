@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('password')->nullable();
             $table->string('catv')->nullable();
-            $table->integer('administrative_status_id')->default(2);
+            $table->integer('administrative_status_id')->nullable()->default(1);
             $table->timestamp('authorization_date')->nullable();
             // $table->integer('status_id')->default(5); SE MUEVEN STATUS Y SIGNAL A TABLA DIAGNOSTICS
             // $table->integer('signal_id')->default(4);
