@@ -9,6 +9,7 @@ use App\Models\Olt;
 use App\Models\PonType;
 use App\Models\SoftwareVersion;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 
 class OltSeeder extends Seeder
 {
@@ -18,19 +19,39 @@ class OltSeeder extends Seeder
     public function run(): void
     {
 
-        // $oltData = [['name' => 'OLT-BARINAS', 'ip' => '190.97.236.254'], ['name' => 'OLT-HUAWEI-CIUDAD-ALIANZA', 'ip' => '190.103.30.76'], ['name' => 'OLT-HUAWEI-SAN-DIEGO', 'ip' => '190.120.253.220'], ['name' => 'OLT-HUAWEI-UNICENTER', 'ip' => '190.103.31.160'], ['name' => 'OLT-HUAWEI-PARAISO', 'ip' => '190.89.29.37'], ['name' => 'OLT-HUAWEI-BARCELONA', 'ip' => '190.97.236.254']];
+        $oltData = [];
 
-        $oltData = [['name' => 'OLT-HUAWEI-UNICENTER', 'ip' => '172.29.0.2'], ['name' => 'OLT-HUAWEI-BARQUISIMETO-OESTE-I(PRADO)', 'ip' => '190.120.252.184'], ['name' => 'OLT-HUAWEI-FLOR-AMARILLO', 'ip' => '190.120.253.215']];
+        try {
 
+            $url = env('AUX_API_URL');
+
+            $data = Http::withHeaders([
+                'AK' => env('API_AUTH_KEY')
+            ])->get($url . 'olts/listing');     
+
+            $oltData = $data->json()["data"];
+               
+        } catch (\Throwable $th) {
+            \Illuminate\Support\Facades\Log::debug('paso algo');
+            \Illuminate\Support\Facades\Log::debug($th);
+
+            $oltData = [
+                ['name' => 'OLT-HUAWEI-UNICENTER', 'ip' => '172.29.0.2', "olt_hardware_version" => "Huawei-MA5680T", "telnet_port"=> "2335", "snmp_port"=> "2163"], 
+                ['name' => 'OLT-HUAWEI-BARQUISIMETO-OESTE-I(PRADO)', 'ip' => '190.120.252.184', "olt_hardware_version" => "Huawei-MA5680T", "telnet_port"=> "2335", "snmp_port"=> "2163"], 
+                ['name' => 'OLT-HUAWEI-FLOR-AMARILLO', 'ip' => '190.120.253.215', "olt_hardware_version" => "Huawei-MA5680T", "telnet_port"=> "2335", "snmp_port"=> "2163"]
+            ];
+        }
 
         foreach ($oltData as $data) {
             Olt::create([
                 'name' => $data["name"],
                 'ip' => $data["ip"],
                 'olt_active' => 0,
-                'olt_hardware_version_id' => HardwareVersion::inRandomOrder()->first()->id,
+                'olt_hardware_version_id' => HardwareVersion::where("name", $data["olt_hardware_version"])->first()->id,
                 'pon_type_id' => PonType::inRandomOrder()->first()->id,
                 'olt_software_version_id' => SoftwareVersion::inRandomOrder()->first()->id,
+                'snmp_udp_port' => intval($data["snmp_port"]),
+                'telnet_port' => intval($data["telnet_port"]),
             ]);
         }
 
