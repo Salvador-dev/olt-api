@@ -2,11 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Jobs\ServicePortSeederJob;
 use App\Models\Onu;
 use App\Models\ServicePort;
 use App\Models\SpeedProfile;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ServicePortSeeder extends Seeder
 {
@@ -16,18 +18,11 @@ class ServicePortSeeder extends Seeder
     public function run(): void
     {
 
-        $speedProfiles = SpeedProfile::all();
+        
+        $currentDB = DB::connection()->getDatabaseName();
+        $id = explode('tenant', $currentDB)[1];
 
-        foreach ($speedProfiles as $speedProfile) {
-            
-            ServicePort::create([
-                'speed_profile_id' => $speedProfile->id,
-                'onu_id' => Onu::inRandomOrder()->first()->id, 
-                'tag_mode' => 'translate', 
-
-            ]);
-
-        }
-
+       ServicePortSeederJob::dispatch($id);
+       
     }
 }

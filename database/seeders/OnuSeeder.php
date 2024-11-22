@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Jobs\OnuSeederJob;
 use App\Models\Onu;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class OnuSeeder extends Seeder
 {
@@ -14,6 +16,9 @@ class OnuSeeder extends Seeder
     public function run(): void
     {
 
-        Onu::factory(300)->create();
+        $currentDB = DB::connection()->getDatabaseName();
+        $id = explode('tenant', $currentDB)[1];
+
+        OnuSeederJob::dispatch($id);
     }
 }

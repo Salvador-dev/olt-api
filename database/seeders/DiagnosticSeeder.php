@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Jobs\DiagnosticSeederJob;
 use App\Models\Diagnostic;
 use App\Models\Onu;
 use App\Models\Signal;
 use App\Models\Status;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DiagnosticSeeder extends Seeder
 {
@@ -16,23 +18,11 @@ class DiagnosticSeeder extends Seeder
      */
     public function run(): void
     {
-        $onus = Onu::all();
+       
+        $currentDB = DB::connection()->getDatabaseName();
+        $id = explode('tenant', $currentDB)[1];
 
-        foreach ($onus as $onu) {
-            
-            $signal_value = number_format(rand(-5, -60), 2);
-
-            $signal = Signal::where('max_frequency', '<=', $signal_value)->first();
-
-            Diagnostic::create([
-                'signal_value' => $signal_value, 
-                'distance' => (string) rand(100, 6000), 
-                'onu_id' => $onu->id,
-                'status_id' => Status::inRandomOrder()->first()->id,
-                'signal_id' => $signal->signal_id,
-            ]);
-            
-        }
+        DiagnosticSeederJob::dispatch($id);
 
     }
 }
