@@ -37,6 +37,8 @@ class BillingSeederJob implements ShouldQueue
     public function __construct($id)
     {
         $this->id = $id;
+        $this->faker = $this->withFaker();
+
     }
 
     /**
@@ -65,7 +67,7 @@ class BillingSeederJob implements ShouldQueue
             \Illuminate\Support\Facades\Log::debug('CURRENT DB ' . $currentDB);
 
 
-            $olts = Olt::all();
+            $olts = Olt::take(10)->get();
 
             $oltData = [
                 ['subscription_end_date' => $this->faker->dateTimeBetween($startDate = '-2 months', $endDate = 'now'), 'subscription_status_id' => 0], 

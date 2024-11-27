@@ -13,8 +13,8 @@ class PonTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        PonType::create(['name' => 'GPON']);
-        PonType::create(['name' => 'EPON']);
-        PonType::create(['name' => 'GPON | EPON']);
+        PonType::create(['name' => 'gpon']);
+        PonType::create(['name' => 'epon']);
+        // PonType::create(['name' => 'GPON | EPON']);
     }
 }

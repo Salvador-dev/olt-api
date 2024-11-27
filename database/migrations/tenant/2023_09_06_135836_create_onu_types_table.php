@@ -22,7 +22,7 @@ return new class extends Migration
             $table->bigInteger('wifi_ports')->nullable();
             $table->bigInteger('voip_ports')->nullable();
             $table->boolean('catv')->default(false);
-            $table->string('allow_custom_profiles')->nullable();
+            $table->boolean('allow_custom_profiles')->nullable();
             $table->timestamps();
         });
     }

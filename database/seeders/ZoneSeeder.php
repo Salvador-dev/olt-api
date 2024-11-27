@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Jobs\ZoneSeederJob;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Zone;
+use Illuminate\Support\Facades\DB;
 
 class ZoneSeeder extends Seeder
 {
@@ -13,12 +15,10 @@ class ZoneSeeder extends Seeder
      */
     public function run(): void
     {
-        Zone::create(['name' => 'Zona 1']);
-        Zone::create(['name' => 'Zona 2']);
-        Zone::create(['name' => 'Zona 3']);
-        Zone::create(['name' => 'Zona 4']);
-        Zone::create(['name' => 'Zona 5']);
-        Zone::create(['name' => 'Zona 6']);
+        $currentDB = DB::connection()->getDatabaseName();
+        $id = explode('tenant', $currentDB)[1];
 
+        ZoneSeederJob::dispatch($id);
     }
+    
 }

@@ -12,5 +12,6 @@ class Zone extends Model
     protected $fillable = [
         'name',
         'description',
+        'smart_olt_id'
     ];
 }

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('zones', function (Blueprint $table) {
             $table->bigInteger('id', true);
             $table->string('name');
+            $table->string('smart_olt_id')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
         });
