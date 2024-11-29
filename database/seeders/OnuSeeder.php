@@ -20,5 +20,6 @@ class OnuSeeder extends Seeder
         $id = explode('tenant', $currentDB)[1];
 
         OnuSeederJob::dispatch($id);
+
     }
 }

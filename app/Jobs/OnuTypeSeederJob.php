@@ -76,6 +76,7 @@ class OnuTypeSeederJob implements ShouldQueue
                 
                 OnuType::create([
                     'name' => $data["name"],
+                    'smart_olt_id' => $data["id"],
                     'pon_type_id' => PonType::where("name", $data["pon_type"])->first()->id,
                     'capability_id' => Capability::where("name", $data["capability"])->first()->id,
                     'allow_custom_profiles' => $data["allow_custom_profiles"] == "1" ? true : false,

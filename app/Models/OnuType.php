@@ -18,6 +18,7 @@ class OnuType extends Model
         'voip_ports',
         'catv',
         'allow_custom_profiles',
+        'smart_olt_id'
     ];
 
     public function capabilities(){

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->bigInteger('voip_ports')->nullable();
             $table->boolean('catv')->default(false);
             $table->boolean('allow_custom_profiles')->nullable();
+            $table->string('smart_olt_id')->nullable();
             $table->timestamps();
         });
     }

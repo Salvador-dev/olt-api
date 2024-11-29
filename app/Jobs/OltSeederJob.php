@@ -69,6 +69,9 @@ class OltSeederJob implements ShouldQueue
                 
                     $oltData = $data->json()["data"];
 
+                    \Illuminate\Support\Facades\Log::debug($oltData);
+
+
                 }
                    
             } catch (\Throwable $th) {
@@ -92,6 +95,7 @@ class OltSeederJob implements ShouldQueue
                     'olt_software_version_id' => SoftwareVersion::inRandomOrder()->first()->id,
                     'snmp_udp_port' => intval($data["snmp_port"]),
                     'telnet_port' => intval($data["telnet_port"]),
+                    'smart_olt_id' => $data["id"] ?? null
                 ]);
             }
            

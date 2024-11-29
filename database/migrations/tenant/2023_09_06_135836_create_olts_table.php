@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('snmp_read_write')->nullable();
             $table->bigInteger('snmp_udp_port')->nullable();
             $table->integer('ipvt_module')->nullable();
+            $table->string('smart_olt_id')->nullable();
             $table->bigInteger('pon_type_id')->nullable()->index('pon_type_id');
             $table->timestamps();
         });
