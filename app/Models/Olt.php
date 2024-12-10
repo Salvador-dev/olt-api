@@ -35,10 +35,17 @@ class Olt extends Model
     {
         return $this->hasMany(Uplink::class);
     }
+
     public function vlans()
     {
         return $this->hasMany(Vlan::class);
     }
+
+    public function temperatures()
+    {
+        return $this->hasMany(OltTemperature::class);
+    }
+
     public function olt_cards()
     {
         return $this->hasMany(OltCard::class);

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('olt_temperature', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('olt_id');
-            $table->string('uptime');
-            $table->float('env_temp');
+            $table->string('uptime')->nullable();
+            $table->float('env_temp')->nullable();
             $table->timestamps();
     
             // Definir la clave foránea
