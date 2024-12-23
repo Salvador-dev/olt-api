@@ -16,7 +16,8 @@ class OltCard extends Model
         'ports',
         'software_version',
         'olt_id',
-        'status'
+        'status',
+        'role'
     ];
 
     public function olt(){

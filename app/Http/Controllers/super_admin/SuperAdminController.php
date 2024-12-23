@@ -252,7 +252,7 @@ class SuperAdminController extends Controller
             DB::connection('mysql')->update('update login_emails set email = ? where email = ?', [$request->email, $oldEmail]);
         }
 
-        return response()->json($data, 200);
+        return response()->json(['data' => $data], 200);
     }
 
     public function destroy($id){
@@ -270,6 +270,6 @@ class SuperAdminController extends Controller
             DB::connection('mysql')->delete('delete from login_emails where company = ?', [$id]);
         }
 
-        return response()->json('Registro eliminado', 200);
+        return response()->json(['data' => 'Registro eliminado'], 200);
     }
 }

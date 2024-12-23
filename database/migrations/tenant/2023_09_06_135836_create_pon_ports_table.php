@@ -16,13 +16,15 @@ return new class extends Migration
         Schema::create('pon_ports', function (Blueprint $table) {
             $table->bigInteger('id', true);
             $table->bigInteger('pon_type_id')->default(1); 
-            $table->integer('admin_status')->comment('1: UP, 2: Down');
+            $table->integer('administrative_status_id')->nullable()->default(1);
             $table->string('onus')->nullable();
             $table->string('average_signal')->nullable();
             $table->string('description')->nullable();
             $table->string('range')->nullable();
             $table->string('tx_power')->nullable();
+            // $table->string('port')->nullable();
             $table->string('board')->nullable();
+            $table->string('pon_port')->nullable();
             $table->string('min_range')->nullable();
             $table->string('max_range')->nullable();
             $table->string('operational_status')->nullable();

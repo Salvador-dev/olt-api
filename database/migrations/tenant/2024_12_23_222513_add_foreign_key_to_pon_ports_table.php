@@ -8,27 +8,21 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('pon_ports', function (Blueprint $table) {
-            $table->foreign(['pon_type_id'], 'pon_ports_ibfk_2')->references(['id'])->on('pon_types');
-            $table->foreign(['olt_id'], 'pon_ports_ibfk_1')->references(['id'])->on('olts');
-
+            $table->foreign(['administrative_status_id'], 'pon_ports_ibfk_3')->references(['status_id'])->on('administrative_status')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('pon_ports', function (Blueprint $table) {
-            $table->dropForeign('pon_ports_ibfk_1');
+            //
         });
     }
 };

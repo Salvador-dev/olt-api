@@ -61,7 +61,7 @@ class entity extends Controller
 
                 DB::connection('mysql')->insert('insert into login_emails (email, company) values (?, ?)', [$email, $id]);
 
-                return response()->json(['created company successfully' => $id], 200);
+                return response()->json(['data' => $id, 'message' => 'created company successfully'], 200);
     
             } else {
     

@@ -74,7 +74,7 @@ class OltController extends Controller
 
     public function show($id)
     {
-        $olt = DB::table('olts')->where('olts.id', $id)
+        $olt = Olt::with('olt_cards')->with('pon_ports')->where('olts.id', $id)->with('olt_cards')
             ->join(
                 'hardware_versions',
                 'olts.olt_hardware_version_id',
@@ -85,14 +85,14 @@ class OltController extends Controller
                 'hardware_versions.name as hardware_version'
             )
             ->first();
-        $olt_cards = OltCard::where('olt_id', $id)->get();
-        $olt->olt_cards = $olt_cards;
-        $olt_uplinks = Uplink::where('olt_id', $id)->get();
-        $olt->olt_uplinks = $olt_uplinks;
-        $olt_ports = PonPort::where('olt_id', $id)->get();
-        $olt->olt_ports = $olt_ports;
-        $olt_vlan = Vlan::where('olt_id', $id)->get();
-        $olt->olt_vlan = $olt_vlan;
+        // $olt_cards = OltCard::where('olt_id', $id)->get();
+        // $olt->olt_cards = $olt_cards;
+        // $olt_uplinks = Uplink::where('olt_id', $id)->get();
+        // $olt->olt_uplinks = $olt_uplinks;
+        // $olt_ports = PonPort::where('olt_id', $id)->get();
+        // $olt->olt_ports = $olt_ports;
+        // $olt_vlan = Vlan::where('olt_id', $id)->get();
+        // $olt->olt_vlan = $olt_vlan;
 
         return response()->json(['data' => $olt], 200);
     }

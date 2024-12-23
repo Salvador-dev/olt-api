@@ -14,7 +14,7 @@ class PonPort extends Model
         'board',
         'port',
         'pon_type_id',
-        'admin_status',
+        'administrative_status_id',
         'onus',
         'onus_active',
         'average_signal',
@@ -26,5 +26,7 @@ class PonPort extends Model
         'range',
         'operational_status',
         'olt_id',
+        'pon_port',
+        // 'port'
     ];
 }

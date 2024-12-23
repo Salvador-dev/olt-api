@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('olt_cards', function (Blueprint $table) {
             $table->bigInteger('id', true);
             $table->bigInteger('slot');
-            $table->string('type');
-            $table->string('real_type');
+            $table->string('type')->nullable();
+            $table->string('real_type')->nullable();
             $table->bigInteger('ports')->nullable();
             $table->string('software_version')->nullable();
             $table->string('status')->nullable();

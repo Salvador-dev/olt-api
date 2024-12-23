@@ -48,6 +48,10 @@ class TenantSeeder extends Seeder
 
         $this->call(OltTemperatureSeeder::class);
 
+        $this->call(OltCardsSeeder::class);
+
+        $this->call(PonPortsSeeder::class);
+
         $this->call(OnuSeeder::class);
 
         $this->call(ServicePortSeeder::class);
