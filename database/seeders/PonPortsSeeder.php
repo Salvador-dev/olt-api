@@ -14,10 +14,8 @@ class PonPortsSeeder extends Seeder
      */
     public function run(): void
     {
-        // $currentDB = DB::connection()->getDatabaseName();
-        // $id = explode('tenant', $currentDB)[1];
-
-        $id = 'dell';
+        $currentDB = DB::connection()->getDatabaseName();
+        $id = explode('tenant', $currentDB)[1];
 
         PonPortsSeederJob::dispatch($id);   
     }
