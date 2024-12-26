@@ -18,5 +18,6 @@ class Vlan extends Model
         'lan_to_lan',
         'pon_ports',
         'olt_id',
+        'scope'
     ];
 }

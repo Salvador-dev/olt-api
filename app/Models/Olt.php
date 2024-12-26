@@ -31,7 +31,7 @@ class Olt extends Model
         return $this->hasMany(Onu::class);
     }
 
-    public function uplink()
+    public function uplinks()
     {
         return $this->hasMany(Uplink::class);
     }

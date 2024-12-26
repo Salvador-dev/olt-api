@@ -15,12 +15,13 @@ return new class extends Migration
     {
         Schema::create('vlans', function (Blueprint $table) {
             $table->bigInteger('id', true);
-            $table->string('description');
-            $table->boolean('multicast_vlan');
-            $table->boolean('management_voip');
-            $table->boolean('dhcp_snooping');
-            $table->boolean('lan_to_lan');
-            $table->string('pon_ports')->nullable()->comment('Campo por definir');
+            $table->string('description')->nullable();
+            $table->string('scope')->nullable();
+            $table->boolean('multicast_vlan')->default(false);
+            $table->boolean('management_voip')->default(false);
+            $table->boolean('dhcp_snooping')->default(false);
+            $table->boolean('lan_to_lan')->default(false);
+            $table->string('pon_ports')->nullable();
             $table->bigInteger('olt_id')->index('olt_id');
             $table->timestamps();
         });

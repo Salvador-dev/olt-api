@@ -46,38 +46,35 @@ class OnuSeederJob implements ShouldQueue
 
             $onusData = [];
        
-            try {
 
-                $olts = Olt::select('smart_olt_id')->get();
+            $olts = Olt::select('smart_olt_id')->get();
 
-                foreach ($olts as $olt) {
-                    $url = env('AUX_API_URL');
-    
+            foreach ($olts as $olt) {
+                $url = env('AUX_API_URL');
+
+                try {
+                    
                     $response = Http::withHeaders([
                         'AK' => env('API_AUTH_KEY')
                     ])->get($url . 'onus/unconfigured_onus_for_olt/' . $olt->smart_olt_id); 
         
                     if($response->json()["status"]){
-
+    
                         $data = $response->json()["data"];
-
+    
                         foreach ($data as $onu) {
                             array_push($onusData, $onu);
                         }
-
-                    } 
-                }
     
-                
-                   
-            } catch (\Throwable $th) {
-                \Illuminate\Support\Facades\Log::debug('paso algo');
-                \Illuminate\Support\Facades\Log::debug($th);
-              
+                    } 
+
+                } catch (\Throwable $th) {
+                    \Illuminate\Support\Facades\Log::debug('paso algo');
+                    \Illuminate\Support\Facades\Log::debug($th);
+                }
+
             }
-
-            \Illuminate\Support\Facades\Log::debug($onusData);
-
+    
             if(count($onusData) > 0){
 
                 foreach ($onusData as $data) {

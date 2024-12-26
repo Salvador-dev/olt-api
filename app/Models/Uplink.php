@@ -12,16 +12,16 @@ class Uplink extends Model
     protected $fillable = [
         'olt_id',
         'name',
-        'uplink_port',
         'description',
         'type',
-        'admin_state',
+        'administrative_status_id',
         'status',
         'negotiation',
         'mtu',
         'wavel',
         'temp',
-        'pivd_untag',
-        'mode_vlan',
+        'pivd',
+        'mode',
+        'vlan_tag',
     ];
 }

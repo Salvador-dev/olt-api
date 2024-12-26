@@ -41,23 +41,22 @@ class OltCardsSeederJob implements ShouldQueue
             \Illuminate\Support\Facades\Log::debug('TENANT ' . $tenant);
             \Illuminate\Support\Facades\Log::debug('CURRENT DB ' . $currentDB);
        
-            try {
+            $olts = Olt::select('id', 'smart_olt_id')->get();
 
-                $olts = Olt::select('id', 'smart_olt_id')->get();
+            foreach ($olts as $olt) {
+                $url = env('AUX_API_URL');
 
-                foreach ($olts as $olt) {
-                    $url = env('AUX_API_URL');
-    
+                try {
                     $response = Http::withHeaders([
                         'AK' => env('API_AUTH_KEY')
                     ])->get($url . 'olts/cards_by_olt/' . $olt->smart_olt_id); 
         
                     if($response->json()["status"]){
-
+    
                         $data = $response->json()["data"];
-
+    
                         foreach ($data as $card) {
-
+    
                             OltCard::create([
                                 'slot' => intval($card['slot']),
                                 'type' => $card['type'],
@@ -68,20 +67,17 @@ class OltCardsSeederJob implements ShouldQueue
                                 'status' => $card['status'],
                                 'role' => $card['role'] ?? 'Unknown'
                             ]);    
-
+    
                         }
-
+    
                     } 
+                } catch (\Throwable $th) {
+                    \Illuminate\Support\Facades\Log::debug('paso algo');
+                    \Illuminate\Support\Facades\Log::debug($th);
                 }
-    
-                
-                   
-            } catch (\Throwable $th) {
-                \Illuminate\Support\Facades\Log::debug('paso algo');
-                \Illuminate\Support\Facades\Log::debug($th);
-              
+
             }
-    
+
         });
     }
 }

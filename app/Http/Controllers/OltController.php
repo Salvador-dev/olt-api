@@ -74,7 +74,7 @@ class OltController extends Controller
 
     public function show($id)
     {
-        $olt = Olt::with('olt_cards')->with('pon_ports')->where('olts.id', $id)->with('olt_cards')
+        $olt = Olt::with('olt_cards')->with('pon_ports')->with('vlans')->with('uplinks')->where('olts.id', $id)
             ->join(
                 'hardware_versions',
                 'olts.olt_hardware_version_id',

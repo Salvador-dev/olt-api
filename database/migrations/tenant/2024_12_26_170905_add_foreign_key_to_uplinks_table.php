@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pon_ports', function (Blueprint $table) {
-            $table->foreign(['administrative_status_id'], 'pon_ports_ibfk_3')->references(['status_id'])->on('administrative_status')->onUpdate('cascade')->onDelete('cascade');
+        Schema::table('uplinks', function (Blueprint $table) {
+            $table->foreign(['administrative_status_id'], 'uplinks_ibfk_2')->references(['status_id'])->on('administrative_status')->onUpdate('cascade')->onDelete('cascade');
+
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pon_ports', function (Blueprint $table) {
-            $table->dropForeign('pon_ports_ibfk_3');
+        Schema::table('uplinks', function (Blueprint $table) {
+            $table->dropForeign('uplinks_ibfk_2');
         });
     }
 };

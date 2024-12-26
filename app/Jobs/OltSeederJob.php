@@ -69,9 +69,6 @@ class OltSeederJob implements ShouldQueue
                 
                     $oltData = $data->json()["data"];
 
-                    \Illuminate\Support\Facades\Log::debug($oltData);
-
-
                 }
                    
             } catch (\Throwable $th) {

@@ -52,6 +52,10 @@ class TenantSeeder extends Seeder
 
         $this->call(PonPortsSeeder::class);
 
+        $this->call(UplinkSeeder::class);
+
+        $this->call(VlanSeeder::class);
+
         $this->call(OnuSeeder::class);
 
         $this->call(ServicePortSeeder::class);
