@@ -51,7 +51,7 @@ class PonPortsSeederJob implements ShouldQueue
 
                 try {
                     
-                    $response = Http::withHeaders([
+                    $response = Http::retry(3, 500)->timeout(60)->withHeaders([
                         'AK' => env('API_AUTH_KEY')
                     ])->get($url . 'olts/pon_ports_details/' . $olt->smart_olt_id); 
         

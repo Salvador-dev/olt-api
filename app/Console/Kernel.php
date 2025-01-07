@@ -14,9 +14,9 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         //$schedule->command('monitoring')->everyMinute();
-        $schedule->command('olt:temperature')->daily();
+        // $schedule->command('olt:temperature')->daily();
         
-        // $schedule->command('data:refresh')->daily();
+        $schedule->command('data:refresh')->daily(); // olt temperature data refresh
 
     }
 

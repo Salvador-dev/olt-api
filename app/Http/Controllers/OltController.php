@@ -144,27 +144,31 @@ class OltController extends Controller
     }
 
     //Debe recibir ID del olt en cuestion
-    public function getOltTemperature()
+    public function getOltTemperature(Request $request)
     {
-        try {
-            // Obtener todos los registros de olt_temperature con información relacionada de olts
-            $oltTemperatures = OltTemperature::with('olt')->get();
-    
-            // Construir la respuesta JSON
-            $response = $oltTemperatures->map(function ($oltTemperature) {
-                return [
-                    'olt_id' => $oltTemperature->olt_id,
-                    'olt_name' => $oltTemperature->olt->name,
-                    'uptime' => $oltTemperature->uptime,
-                    'env_temp' => $oltTemperature->env_temp,
-                    'created_at' => $oltTemperature->created_at->toDateTimeString(), // Agregado
-                ];
-            });
-    
-            return response()->json($response);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+
+        $search = $request->input("search") ?? null;
+        $oltName = $request->input("oltName") ?? null;
+        $zoneName = $request->input("zone") ?? null;
+        $orderBy = $request->input("orderBy") ?? 'DESC';
+        $pageOffset = $request->input("pageOffset") ?? 10;
+
+        // Obtener todos los registros de olt_temperature con información relacionada de olts
+        $oltTemperatures = Olt::with('temperatures')->select('id', 'name')->paginate($pageOffset);
+
+        // Construir la respuesta JSON
+        // $response = $oltTemperatures->map(function ($oltTemperature) {
+        //     return [
+        //         'olt_id' => $oltTemperature->olt_id,
+        //         'olt_name' => $oltTemperature->olt->name,
+        //         'uptime' => $oltTemperature->uptime,
+        //         'env_temp' => $oltTemperature->env_temp,
+        //         'created_at' => $oltTemperature->created_at->toDateTimeString(), // Agregado
+        //     ];
+        // });
+
+        return response()->json($oltTemperatures);
+        
     }
     
 

@@ -49,7 +49,7 @@ class VlanSeederJob implements ShouldQueue
 
                 try {
                     
-                    $response = Http::withHeaders([
+                    $response = Http::retry(3, 500)->timeout(60)->withHeaders([
                         'AK' => env('API_AUTH_KEY')
                     ])->get($url . 'olts/vlans_by_olt/' . $olt->smart_olt_id); 
         

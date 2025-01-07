@@ -54,7 +54,7 @@ class OnuSeederJob implements ShouldQueue
 
                 try {
                     
-                    $response = Http::withHeaders([
+                    $response = Http::retry(3, 500)->timeout(60)->withHeaders([
                         'AK' => env('API_AUTH_KEY')
                     ])->get($url . 'onus/unconfigured_onus_for_olt/' . $olt->smart_olt_id); 
         

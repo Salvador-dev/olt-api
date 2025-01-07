@@ -46,7 +46,7 @@ class ZoneSeederJob implements ShouldQueue
     
                 $url = env('AUX_API_URL');
     
-                $data = Http::withHeaders([
+                $data = Http::retry(3, 500)->timeout(60)->withHeaders([
                     'AK' => env('API_AUTH_KEY')
                 ])->get($url . 'zones/listing');     
     

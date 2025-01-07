@@ -47,7 +47,7 @@ class OltCardsSeederJob implements ShouldQueue
                 $url = env('AUX_API_URL');
 
                 try {
-                    $response = Http::withHeaders([
+                    $response = Http::retry(3, 500)->timeout(60)->withHeaders([
                         'AK' => env('API_AUTH_KEY')
                     ])->get($url . 'olts/cards_by_olt/' . $olt->smart_olt_id); 
         
