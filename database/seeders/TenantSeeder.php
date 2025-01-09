@@ -46,27 +46,27 @@ class TenantSeeder extends Seeder
 
         $this->call(OltSeeder::class);
 
-        $this->call(OltTemperatureSeeder::class);
+        // $this->call(OltTemperatureSeeder::class);
 
-        $this->call(OltCardsSeeder::class);
+        // $this->call(OltCardsSeeder::class);
 
-        $this->call(PonPortsSeeder::class);
+        // $this->call(PonPortsSeeder::class);
 
-        $this->call(UplinkSeeder::class);
+        // $this->call(UplinkSeeder::class);
 
-        $this->call(VlanSeeder::class);
+        // $this->call(VlanSeeder::class);
 
-        $this->call(OnuSeeder::class);
+        // $this->call(OnuSeeder::class);
 
-        $this->call(ServicePortSeeder::class);
+        // $this->call(ServicePortSeeder::class);
         
-        $this->call(DiagnosticSeeder::class);
+        // $this->call(DiagnosticSeeder::class);
 
-        $this->call(ReportSeeder::class);
+        // $this->call(ReportSeeder::class);
 
-        $this->call(SubscriptionStatusSeeder::class);
+        // $this->call(SubscriptionStatusSeeder::class);
 
-        $this->call(BillingSeeder::class);
+        // $this->call(BillingSeeder::class);
 
     }
 }

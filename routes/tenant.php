@@ -171,7 +171,6 @@ Route::middleware(['tenant', InitializeTenancyByPath::class])
           Route::get('/olts/{id}', [OltController::class, 'show']);
           Route::patch('/olts/{id}', [OltController::class, 'update']);
           Route::delete('/olts/{id}', [OltController::class, 'destroy']);
-          Route::get('/olts', [OltController::class, 'paginater']);
           Route::get('/get_olts_uptime_and_env_temperature', [OltController::class, 'getOltTemperature']);
           Route::get('/get/hardware', [OltController::class, 'getHardware']);
           Route::get('/get/software', [OltController::class, 'getSoftware']);

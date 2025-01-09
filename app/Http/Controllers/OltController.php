@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\OltTemperatureJob;
 use App\Models\Olt;
 use App\Models\OltCard;
 use App\Models\HardwareVersion;
@@ -35,13 +36,6 @@ class OltController extends Controller
             ->get();
     
         return response()->json(['data' => $data], 200);
-    }
-    
-
-    public function paginater()
-    {
-        $data = Olt::with('onus')->paginate(2);
-        return response()->json($data, 200);
     }
 
     public function store(Request $request)
@@ -137,6 +131,22 @@ class OltController extends Controller
             $olt->onus()->delete();
             $olt->delete();
          
+            return response()->json(['data' => 'Success!'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function syncOltData($id)
+    {
+        try {
+            $olt = Olt::findOrFail($id);
+
+            $currentDB = DB::connection()->getDatabaseName();
+            $id = explode('tenant', $currentDB)[1];
+
+            OltTemperatureJob::dispatch($id, $olt);    
+
             return response()->json(['data' => 'Success!'], 200);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
