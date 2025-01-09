@@ -164,7 +164,20 @@ class OltController extends Controller
         $pageOffset = $request->input("pageOffset") ?? 10;
 
         // Obtener todos los registros de olt_temperature con información relacionada de olts
-        $oltTemperatures = Olt::with('temperatures')->select('id', 'name')->paginate($pageOffset);
+        $data = Olt::with('temperatures')
+            ->join('hardware_versions', 'olts.olt_hardware_version_id',  'hardware_versions.id')
+            ->join('software_versions', 'olts.olt_software_version_id',  'software_versions.id')
+            ->select('olts.id', 'olts.name');
+
+        if($search){
+            $data = $data->where('olts.name', 'LIKE', "%$search%")
+            ->orWhere('hardware_versions.name', 'LIKE', "%$search%")
+            ->orWhere('software_versions.name', 'LIKE', "%$search%");
+        }
+
+        if ($oltName) {
+            $data = $data->where('olts.name', 'LIKE', "%$oltName%");
+        }
 
         // Construir la respuesta JSON
         // $response = $oltTemperatures->map(function ($oltTemperature) {
@@ -177,7 +190,9 @@ class OltController extends Controller
         //     ];
         // });
 
-        return response()->json($oltTemperatures);
+        $data = $data->paginate($pageOffset);
+
+        return response()->json($data);
         
     }
     
