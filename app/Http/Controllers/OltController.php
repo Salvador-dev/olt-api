@@ -2,7 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\BillingSeederJob;
+use App\Jobs\DiagnosticSeederJob;
+use App\Jobs\GetSmartOltIdJob;
+use App\Jobs\OltCardsSeederJob;
 use App\Jobs\OltTemperatureJob;
+use App\Jobs\OltTemperatureSeederJob;
+use App\Jobs\OnuSeederJob;
+use App\Jobs\PonPortsSeederJob;
+use App\Jobs\ReportSeederJob;
+use App\Jobs\ServicePortSeederJob;
+use App\Jobs\UplinkSeederJob;
+use App\Jobs\VlanSeederJob;
 use App\Models\Olt;
 use App\Models\OltCard;
 use App\Models\HardwareVersion;
@@ -15,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Models\OltTemperature;
 use FreeDSx\Snmp\SnmpClient;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 
 class OltController extends Controller
@@ -62,6 +74,24 @@ class OltController extends Controller
             'ipvt_module' => $request->ipvt_module,
             'pon_type_id' => $request->pon_type_id,
         ]);
+
+        $currentDB = DB::connection()->getDatabaseName();
+        $id = explode('tenant', $currentDB)[1];
+
+        Bus::chain([
+            new GetSmartOltIdJob($id),
+            new OltTemperatureSeederJob($id),
+            new OltCardsSeederJob($id),
+            new PonPortsSeederJob($id),
+            new UplinkSeederJob($id),
+            new VlanSeederJob($id),
+            new OnuSeederJob($id),
+            new ServicePortSeederJob($id),
+            new DiagnosticSeederJob($id),
+            new ReportSeederJob($id),
+            new BillingSeederJob($id),
+        ])->dispatch();
+        // ])->dispatch()->afterResponse();
 
         return response()->json(['data' => $data], 200);
     }

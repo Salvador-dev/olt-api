@@ -30,6 +30,8 @@ class TenantSeeder extends Seeder
         
         $this->call(SignalSeeder::class);
 
+        $this->call(SubscriptionStatusSeeder::class);
+
         // SEEDERS DE ABAJO SON SOLO PARA PRUEBAS
 
         $this->call(CapabilitySeeder::class);
@@ -44,7 +46,7 @@ class TenantSeeder extends Seeder
 
         $this->call(OdbSeeder::class);
 
-        $this->call(OltSeeder::class);
+        // $this->call(OltSeeder::class);
 
         // $this->call(OltTemperatureSeeder::class);
 
@@ -63,8 +65,6 @@ class TenantSeeder extends Seeder
         // $this->call(DiagnosticSeeder::class);
 
         // $this->call(ReportSeeder::class);
-
-        // $this->call(SubscriptionStatusSeeder::class);
 
         // $this->call(BillingSeeder::class);
 
