@@ -5,9 +5,14 @@ namespace App\Http\Controllers;
 use App\Jobs\BillingSeederJob;
 use App\Jobs\DiagnosticSeederJob;
 use App\Jobs\GetSmartOltIdJob;
+use App\Jobs\OltCardsById;
 use App\Jobs\OltCardsSeederJob;
+use App\Jobs\OltPonPortsById;
 use App\Jobs\OltTemperatureJob;
 use App\Jobs\OltTemperatureSeederJob;
+use App\Jobs\OltUnconfiguredOnusById;
+use App\Jobs\OltUplinksById;
+use App\Jobs\OltVlansById;
 use App\Jobs\OnuSeederJob;
 use App\Jobs\PonPortsSeederJob;
 use App\Jobs\ReportSeederJob;
@@ -28,6 +33,7 @@ use App\Models\OltTemperature;
 use FreeDSx\Snmp\SnmpClient;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\TryCatch;
 
 class OltController extends Controller
 {
@@ -52,48 +58,92 @@ class OltController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'ip' => 'required',
-            'olt_hardware_version_id' => 'required',
-            'telnet_port' => 'required',
-            'snmp_udp_port' => 'required',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $data = Olt::create([
-            'name' => $request->name,
-            'olt_hardware_version_id' => $request->olt_hardware_version_id,
-            'olt_software_version_id' => $request->olt_software_version_id,
-            'ip' => $request->ip,
-            'telnet_port' => $request->telnet_port,
-            'telnet_username' => $request->telnet_username,
-            'telnet_password' => $request->telnet_password,
-            'snmp_read_only' => $request->snmp_read_only,
-            'snmp_read_write' => $request->snmp_read_write,
-            'snmp_udp_port' => $request->snmp_udp_port,
-            'ipvt_module' => $request->ipvt_module,
-            'pon_type_id' => $request->pon_type_id,
-        ]);
+            $request->validate([
+                'name' => 'required|max:255',
+                'ip' => 'required',
+                'olt_hardware_version_id' => 'required',
+                'telnet_port' => 'required',
+                'snmp_udp_port' => 'required',
+            ]);
+    
+            $data = Olt::create([
+                'name' => $request->name,
+                'olt_hardware_version_id' => $request->olt_hardware_version_id,
+                'olt_software_version_id' => $request->olt_software_version_id,
+                'ip' => $request->ip,
+                'telnet_port' => $request->telnet_port,
+                'telnet_username' => $request->telnet_username,
+                'telnet_password' => $request->telnet_password,
+                'snmp_read_only' => $request->snmp_read_only,
+                'snmp_read_write' => $request->snmp_read_write,
+                'snmp_udp_port' => $request->snmp_udp_port,
+                'ipvt_module' => $request->ipvt_module,
+                'pon_type_id' => $request->pon_type_id,
+            ]);
+    
+            $currentDB = DB::connection()->getDatabaseName();
+            $id = explode('tenant', $currentDB)[1];
+    
+            Bus::chain([
+                new GetSmartOltIdJob($id),
+                // new OltCardsById($id, $data->id),
+                // new PonPortsSeederJob($id),
+                // new UplinkSeederJob($id),
+                // new VlanSeederJob($id),
+                // new OnuSeederJob($id),
+                // new ServicePortSeederJob($id),
+                // new DiagnosticSeederJob($id),
+                // new ReportSeederJob($id),
+                // new BillingSeederJob($id),
+            ])->dispatch();
+            // ])->dispatch()->afterResponse();
+    
+    
+            DB::commit();
 
-        $currentDB = DB::connection()->getDatabaseName();
-        $id = explode('tenant', $currentDB)[1];
+            return response()->json(['data' => $data], 200);
 
-        Bus::chain([
-            new GetSmartOltIdJob($id),
-            new OltTemperatureSeederJob($id),
-            new OltCardsSeederJob($id),
-            new PonPortsSeederJob($id),
-            new UplinkSeederJob($id),
-            new VlanSeederJob($id),
-            new OnuSeederJob($id),
-            new ServicePortSeederJob($id),
-            new DiagnosticSeederJob($id),
-            new ReportSeederJob($id),
-            new BillingSeederJob($id),
-        ])->dispatch();
-        // ])->dispatch()->afterResponse();
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
 
-        return response()->json(['data' => $data], 200);
+    public function sync($id){
+
+        try {
+
+            $currentDB = DB::connection()->getDatabaseName();
+            $dbId = explode('tenant', $currentDB)[1];
+    
+            Bus::chain([
+                new GetSmartOltIdJob($dbId),
+                new OltCardsById($dbId, $id),
+                new OltPonPortsById($dbId, $id),
+                new OltUplinksById($dbId, $id),
+                new OltVlansById($dbId, $id),
+                new OltUnconfiguredOnusById($dbId, $id),
+                // new ServicePortSeederJob($id),
+                // new DiagnosticSeederJob($id),
+                // new ReportSeederJob($id),
+                // new BillingSeederJob($id),
+            ])->dispatch();
+            // ])->dispatch()->afterResponse();
+
+            $olt = Olt::find($id);
+            $olt->olt_active = 2;
+            $olt->save();
+
+            return response()->json(['data' => 'OLT data synchronization in progress'], 200);
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+
     }
 
     public function show($id)
@@ -123,30 +173,42 @@ class OltController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'ip' => 'required',
-            'olt_hardware_version_id' => 'required',
-            'telnet_port' => 'required',
-            'snmp_udp_port' => 'required',
-        ]);
 
-        $data = Olt::where('id', $id)->update([
-            'name' => $request->name,
-            'olt_hardware_version_id' => $request->olt_hardware_version_id,
-            'olt_software_version_id' => $request->olt_software_version_id,
-            'ip' => $request->ip,
-            'telnet_port' => $request->telnet_port,
-            'telnet_username' => $request->telnet_username,
-            'telnet_password' => $request->telnet_password,
-            'snmp_read_only' => $request->snmp_read_only,
-            'snmp_read_write' => $request->snmp_read_write,
-            'snmp_udp_port' => $request->snmp_udp_port,
-            'ipvt_module' => $request->ipvt_module,
-            'pon_type_id' => $request->pon_type_id,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        return response()->json(['data' => $data], 200);
+            $request->validate([
+                'name' => 'required|max:255',
+                'ip' => 'required',
+                'olt_hardware_version_id' => 'required',
+                'telnet_port' => 'required',
+                'snmp_udp_port' => 'required',
+            ]);
+    
+            $data = Olt::where('id', $id)->update([
+                'name' => $request->name,
+                'olt_hardware_version_id' => $request->olt_hardware_version_id,
+                'olt_software_version_id' => $request->olt_software_version_id,
+                'ip' => $request->ip,
+                'telnet_port' => $request->telnet_port,
+                'telnet_username' => $request->telnet_username,
+                'telnet_password' => $request->telnet_password,
+                'snmp_read_only' => $request->snmp_read_only,
+                'snmp_read_write' => $request->snmp_read_write,
+                'snmp_udp_port' => $request->snmp_udp_port,
+                'ipvt_module' => $request->ipvt_module,
+                'pon_type_id' => $request->pon_type_id,
+            ]);
+    
+            DB::commit();
+
+            return response()->json(['data' => $data], 200);
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+        
     }
 
     public function destroy($id)
@@ -154,11 +216,11 @@ class OltController extends Controller
         try {
             $olt = Olt::findOrFail($id);
 
-            $olt->uplink()->delete();
-            $olt->vlans()->delete();
-            $olt->olt_cards()->delete();
-            $olt->pon_ports()->delete();
-            $olt->onus()->delete();
+            // $olt->uplink()->delete();
+            // $olt->vlans()->delete();
+            // $olt->olt_cards()->delete();
+            // $olt->pon_ports()->delete();
+            // $olt->onus()->delete();
             $olt->delete();
          
             return response()->json(['data' => 'Success!'], 200);

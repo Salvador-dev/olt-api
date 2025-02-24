@@ -53,11 +53,7 @@ class GetSmartOltIdJob implements ShouldQueue
                 if($data->json()["status"]){
 
                     // optimizar y comparar tiempos
-                
                     $oltData = $data->json()["data"];
-
-                    \Illuminate\Support\Facades\Log::debug($oltData);
-
 
                 }
                    
@@ -77,7 +73,7 @@ class GetSmartOltIdJob implements ShouldQueue
                         $dataOlt = null;
 
                         foreach ($oltData as $item) {
-                            if($item['ip'] == $olt->ip){
+                            if($item['ip'] == $olt->ip && $item['name'] == $olt->name){
                                 $dataOlt = $item;
                             }
                         }

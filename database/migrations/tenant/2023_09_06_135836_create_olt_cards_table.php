@@ -18,7 +18,7 @@ return new class extends Migration
             $table->bigInteger('slot');
             $table->string('type')->nullable();
             $table->string('real_type')->nullable();
-            $table->bigInteger('ports')->nullable();
+            $table->bigInteger('ports')->nullable(); // si es nulo es porque esta caida
             $table->string('software_version')->nullable();
             $table->string('status')->nullable();
             $table->string('role')->nullable();

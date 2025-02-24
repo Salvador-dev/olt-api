@@ -22,8 +22,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('range')->nullable();
             $table->string('tx_power')->nullable();
-            // $table->string('port')->nullable();
-            $table->string('board')->nullable();
+            $table->integer('board')->comment('olt card slot');
             $table->string('pon_port')->nullable();
             $table->string('min_range')->nullable();
             $table->string('max_range')->nullable();

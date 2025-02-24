@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('unique_external_id');
             $table->string('serial');
             $table->bigInteger('olt_id')->index('olt_id');
-            $table->string('board')->nullable();
-            $table->string('port')->nullable();
+            $table->integer('board');
+            $table->integer('port');
             $table->bigInteger('onu_type_id')->index('onu_type_id');
             $table->bigInteger('zone_id')->index('zone_id');
             $table->string('name');
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('password')->nullable();
             $table->string('catv')->nullable();
-            $table->integer('administrative_status_id')->nullable()->default(1);
+            $table->integer('administrative_status_id')->default(1);
             $table->timestamp('authorization_date')->nullable();
             // $table->integer('status_id')->default(5); SE MUEVEN STATUS Y SIGNAL A TABLA DIAGNOSTICS
             // $table->integer('signal_id')->default(4);

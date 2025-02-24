@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Olt;
-use App\Models\OltCard;
+use App\Models\Vlan;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,18 +13,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Stancl\Tenancy\Facades\Tenancy;
 
-class OltCardsSeederJob implements ShouldQueue
+class OltVlansById implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $id;
+    protected $id, $oltId;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($id)
+    public function __construct($id, $oltId)
     {
         $this->id = $id;
+        $this->oltId = $oltId;
     }
 
     /**
@@ -36,47 +37,47 @@ class OltCardsSeederJob implements ShouldQueue
 
             $currentDB = DB::connection()->getDatabaseName();
 
-            \Illuminate\Support\Facades\Log::debug('======== OLT CARDS SEEDER ========');
+            \Illuminate\Support\Facades\Log::debug('======== OLT VLANS JOB ========');
             \Illuminate\Support\Facades\Log::debug('ID ' . $this->id);
             \Illuminate\Support\Facades\Log::debug('TENANT ' . $tenant);
             \Illuminate\Support\Facades\Log::debug('CURRENT DB ' . $currentDB);
        
-            $olts = Olt::select('id', 'smart_olt_id')->where('smart_olt_id', '!=', null)->get();
+            $olt = Olt::select('id', 'smart_olt_id')->where('smart_olt_id', '!=', null)->where('id', $this->oltId)->first();
 
-            foreach ($olts as $olt) {
+            if($olt->smart_olt_id != null){
+
                 $url = env('AUX_API_URL');
 
                 try {
                     $response = Http::retry(3, 500)->timeout(60)->withHeaders([
                         'AK' => env('API_AUTH_KEY')
-                    ])->get($url . 'olts/cards_by_olt/' . $olt->smart_olt_id); 
+                    ])->get($url . 'olts/vlans_by_olt/' . $olt->smart_olt_id); 
         
                     if($response->json()["status"]){
     
                         $data = $response->json()["data"];
     
-                        foreach ($data as $card) {
-    
-                            OltCard::create([
-                                'slot' => intval($card['slot']) ?? 0,
-                                'type' => $card['type'],
-                                'real_type' => $card['real_type'],
-                                'ports' => intval($card['ports']),
-                                'software_version' => $card['software_version'] ?? 'Unknown',
-                                'olt_id' => $olt->id,
-                                'status' => $card['status'],
-                                'role' => $card['role'] ?? 'Unknown'
-                            ]);    
-    
+                        foreach ($data as $vlan) {
+                            Vlan::updateOrCreate([
+                                "olt_id" => $olt->id,
+                                "vlan_id" => $vlan['id'],
+                            ],
+                            [
+                                "description" => $vlan['description'],
+                                "scope" => $vlan['scope']
+                            ]);   
                         }
     
                     } 
                 } catch (\Throwable $th) {
+                    $olt->olt_active = 0;
                     \Illuminate\Support\Facades\Log::debug('paso algo');
                     \Illuminate\Support\Facades\Log::debug($th);
                 }
 
             }
+
+            $olt->save();
 
         });
     }

@@ -22,7 +22,8 @@ class Olt extends Model
         'snmp_udp_port',
         'ipvt_module',
         'pon_type_id',
-        'smart_olt_id'
+        'smart_olt_id',
+        'olt_active'
         
     ];
 
