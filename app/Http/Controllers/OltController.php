@@ -7,6 +7,7 @@ use App\Jobs\DiagnosticSeederJob;
 use App\Jobs\GetSmartOltIdJob;
 use App\Jobs\OltCardsById;
 use App\Jobs\OltCardsSeederJob;
+use App\Jobs\OltConfiguredOnusById;
 use App\Jobs\OltPonPortsById;
 use App\Jobs\OltTemperatureJob;
 use App\Jobs\OltTemperatureSeederJob;
@@ -126,6 +127,7 @@ class OltController extends Controller
                 new OltUplinksById($dbId, $id),
                 new OltVlansById($dbId, $id),
                 new OltUnconfiguredOnusById($dbId, $id),
+                new OltConfiguredOnusById($dbId, $id),
                 // new ServicePortSeederJob($id),
                 // new DiagnosticSeederJob($id),
                 // new ReportSeederJob($id),

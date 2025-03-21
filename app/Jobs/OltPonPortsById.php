@@ -61,13 +61,12 @@ class OltPonPortsById implements ShouldQueue
     
                         foreach ($data as $ponPort) {
                             PonPort::updateOrCreate([
-                                'pon_port' => $ponPort['pon_port'],
+                                'pon_port' => intval($ponPort['pon_port']),
                                 'olt_id' => $olt->id,
+                                'board' => intval($ponPort['board']),
                             ],
                             [
-                                'board' => intval($ponPort['board']),
                                 'pon_type_id' => PonType::where("name", $ponPort['pon_type'])->first()->id,
-                                'pon_port' => $ponPort['pon_port'],
                                 'administrative_status_id' => AdministrativeStatus::where('description', $ponPort['admin_status'])->first()->id,
                                 'onus' => strval($ponPort['onus_count']),
                                 'onus_active' => intval($ponPort['online_onus_count']),

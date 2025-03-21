@@ -79,29 +79,19 @@ class OltUnconfiguredOnusById implements ShouldQueue
 
                     Onu::updateOrCreate([
                         'olt_id' => $olt->id, 
-                        'unique_external_id' => $data["external_id"] ?? "no tiene", 
+                        'unique_external_id' => $data["sn"] ?? "no tiene", 
                         'board' => $data["board"],
                         'port' => $data["port"],
                     ],
                     [
                         'serial' => $data["sn"] ?? "no tiene", 
                         'onu_type_id' => OnuType::where('smart_olt_id', $data["onu_type_id"])->first()->id ?? OnuType::inRandomOrder()->first()->id, 
-                        'zone_id' => Zone::inRandomOrder()->first()->id, // hacer zone nullable ya que respuesta de smartolt no trae zona
+                        // 'zone_id' => Zone::inRandomOrder()->first()->id, // hacer zone nullable ya que respuesta de smartolt no trae zona
                         'name' => $data["onu"],
-                        'latitude' => '10.487271745341458',
-                        'longitude' => '-66.93616104021204',
                         'administrative_status_id' => $data["is_disabled"] == 1 ? 0 : 1
                     ]);          
                     
                 }
-
-                $olt->olt_active = 1;
-
-            } else {
-
-                Onu::factory(300)->create();
-
-                $olt->olt_active = 1;
 
             }
 

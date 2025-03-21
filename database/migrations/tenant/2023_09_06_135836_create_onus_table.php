@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('board');
             $table->integer('port');
             $table->bigInteger('onu_type_id')->index('onu_type_id');
-            $table->bigInteger('zone_id')->index('zone_id');
+            $table->bigInteger('zone_id')->index('zone_id')->nullable();
             $table->string('name');
             $table->string('address')->nullable();
             $table->bigInteger('odb_id')->nullable();

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('management_voip')->default(false);
             $table->boolean('dhcp_snooping')->default(false);
             $table->boolean('lan_to_lan')->default(false);
-            $table->string('pon_ports')->nullable();
+            $table->integer('pon_ports')->nullable();
             $table->bigInteger('olt_id')->index('olt_id');
             $table->timestamps();
         });

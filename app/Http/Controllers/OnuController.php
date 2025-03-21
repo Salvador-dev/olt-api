@@ -39,25 +39,25 @@ class OnuController extends Controller
 
 
         $data = DB::table('onus')->join('olts', 'onus.olt_id', 'olts.id')
-            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
-            ->join('status', 'diagnostics.status_id', 'status.id')
-            ->join('signal', 'diagnostics.signal_id', 'signal.id')
-            ->join('zones', 'onus.zone_id', 'zones.id')
-            ->join('odbs', 'onus.odb_id', 'odbs.id')
-            ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
+            // ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            // ->join('status', 'diagnostics.status_id', 'status.id')
+            // ->join('signal', 'diagnostics.signal_id', 'signal.id')
+            // ->join('zones', 'onus.zone_id', 'zones.id')
+            // ->join('odbs', 'onus.odb_id', 'odbs.id')
+            // ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
             ->select(
                 'onus.id',
                 'onus.name',
                 'onus.unique_external_id',
-                'status.description as status',
+                // 'status.description as status',
                 'onus.serial',
-                'signal.description as signal',
+                // 'signal.description as signal',
                 'onus.olt_id',
                 'olts.name as olt_name',
                 'onus.zone_id',
-                'zones.name as zone_name',
+                // 'zones.name as zone_name',
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
                 'onus.catv',

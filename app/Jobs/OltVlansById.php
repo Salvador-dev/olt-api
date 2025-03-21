@@ -60,7 +60,7 @@ class OltVlansById implements ShouldQueue
                         foreach ($data as $vlan) {
                             Vlan::updateOrCreate([
                                 "olt_id" => $olt->id,
-                                "vlan_id" => $vlan['id'],
+                                "vlan_id" => $vlan['vlan'],
                             ],
                             [
                                 "description" => $vlan['description'],
