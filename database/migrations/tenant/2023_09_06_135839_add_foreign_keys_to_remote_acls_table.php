@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('remote_acls', function (Blueprint $table) {
-            $table->foreign(['olt_id'], 'remote_acls_ibfk_1')->references(['id'])->on('olts');
+            $table->foreign(['olt_id'], 'remote_acls_ibfk_1')->references(['id'])->on('olts')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

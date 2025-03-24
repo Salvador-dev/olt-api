@@ -31,7 +31,7 @@ class DiagnosticController extends Controller
             ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('status', 'diagnostics.status_id', 'status.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
-            ->join('odbs', 'onus.odb_id', 'odbs.id')
+            // ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('speed_profiles', 'speed_profiles.id', 'onus.speed_profile_id')
@@ -44,7 +44,7 @@ class DiagnosticController extends Controller
                 'onus.name as name',
                 'onus.serial as serial',
                 'zones.name as zone',
-                'odbs.name as odb',
+                // 'odbs.name as odb',
                 'diagnostics.updated_at as last_change'
             );
 

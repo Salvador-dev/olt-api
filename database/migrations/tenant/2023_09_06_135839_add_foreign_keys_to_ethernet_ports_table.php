@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('ethernet_ports', function (Blueprint $table) {
-            $table->foreign(['onu_id'], 'ethernet_ports_ibfk_1')->references(['id'])->on('onus');
+            $table->foreign(['onu_id'], 'ethernet_ports_ibfk_1')->references(['id'])->on('onus')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

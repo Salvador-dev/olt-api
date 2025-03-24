@@ -39,10 +39,10 @@ class OnuController extends Controller
 
 
         $data = DB::table('onus')->join('olts', 'onus.olt_id', 'olts.id')
-            // ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
-            // ->join('status', 'diagnostics.status_id', 'status.id')
-            // ->join('signal', 'diagnostics.signal_id', 'signal.id')
-            // ->join('zones', 'onus.zone_id', 'zones.id')
+            ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+            ->join('status', 'diagnostics.status_id', 'status.id')
+            ->join('signal', 'diagnostics.signal_id', 'signal.id')
+            ->join('zones', 'onus.zone_id', 'zones.id')
             // ->join('odbs', 'onus.odb_id', 'odbs.id')
             // ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
@@ -51,13 +51,13 @@ class OnuController extends Controller
                 'onus.id',
                 'onus.name',
                 'onus.unique_external_id',
-                // 'status.description as status',
+                'status.description as status',
                 'onus.serial',
-                // 'signal.description as signal',
+                'signal.description as signal',
                 'onus.olt_id',
                 'olts.name as olt_name',
                 'onus.zone_id',
-                // 'zones.name as zone_name',
+                'zones.name as zone_name',
                 'onu_types.name as onu_type',
                 'pon_types.name as pon_type',
                 'onus.catv',
@@ -139,14 +139,13 @@ class OnuController extends Controller
 
 
         $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.status_id')
-            // ->where('administrative_status.description', 'Enabled') // TODO verificar si se quieren ver onus desactivadas en seccion de configuradas
             ->where('onus.speed_profile_id', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
             ->join('status', 'diagnostics.status_id', 'status.id')
             ->join('signal', 'diagnostics.signal_id', 'signal.id')
             ->join('zones', 'onus.zone_id', 'zones.id')
-            ->join('odbs', 'onus.odb_id', 'odbs.id')
+            // ->join('odbs', 'onus.odb_id', 'odbs.id')
             ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
@@ -355,35 +354,35 @@ class OnuController extends Controller
                 ->join('olts', 'onus.olt_id', 'olts.id')
                 ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
                 ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
-                ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
-                ->join('zones', 'onus.zone_id', 'zones.id')
-                ->join('odbs', 'onus.odb_id', 'odbs.id')
-                ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
-                ->join('status', 'diagnostics.status_id', 'status.id')
-                ->join('signal', 'diagnostics.signal_id', 'signal.id')
+                // ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
+                // ->join('zones', 'onus.zone_id', 'zones.id')
+                // ->join('odbs', 'onus.odb_id', 'odbs.id')
+                // ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+                // ->join('status', 'diagnostics.status_id', 'status.id')
+                // ->join('signal', 'diagnostics.signal_id', 'signal.id')
                 ->select(
                     'onus.id',
                     'onus.name as name',
                     'onus.unique_external_id',
-                    'status.description as status',
+                    // 'status.description as status',
                     'onus.serial',
-                    'signal.description as signal',
-                    'diagnostics.signal_value as signal_frequency',
+                    // 'signal.description as signal',
+                    // 'diagnostics.signal_value as signal_frequency',
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
                     'olts.name as olt_name',
-                    'zones.name as zone_name',
-                    'zones.id as zone_id',
+                    // 'zones.name as zone_name',
+                    // 'zones.id as zone_id',
                     'onus.board',
                     'onus.port',
                     'onus.address',
                     'onus.latitude',
                     'onus.longitude',
-                    'odbs.name as odb_name',
+                    // 'odbs.name as odb_name',
                     'onus.speed_profile_id',
-                    'odbs.id as odb_id',
-                    'service_ports.vlan_id as vlan',
+                    // 'odbs.id as odb_id',
+                    // 'service_ports.vlan_id as vlan',
                     'pon_types.name as pon_type',
                     'pon_types.id as pon_type_id',
                     'onu_types.name as onu_type',
@@ -392,24 +391,24 @@ class OnuController extends Controller
                 )
                 ->first();
 
-            if ($onu) {
-                $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
-                $service_ports = ServicePort::join('speed_profiles', 'service_ports.speed_profile_id', 'speed_profiles.id')
-                    ->where('service_ports.onu_id', $onu->id)
-                    ->select(
-                        'service_ports.id as service_port',
-                        'speed_profiles.download_speed',
-                        'speed_profiles.upload_speed',
-                        'service_ports.vlan_id as vlan',
-                        'service_ports.cvlan_id as cvlan',
-                        'service_ports.svlan_id as svlan',
-                        'service_ports.tag_mode'
-                    )
-                    ->get();
+            // if ($onu) {
+            //     $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
+            //     $service_ports = ServicePort::join('speed_profiles', 'service_ports.speed_profile_id', 'speed_profiles.id')
+            //         ->where('service_ports.onu_id', $onu->id)
+            //         ->select(
+            //             'service_ports.id as service_port',
+            //             'speed_profiles.download_speed',
+            //             'speed_profiles.upload_speed',
+            //             'service_ports.vlan_id as vlan',
+            //             'service_ports.cvlan_id as cvlan',
+            //             'service_ports.svlan_id as svlan',
+            //             'service_ports.tag_mode'
+            //         )
+            //         ->get();
 
-                $onu['ethernet_ports'] = $ethernet_ports;
-                $onu['service_ports'] = $service_ports;
-            }
+            //     $onu['ethernet_ports'] = $ethernet_ports;
+            //     $onu['service_ports'] = $service_ports;
+            // }
 
             return response()->json(['data' => $onu], 200);
             

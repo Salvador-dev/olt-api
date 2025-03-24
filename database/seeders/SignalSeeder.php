@@ -13,8 +13,8 @@ class SignalSeeder extends Seeder
      */
     public function run(): void
     {
-        Signal::create(['description' => 'Very Good', 'signal_id' => 1, 'max_frequency' => -25.00]);
-        Signal::create(['description' => 'Warning', 'signal_id' => 2, 'max_frequency' => -31.00]);
+        Signal::create(['description' => 'Very Good', 'signal_id' => 1, 'max_frequency' => -30.00]);
+        Signal::create(['description' => 'Warning', 'signal_id' => 2, 'max_frequency' => -45.00]);
         Signal::create(['description' => 'Critical', 'signal_id' => 3, 'max_frequency' => -60.00]);
         Signal::create(['description' => 'Unknown', 'signal_id' => 4]);
   

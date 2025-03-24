@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('pon_ports', function (Blueprint $table) {
-            $table->foreign(['pon_type_id'], 'pon_ports_ibfk_2')->references(['id'])->on('pon_types');
-            $table->foreign(['olt_id'], 'pon_ports_ibfk_1')->references(['id'])->on('olts');
+            $table->foreign(['pon_type_id'], 'pon_ports_ibfk_2')->references(['id'])->on('pon_types')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign(['olt_id'], 'pon_ports_ibfk_1')->references(['id'])->on('olts')->onUpdate('cascade')->onDelete('cascade');
 
         });
     }

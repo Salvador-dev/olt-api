@@ -3,13 +3,17 @@
 namespace App\Jobs;
 
 use App\Models\AdministrativeStatus;
+use App\Models\Diagnostic;
 use App\Models\Olt;
 use App\Models\Onu;
 use App\Models\OnuType;
 use App\Models\PonPort;
 use App\Models\ServicePort;
+use App\Models\Signal;
 use App\Models\SpeedProfile;
+use App\Models\Status;
 use App\Models\Zone;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -102,8 +106,18 @@ class OltConfiguredOnusById implements ShouldQueue
                         'wan_mode' => $data['wan_mode'],
                         'address' => $data['address'],
                         'catv' => $data['catv'],
-                        'speed_profile_id' => SpeedProfile::where('name', $data['service_ports'][0]["upload_speed"])->first()->id, 
+                        'speed_profile_id' => SpeedProfile::where('name', $data['service_ports'][0]["upload_speed"])->first()->id,
+                        'authorization_date' => Carbon::parse($data["authorization_date"])
 
+                    ]);
+
+                    $diagnostic = Diagnostic::updateOrCreate([
+                        'onu_id' => $onu->id,
+                    ],
+                    [
+                        'signal_value' => $data['signal_1310'], 
+                        'status_id' => Status::where('description', $data['status'])->first()->id,
+                        'signal_id' => Signal::where('description', $data['signal'])->first()->id,
                     ]);
                     
                     if(count($data['service_ports']) > 0){
@@ -115,7 +129,7 @@ class OltConfiguredOnusById implements ShouldQueue
                             ],
                             [
                                 'tag_mode' => $service_port["tag_transform_mode"], 
-                                'speed_profile_id' => SpeedProfile::where('name', $service_port["upload_speed"])->first()->id, 
+                                'speed_profile_id' => SpeedProfile::where('name', $service_port["upload_speed"])->first()->id,
                             ]);
                         }
 
