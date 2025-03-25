@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Imports\OnusImport;
 use App\Models\AdministrativeStatus;
+use App\Models\Diagnostic;
 use Illuminate\Support\Facades\Cache;
 use App\Models\EthernetPort;
 use App\Models\Odb;
 use App\Models\Onu;
 use App\Models\Report;
 use App\Models\ServicePort;
+use App\Models\Signal;
 use App\Models\SpeedProfile;
+use App\Models\Status;
 use App\Models\Zone;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -140,6 +143,7 @@ class OnuController extends Controller
 
         $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.status_id')
             ->where('onus.speed_profile_id', '!=',  null)
+            ->where('onus.authorization_date', '!=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
             ->join('status', 'diagnostics.status_id', 'status.id')
@@ -235,7 +239,8 @@ class OnuController extends Controller
 
 
         $data = DB::table('onus')->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.status_id')
-            ->where('speed_profile_id', null)
+            ->where('onus.authorization_date', '=',  null)
+            ->where('onus.speed_profile_id', '=',  null)
             ->join('olts', 'onus.olt_id', 'olts.id')
             ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
             ->join('pon_types', 'pon_types.id', 'onu_types.pon_type_id')
@@ -252,17 +257,17 @@ class OnuController extends Controller
 
 
         $data = $data->orderBy('id', $orderBy);
-        // ->search($search);
 
         if($search){
-            $data = $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%");
+            $data = $data->where('onus.name', 'LIKE', "%$search%")->orWhere('onus.serial', 'LIKE', "%$search%")
+            ->where('onus.authorization_date', '=',  null)
+            ->where('onus.speed_profile_id', '=',  null);
         }
  
         if ($oltName) {
             $data = $data->where('olts.name', 'LIKE', "%$oltName%");
         }
 
-    
         $data = $data->paginate($pageOffset);
         
         return response()->json($data, 200);
@@ -345,6 +350,80 @@ class OnuController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
+    public function detail($id)
+    {
+        try {
+
+            $onu = Onu::where('onus.id', $id)
+                ->join('administrative_status', 'onus.administrative_status_id', 'administrative_status.status_id')
+                ->join('olts', 'onus.olt_id', 'olts.id')
+                ->join('onu_types', 'onus.onu_type_id', 'onu_types.id')
+                ->join('pon_types', 'onu_types.pon_type_id', 'pon_types.id')
+                ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
+                ->join('zones', 'onus.zone_id', 'zones.id')
+                ->join('odbs', 'onus.odb_id', 'odbs.id')
+                ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
+                ->join('status', 'diagnostics.status_id', 'status.id')
+                ->join('signal', 'diagnostics.signal_id', 'signal.id')
+                ->select(
+                    'onus.id',
+                    'onus.name as name',
+                    'onus.unique_external_id',
+                    'status.description as status',
+                    'onus.serial',
+                    'signal.description as signal',
+                    'diagnostics.signal_value as signal_frequency',
+                    'onus.catv',
+                    'onus.authorization_date',
+                    'onus.olt_id',
+                    'olts.name as olt_name',
+                    'zones.name as zone_name',
+                    'zones.id as zone_id',
+                    'onus.board',
+                    'onus.port',
+                    'onus.address',
+                    'onus.latitude',
+                    'onus.longitude',
+                    'odbs.name as odb_name',
+                    'onus.speed_profile_id',
+                    'odbs.id as odb_id',
+                    'service_ports.vlan_id as vlan',
+                    'pon_types.name as pon_type',
+                    'pon_types.id as pon_type_id',
+                    'onu_types.name as onu_type',
+                    'onu_types.id as onu_type_id',
+                    'administrative_status.description as administrative_status'
+                )
+                ->first();
+
+            if ($onu) {
+                $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
+                $service_ports = ServicePort::join('speed_profiles', 'service_ports.speed_profile_id', 'speed_profiles.id')
+                    ->where('service_ports.onu_id', $onu->id)
+                    ->select(
+                        'service_ports.id as service_port',
+                        'speed_profiles.download_speed',
+                        'speed_profiles.upload_speed',
+                        'service_ports.vlan_id as vlan',
+                        'service_ports.cvlan_id as cvlan',
+                        'service_ports.svlan_id as svlan',
+                        'service_ports.tag_mode'
+                    )
+                    ->get();
+
+                $onu['ethernet_ports'] = $ethernet_ports;
+                $onu['service_ports'] = $service_ports;
+            }
+
+            return response()->json(['data' => $onu], 200);
+            
+        } catch (Exception $e) {
+
+            return response()->json(array('error' => $e), 200);
+        }
+
+    }
+
     public function show($id)
     {
         try {
@@ -357,17 +436,11 @@ class OnuController extends Controller
                 // ->leftJoin('service_ports', 'service_ports.onu_id', 'onus.id')
                 // ->join('zones', 'onus.zone_id', 'zones.id')
                 // ->join('odbs', 'onus.odb_id', 'odbs.id')
-                // ->join('diagnostics', 'diagnostics.onu_id', 'onus.id')
-                // ->join('status', 'diagnostics.status_id', 'status.id')
-                // ->join('signal', 'diagnostics.signal_id', 'signal.id')
                 ->select(
                     'onus.id',
                     'onus.name as name',
                     'onus.unique_external_id',
-                    // 'status.description as status',
                     'onus.serial',
-                    // 'signal.description as signal',
-                    // 'diagnostics.signal_value as signal_frequency',
                     'onus.catv',
                     'onus.authorization_date',
                     'onus.olt_id',
@@ -390,25 +463,6 @@ class OnuController extends Controller
                     'administrative_status.description as administrative_status'
                 )
                 ->first();
-
-            // if ($onu) {
-            //     $ethernet_ports = EthernetPort::where('onu_id', $onu->id)->get();
-            //     $service_ports = ServicePort::join('speed_profiles', 'service_ports.speed_profile_id', 'speed_profiles.id')
-            //         ->where('service_ports.onu_id', $onu->id)
-            //         ->select(
-            //             'service_ports.id as service_port',
-            //             'speed_profiles.download_speed',
-            //             'speed_profiles.upload_speed',
-            //             'service_ports.vlan_id as vlan',
-            //             'service_ports.cvlan_id as cvlan',
-            //             'service_ports.svlan_id as svlan',
-            //             'service_ports.tag_mode'
-            //         )
-            //         ->get();
-
-            //     $onu['ethernet_ports'] = $ethernet_ports;
-            //     $onu['service_ports'] = $service_ports;
-            // }
 
             return response()->json(['data' => $onu], 200);
             
@@ -503,6 +557,21 @@ class OnuController extends Controller
         $data->authorization_date = now();
     
         $data->save();
+
+        // DEFINIR DE DONDE SALE EL DIAGNOSTICO
+        $signal_value = number_format(rand(-5, -60), 2);
+
+        $signal = Signal::where('max_frequency', '<=', $signal_value)->first();
+
+        $diagnostic = Diagnostic::updateOrCreate([
+            'onu_id' => $data->id,
+        ],
+        [
+            'signal_value' => $signal_value, 
+            'signal_value' => $data['signal_1310'], 
+            'status_id' => Status::inRandomOrder()->first()->id,
+            'signal_id' => $signal->signal_id,
+        ]);
 
         $data = Report::create([
             'action' => 'Authorized',

@@ -152,6 +152,7 @@ Route::middleware(['tenant', InitializeTenancyByPath::class])
           Route::get('/onus/unconfigured', [OnuController::class, 'unconfiguredOnus']);
           Route::post('/onus', [OnuController::class, 'store']);
           Route::get('/onus/{id}', [OnuController::class, 'show']);
+          Route::get('/onus/details/{id}', [OnuController::class, 'detail']);
           Route::patch('/onus/{id}', [OnuController::class, 'update']);
           Route::patch('/onus/authorize/{id}', [OnuController::class, 'authorize_onu']);
           Route::delete('/onus/{id}', [OnuController::class, 'destroy']);
